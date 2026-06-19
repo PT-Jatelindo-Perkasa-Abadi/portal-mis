@@ -1,0 +1,15 @@
+<h2>Halo, <strong><?= $this->name; ?></strong></h2>
+
+<p>Silakan gunakan kode OTP berikut untuk melanjutkan proses perubahan password. Demi keamanan, jangan
+    bagikan kode kepada siapa pun.</p>
+<p>Kode OTP berlaku selama 15 menit.</p>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td style="padding-top: 16px; padding-bottom: 16px;">
+            <div class="pre-code">
+                <pre style="margin: 0"><?= $this->otp ?></pre>
+            </div>
+        </td>
+    </tr>
+</table>

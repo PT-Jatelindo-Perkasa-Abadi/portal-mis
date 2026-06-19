@@ -1,0 +1,90 @@
+<!-- <div class="content-header">
+    <h1 class="header-title">Dashboard</h1>
+</div>
+<div class="content-body">
+    <div class="card-awaiting mb-4">
+        <img src="<?= $this->baseUrl('/assets/img/img-disbursement-waiting.svg'); ?>" alt="waiting image" />
+        <div class="d-flex flex-column flex-fill">
+            <h5 class="card-title">Disbursement <b>Awaiting</b> approval</h5>
+            <span class="card-count"><?= $this->data['waiting_approve'] ?? '0'; ?></span>
+        </div>
+        <a href="/disbursement" class="card-link">
+            <img src="<?= $this->baseUrl('/assets/img/ic-arrow-next.svg'); ?>" alt="icon next" />
+        </a>
+    </div>
+    <div class="card card-accordion shadow-none no-arrows" id="dashboardStat">
+        <div class="card-header collapsed">
+            <div class="card-title">
+                <div class="d-flex flex-column">
+                    <h1 class="fs-6 font-bold mb-0">
+                        Summary, <?= date('01 - t F Y', strtotime($this->data['transaction_month'] . '-01')); ?>
+                    </h1>
+                </div>
+            </div>
+        </div>
+        <div id="collapseDashboardStat" class="accordion-collapse collapsed" data-bs-parent="#dashboardStat">
+            <div class="accordion-body p-4 pt-0">
+                <div class="row mb-4">
+                    <div class="col-6">
+                        <div class="card shadow-none p-3">
+                            <div class="d-flex gap-3">
+                                <img src="<?= $this->baseUrl('/assets/img/img-total-disbursement.svg'); ?>"
+                                    alt="img total" />
+                                <div class="d-flex flex-column gap-1">
+                                    <h5 class="fs-7 fw-normal mb-0">Total Disbursement</h5>
+                                    <span class="fs-6 fw-bold mb-0">
+                                        <?= $this->data['total_disburse'] ?? '0'; ?>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card shadow-none p-3">
+                            <div class="d-flex gap-3">
+                                <img src="<?= $this->baseUrl('/assets/img/img-total-amount.svg'); ?>"
+                                    alt="img amount" />
+                                <div class="d-flex flex-column gap-1">
+                                    <h5 class="fs-7 fw-normal mb-0">Total Amount</h5>
+                                    <span class="fs-6 fw-bold mb-0">
+                                        Rp<?= number_format($this->data['total_amount'], 0, ',', '.'); ?>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="card p-3">
+                            <div class="d-flex gap-3">
+                                <img src="<?= $this->baseUrl('/assets/img/img-total-transaction.svg'); ?>"
+                                    alt="image total transaction" />
+                                <div class="d-flex flex-column gap-1">
+                                    <h5 class="fs-7 fw-normal mb-0">Total Transaction</h5>
+                                    <span class="fs-6 fw-bold mb-0">
+                                        <?= $this->data['total_transaction'] ?? '0'; ?>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card p-3">
+                            <div class="d-flex gap-3">
+                                <img src="<?= $this->baseUrl('/assets/img/img-fee-transaction.svg'); ?>"
+                                    alt="image total fee" />
+                                <div class="d-flex flex-column gap-1">
+                                    <h5 class="fs-7 fw-normal mb-0">Total Fee</h5>
+                                    <span class="fs-6 fw-bold mb-0">
+                                        Rp<?= number_format($this->data['total_fee'], 0, ',', '.'); ?>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> -->

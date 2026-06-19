@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <?= $this->headTitle('Portal MIS')->setSeparator(' - '); ?>
+    <meta name="theme-color" content="#0092D5">
+    <link rel="icon" href="<?= $this->baseUrl('/assets/img/cropped-Jatelindo-Warna-32x32.webp'); ?>" sizes="32x32" />
+    <link rel="icon" href="<?= $this->baseUrl('/assets/img/cropped-Jatelindo-Warna-192x192.webp'); ?>"
+        sizes="192x192" />
+    <link rel="apple-touch-icon" href="<?= $this->baseUrl('/assets/img/cropped-Jatelindo-Warna-180x180.webp'); ?>" />
+    <link rel="shortcut icon" href="<?= $this->baseUrl('/assets/img/'); ?>icon-launcher.png" />
+    <link rel="stylesheet" href="<?= $this->baseUrl('/assets/css/fonts.css'); ?>" />
+    <link rel="stylesheet" href="<?= $this->baseUrl('/assets/css/app.min.css'); ?>" />
+    <script src="<?= $this->baseUrl('/assets/js/app.min.js'); ?>"></script>
+</head>
+
+<body>
+    <div class="modal fade" id="modalLoading" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="modalLoadingLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-fit">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="d-flex flex-column align-items-center gap-2">
+                        <span class="spinner-progress"></span>
+                        <h3 id="modalLoadingTitle" class="text-neutral-100 fs-7 fw-bold mb-0">
+                            Loading
+                        </h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <aside id="sidebar-dashboard" class="sidebar">
+        <div class="sidebar-group">
+            <div class="sidebar-header">
+                <div class="header-logo">
+                    <img src="<?= $this->baseUrl('/assets/img/logo-mis-black.svg'); ?>" alt="logo" />
+                </div>
+                <div class="header-account">
+                    <div class="header-account-content">
+                        <div class="account-initial"><?= $this->initialUser; ?></div>
+                        <div class="account-content">
+                            <h5 class="account-name"><?= $this->user['fullName']; ?></h5>
+                            <h5 class="account-role">
+                                <?= $this->user['role']; ?>
+                            </h5>
+                        </div>
+                    </div>
+                    <a href="/profile" class="header-account-footer">
+                        <span>Profile Details</span>
+                        <img src="<?= $this->baseUrl('assets/img/ic-arrow-right.svg'); ?>" alt="arrow right" />
+                    </a>
+                </div>
+            </div>
+            <div class="sidebar-body">
+                <ul id="sidebarMenu" class="sidebar-menu-group">
+                    <li class="menu-item <?= $this->activeMenu('default', 'index', 'index', 'active'); ?>">
+                        <a href="/">
+                            <span class="icon-menu ic-dashboard"></span>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="menu-item <?= $this->activeMenu('summary', 'index', 'index', 'active'); ?>">
+                        <a href="/">
+                            <span class="icon-menu ic-summary"></span>
+                            <span>Rangkuman Distribusi</span>
+                        </a>
+                    </li>
+                    <li class="menu-item <?= $this->activeMenu('history', 'index', 'index', 'active'); ?>">
+                        <a href="/">
+                            <span class="icon-menu ic-report"></span>
+                            <span>Laporan Transaksi</span>
+                        </a>
+                    </li>
+                    <li class="menu-item <?= $this->activeMenu('users', 'index', 'index', 'active'); ?>">
+                        <a href="/">
+                            <span class="icon-menu ic-users"></span>
+                            <span>Kelola User</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="sidebar-footer">
+            <div class="sidebar-button" data-bs-toggle="modal" data-bs-target="#modalLogout">
+                <img src="<?= $this->baseUrl('/assets/img/ic-logout-sm.svg'); ?>" alt="logout" />
+                <span class="sidebar-button-title">Keluar</span>
+            </div>
+        </div>
+    </aside>
+    <main class="main bg-white">
+        <div class="content">
+            <?= $this->layout()->content; ?>
+        </div>
+    </main>
+
+    <div class="modal fade" id="modalLogout" data-bs-backdrop="static" data-bs-keyboard="false" data-bs-focus="false"
+        tabindex="-1" aria-labelledby="modalLogoutLabel">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="d-flex flex-column align-items-center py-4 gap-4">
+                        <img src="<?= $this->baseUrl('/assets/img/img-confirm-logout.svg'); ?>"
+                            alt="image confirm logout" />
+                        <div class="d-flex flex-column align-items-center gap-2">
+                            <h3 class="text-neutral-100 fs-5 fw-bold mb-0">
+                                Are you sure you want to logout?
+                            </h3>
+                            <p class="text-neutral-70 text-sm text-center">
+                                To monitor ongoing disbursements, please log in again
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-base flex-fit" data-bs-toggle="modal"
+                        data-bs-target="#modalLogout">
+                        No
+                    </button>
+                    <a href="/auth/logout" class="btn btn-danger flex-fit">
+                        Yes, Log out
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

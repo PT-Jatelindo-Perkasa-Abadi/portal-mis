@@ -1,0 +1,64 @@
+<div class="d-flex">
+    <img src="<?= $this->baseUrl('assets/img/logo-jatelindo-black.svg'); ?>" class="d-flex d-md-none img-fluid w-100"
+        alt="logo jatelindo">
+</div>
+<form id="login-form" class="form form-validation" method="POST" action="/auth/login" autocomplete="off">
+    <div class="form-header">
+        <h1 class="form-header-title">Masuk ke Dashboard</h1>
+        <p class="form-header-description">
+            Masuk dengan akun Anda
+        </p>
+    </div>
+    <div class="form-content">
+        <div class="form-group">
+            <label for="email" class="form-label">Email</label>
+            <input id="email" type="email" name="email" class="form-control" placeholder="Masukkan email"
+                value="<?= $this->escape($this->email); ?>" required />
+            <div class="form-feedback"></div>
+        </div>
+        <div class="form-group">
+            <div class="d-flex align-items-center justify-content-between">
+                <label for="password" class="form-label">Kata Sandi</label>
+                <a href="/auth/forgot-password" class="form-label font-medium text-danger">
+                    Lupa Kata Sandi
+                </a>
+            </div>
+            <div class="input-append append-right">
+                <input id="password" name="password" class="form-control" type="password"
+                    placeholder="Masukkan kata sandi" required />
+                <div class="append-icon icon-password" data-toggle="password"></div>
+            </div>
+            <div class="form-feedback"></div>
+        </div>
+    </div>
+    <div class="form-footer">
+        <button type="submit" class="btn btn-primary btn-full w-full" name="submit" value="signin" disabled>
+            Masuk
+        </button>
+    </div>
+</form>
+
+<p class="auth-tos"></p>
+
+<script type="text/javascript">
+$(document).ready(function() {
+    app.FormValidation.init("#login-form");
+
+    <?php if ($this->error) : ?>
+    app.FormValidation.feedback('#password', '<?= $this->error; ?>');
+    <?php endif; ?>
+
+    <?php if ($this->connectionError) : ?>
+    app.Toast.fire({
+        icon: "error",
+        iconHtml: '<img src="<?= $this->baseUrl('/assets/img/ic-toast-error.svg'); ?>" />',
+        text: "<?= $this->connectionError; ?>",
+        timer: 3000,
+        timerProgressBar: true,
+        customClass: {
+            container: "swal2-custom",
+        },
+    });
+    <?php endif; ?>
+});
+</script>

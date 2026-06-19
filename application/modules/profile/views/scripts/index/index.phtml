@@ -1,0 +1,265 @@
+<div class="content-header">
+    <h1 class="header-title">Profile</h1>
+</div>
+<div class="content-body">
+    <div class="card card-profile">
+        <div class="card-header profile-header">
+            <div class="d-flex gap-3">
+                <span class="profile-initial"><?= $this->initialUser; ?></span>
+                <div class="d-flex flex-column flex-fill">
+                    <h1 class="profile-name"><?= $this->user['fullName']; ?></h1>
+                    <span class="profile-role">
+                        <?= $this->user['role']; ?>
+                    </span>
+                </div>
+                <span class="badge badge-profile profile-active">Active</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="d-flex flex-column gap-4">
+                <div class="card card-accordion shadow-none" id="accountInformation">
+                    <div class="card-header" data-bs-toggle="collapse" data-bs-target="#collapseInformation"
+                        aria-expanded="true" aria-controls="collapseInformation">
+                        <div class="card-title">
+                            <div class="d-flex flex-column">
+                                <h1 class="fs-6 font-bold mb-0">Account Information</h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="collapseInformation" class="accordion-collapse collapse show"
+                        data-bs-parent="#accountInformation">
+                        <div class="accordion-body">
+                            <div class="d-flex flex-column p-4 py-0 border-top">
+                                <div class="d-flex flex-column gap-4">
+                                    <div class="d-flex flex-column">
+                                        <div
+                                            class="d-flex align-items-center justify-content-between py-3 border-bottom">
+                                            <span class="fs-7 text-neutral-70">Role</span>
+                                            <span class="fs-7 text-neutral-100">
+                                                <?= $this->user['role']; ?>
+                                            </span>
+                                        </div>
+                                        <div
+                                            class="d-flex align-items-center justify-content-between py-3 border-bottom">
+                                            <span class="fs-7 text-neutral-70">Username</span>
+                                            <span class="fs-7 text-neutral-100">
+                                                <?= $this->user['username']; ?>
+                                            </span>
+                                        </div>
+                                        <div
+                                            class="d-flex align-items-center justify-content-between py-3 border-bottom">
+                                            <span class="fs-7 text-neutral-70">Account Name</span>
+                                            <span class="fs-7 text-neutral-100">
+                                                <?= $this->user['fullName']; ?>
+                                            </span>
+                                        </div>
+                                        <div
+                                            class="d-flex align-items-center justify-content-between py-3 border-bottom">
+                                            <span class="fs-7 text-neutral-70">Email</span>
+                                            <span class="fs-7 text-neutral-100">
+                                                <?= $this->user['email']; ?>
+                                            </span>
+                                        </div>
+                                        <div
+                                            class="d-flex align-items-center justify-content-between py-3 border-bottom">
+                                            <span class="fs-7 text-neutral-70">Created At</span>
+                                            <span class="fs-7 text-neutral-100">
+                                                <?= $this->user['createdAt']; ?>
+                                            </span>
+                                        </div>
+                                        <div class="d-flex align-items-center justify-content-between py-3">
+                                            <span class="fs-7 text-neutral-70">Updated At</span>
+                                            <span class="fs-7 text-neutral-100">
+                                                <?= $this->user['updatedAt']; ?>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card card-accordion shadow-none" id="cardChangePassword">
+                    <div id="collapseChangePassword" class="accordion-collapse collapse show"
+                        data-bs-parent="#cardChangePassword">
+                        <div class="accordion-body">
+                            <div class="d-flex align-items-center justify-content-between p-4">
+                                <p class="form-label fs-6 text-neutral-100 fw-bold mb-0">
+                                    Settings
+                                </p>
+                                <button class="btn btn-outline-warning bg-hover-warning-subtle" data-bs-toggle="modal"
+                                    data-bs-target="#modalChangePassword">
+                                    <div class="d-flex align-items-center gap-1">
+                                        <span class="icon-lock"></span>
+                                        Change Password
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalChangePassword" data-bs-backdrop="static" data-bs-keyboard="false"
+    data-bs-focus="false" tabindex="-1" aria-labelledby="modalChangePasswordLabel">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Change Password</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" tabindex="-1" data-bs-focus="false"
+                    aria-label="Close"></button>
+            </div>
+            <form id="change-password-form" class="form form-validation d-block" action="" method="POST"
+                autocomplete="off">
+                <div class="modal-body">
+                    <div class="form-content">
+                        <div class="form-group">
+                            <label for="currentPassword" class="form-label">Current Password</label>
+                            <div class="input-append append-right">
+                                <input id="currentPassword" name="currentPassword" class="form-control" type="password"
+                                    minlength="8" placeholder="Enter current password" required />
+                                <div class="append-icon icon-password" data-toggle="password"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="newPassword" class="form-label">New Password</label>
+                            <div class="input-append append-right">
+                                <input id="newPassword" name="newPassword" class="form-control password-validate"
+                                    type="password" minlength="8" placeholder="Enter new password" required />
+                                <div class="append-icon icon-password" data-toggle="password"></div>
+                            </div>
+                            <div class="term-password mt-2" style="display: none;">
+                                <div class="d-flex align-items-center gap-2" data-rule="length">
+                                    <span class="ic icon-checklist"></span>
+                                    <span class="term-item">Minimum of 8 characters</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2" data-rule="upper">
+                                    <span class="ic icon-checklist"></span>
+                                    <span class="term-item">Must include uppercase letters (A-Z)</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2" data-rule="lower">
+                                    <span class="ic icon-checklist"></span>
+                                    <span class="term-item">Must include lowercase letters (a-z)</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2" data-rule="special">
+                                    <span class="ic icon-checklist"></span>
+                                    <span class="term-item">Must include at least one special character</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                            <div class="input-append append-right">
+                                <input id="confirmPassword" name="confirmPassword"
+                                    class="form-control password-validate" type="password" minlength="8"
+                                    placeholder="Enter new password" required />
+                                <div class="append-icon icon-password" data-toggle="password"></div>
+                            </div>
+                            <div class="term-password mt-2" style="display: none;">
+                                <div class="d-flex align-items-center gap-2" data-rule="length">
+                                    <span class="ic icon-checklist"></span>
+                                    <span class="term-item">Minimum of 8 characters</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2" data-rule="upper">
+                                    <span class="ic icon-checklist"></span>
+                                    <span class="term-item">Must include uppercase letters (A-Z)</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2" data-rule="lower">
+                                    <span class="ic icon-checklist"></span>
+                                    <span class="term-item">Must include lowercase letters (a-z)</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2" data-rule="special">
+                                    <span class="ic icon-checklist"></span>
+                                    <span class="term-item">Must include at least one special character</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary w-100">
+                        Save Password
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<?php if($this->success) : ?>
+<div id="modalSuccess" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="d-flex flex-column align-items-center pt-2 gap-4">
+                    <img src="<?= $this->baseUrl('assets/img/img-new-password.svg'); ?>" alt="image new password" />
+                    <div class="d-flex flex-column align-items-center gap-2">
+                        <h3 class="text-neutral-100 fs-5 fw-bold mb-0">
+                            Password Updated
+                        </h3>
+                        <p class="text-neutral-70 text-sm text-center">
+                            Keep your password private to ensure your account's security
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary flex-fill" data-bs-dismiss="modal"
+                    data-bs-target="#modalSuccess">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var modal = new bootstrap.Modal(document.getElementById('modalSuccess'));
+    modal.show();
+});
+</script>
+<?php endif; ?>
+
+<?php if ($this->error) : ?>
+<div class="modal fade" id="errorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="d-flex flex-column align-items-center pt-2 gap-4">
+                    <img src="<?= $this->baseUrl('assets/img/img-new-password.svg'); ?>" alt="image new password" />
+                    <div class="d-flex flex-column align-items-center gap-2">
+                        <h3 class="text-neutral-100 fs-5 fw-bold mb-0">
+                            Unable to Update Password
+                        </h3>
+                        <p class="text-neutral-70 text-sm text-center">
+                            <?= $this->error; ?>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary flex-fill" data-bs-dismiss="modal"
+                    data-bs-target="#errorModal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var modal = new bootstrap.Modal(document.getElementById('errorModal'));
+    modal.show();
+});
+</script>
+<?php endif; ?>
+
+<script>
+$(document).ready(function() {
+    app.FormValidation.init("#change-password-form");
+    app.ValidatePassword.init('.password-validate');
+});
+</script>

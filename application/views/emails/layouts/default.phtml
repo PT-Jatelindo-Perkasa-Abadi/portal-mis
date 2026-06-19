@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title><?= $this->subject ?></title>
+    <meta name="theme-color" content="#0092D5">
+    <link rel="icon" href="<?= $this->baseUrl('/assets/img/cropped-Jatelindo-Warna-32x32.webp'); ?>" sizes="32x32" />
+    <link rel="icon" href="<?= $this->baseUrl('/assets/img/cropped-Jatelindo-Warna-192x192.webp'); ?>"
+        sizes="192x192" />
+    <link rel="apple-touch-icon" href="<?= $this->baseUrl('/assets/img/cropped-Jatelindo-Warna-180x180.webp'); ?>" />
+    <link rel="shortcut icon" href="<?= $this->baseUrl('/assets/img/'); ?>icon-launcher.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@100..800&display=swap" rel="stylesheet" />
+    <style>
+    body {
+        font-family: "Sora", sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+    }
+
+    table {
+        border-collapse: collapse !important;
+    }
+
+    .container {
+        width: 80%;
+        max-width: 100%;
+        margin: 0 auto;
+        background-color: #ffffff;
+        border-radius: 0;
+        overflow: hidden;
+    }
+
+    .pre-code {
+        background: #f3f3f7;
+        display: block;
+        font-size: 1.2rem;
+        font-weight: bold;
+        letter-spacing: 4px;
+        padding: 10px 12px;
+        border: 1px solid #ebebf2;
+        border-radius: 8px;
+        width: fit-content;
+    }
+
+    .header {
+        background-image: url('<?= $this->backgroundHeader; ?>');
+        background-size: cover;
+        background-position: top center;
+        background-repeat: no-repeat;
+        color: #ffffff;
+        padding: 32px;
+        margin: 0;
+        display: block;
+    }
+
+    .content-cell {
+        padding: 32px !important;
+        /* Memaksa padding 32px atas, bawah, kanan, kiri */
+        color: #333333;
+        line-height: 1.6;
+        text-align: left;
+    }
+
+    /* Selector h2 disesuaikan dengan pembungkus barunya */
+    .content-cell h2 {
+        margin-top: 0;
+        margin-bottom: 24px;
+        font-size: 20px;
+        color: #000000;
+        font-weight: 400;
+        /* "Halo," reguler */
+        text-align: left;
+    }
+
+    .content-cell h2 strong {
+        font-weight: 700;
+        /* Variabel bold */
+    }
+
+    .content-cell p {
+        margin-top: 0;
+        /* margin-bottom: 16px; */
+        font-size: 14px;
+        color: #1c1c1c;
+        text-align: left;
+    }
+
+    .info-table {
+        width: 100%;
+        margin-top: 16px;
+        border-collapse: collapse;
+    }
+
+    .info-table td {
+        padding: 8px 0;
+        /* Jarak vertikal antar baris */
+        vertical-align: top;
+        font-size: 15px;
+        color: #1c1c1c;
+    }
+
+    .info-table .label {
+        width: 180px;
+        /* Lebar kolom kiri agar teks muat satu baris */
+        white-space: nowrap;
+        /* Memaksa teks label tetap lurus ke samping */
+        font-weight: 400;
+        /* Memastikan teks kiri TIDAK TEBAL (Reguler) */
+    }
+
+    .info-table .colon {
+        width: 20px;
+        /* Jarak untuk tanda titik dua (:) agar lurus vertikal */
+        text-align: center;
+        font-weight: 400;
+        /* Titik dua tidak tebal */
+    }
+
+    .info-table .value {
+        font-weight: 700;
+        /* Membuat variabel {{...}} di sebelah kanan menjadi TEBAL */
+    }
+
+    .label {
+        width: 120px;
+        font-weight: bold;
+    }
+
+    .footer {
+        background-color: #f9f9f9;
+        padding: 24px 32px;
+        text-align: center;
+        font-size: 12px;
+        color: #888888;
+        border-top: 1px solid #eeeeee;
+    }
+
+    .btn-link {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .btn-click {
+        display: inline-block;
+        background-color: #3A7BF6;
+        /* Sesuai Hex di Figma */
+        color: #ffffff !important;
+        /* Warna teks putih */
+        font-family: "Sora", sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        /* Bold */
+        text-decoration: none;
+        /* Menghilangkan garis bawah tautan */
+        padding: 10px 16px;
+        /* Padding sesuai Figma (Top/Bottom Left/Right) */
+        line-height: 28px;
+        /* Menjaga total tinggi elemen mendekati 48px */
+        border-radius: 8px;
+        /* Radius sesuai Figma */
+        text-align: center;
+    }
+
+    hr {
+        border: 0;
+        border-top: 1px solid #eeeeee;
+        margin: 30px 0;
+    }
+
+    @media only screen and (min-width: 651px) {
+        body {
+            background-color: #f4f4f4;
+            color: #12161c;
+        }
+
+        .logo-white {
+            display: none !important;
+        }
+
+        .logo-dark {
+            display: block !important;
+        }
+
+        .pre-code {
+            font-size: 1.5rem !important;
+        }
+
+        .text-company {
+            color: #888a8d !important;
+        }
+
+        .text-company,
+        .font-heading,
+        .font-body {
+            font-size: 1rem !important;
+        }
+
+        .font-heading,
+        .font-body {
+            color: #12161c !important;
+        }
+    }
+
+    /* ==========================================================================
+   Responsive Queries (Mobile / Layar Kecil)
+   ========================================================================== */
+    @media screen and (max-width: 650px) {
+
+        body {
+            background-color: #ffffff !important;
+        }
+
+        /* Membalik urutan susunan Header (Logo di atas, teks di bawah) */
+        .header-table {
+            display: table !important;
+            width: 100% !important;
+        }
+
+        .header-table tr {
+            display: table !important;
+            width: 100% !important;
+        }
+
+        .header-table .header-logo {
+            display: table-header-group !important;
+            width: 100% !important;
+            text-align: left !important;
+            padding-bottom: 8px !important;
+            /* Jarak dari logo ke elemen di bawahnya */
+        }
+
+        .header-table .header-title {
+            display: table-footer-group !important;
+            width: 100% !important;
+            text-align: left !important;
+            font-size: 20px !important;
+            /* Mengecilkan font jadi 20px */
+            padding-top: 18px !important;
+            /* Memberikan padding top 18px */
+        }
+
+        .header-table .header-logo img {
+            margin: 0 !important;
+        }
+
+        /* --- Perbaikan Info Table Agar Tidak Terpotong di Mobile --- */
+        .info-table .label {
+            width: 135px !important;
+            /* Mempersempit kolom label agar sisa kolom kanan luas */
+            white-space: normal !important;
+            font-size: 14px !important;
+        }
+
+        .info-table .colon {
+            width: 15px !important;
+        }
+
+        .info-table .value {
+            font-size: 14px !important;
+            word-break: break-word;
+            /* Teks variabel panjang otomatis patah baris dengan aman */
+        }
+    }
+
+    /* ==========================================================================
+    Responsive Queries (Dark Mode Global - Dipisah, Tidak Boleh Bersarang)
+   ========================================================================== */
+    @media (prefers-color-scheme: dark) {
+        body {
+            background-color: #2a2d33 !important;
+        }
+
+        .logo-white {
+            display: block !important;
+        }
+
+        .pre-code {
+            background-color: #727272 !important;
+            border-color: #727272 !important;
+        }
+
+        .border-color {
+            border-left: 1px solid #5a5a5a !important;
+            border-right: 1px solid #5a5a5a !important;
+        }
+
+        .border-color-2 {
+            border-left: 1px solid #5a5a5a !important;
+            border-right: 1px solid #5a5a5a !important;
+            border-bottom: 1px solid #5a5a5a !important;
+        }
+
+        .hr {
+            margin: 0 !important;
+            padding: 0 !important;
+            border: 1px solid #e7e8e8 !important;
+        }
+
+        .text-company,
+        .font-heading,
+        .font-body {
+            color: #fff !important;
+        }
+    }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <?= $this->partial('partials/header.phtml', ['logo' => $this->logoUrl]); ?>
+        <?= $this->content; ?>
+        <?= $this->partial('partials/footer.phtml'); ?>
+    </div>
+</body>
+
+</html>
