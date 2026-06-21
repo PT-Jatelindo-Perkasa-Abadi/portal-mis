@@ -22,6 +22,11 @@ class App_Service_Api
         $this->activityId = Zend_Registry::get('activity_id');
     }
 
+    private function getBasicAuthHeader()
+    {
+        return 'Basic ' . base64_encode($this->userAuth . ':' . $this->userPassword);
+    }
+
     public function setToken($token)
     {
         $this->accessToken = $token;
@@ -31,16 +36,17 @@ class App_Service_Api
     {
         $url = rtrim($this->baseUrl, '/') . '/' . ltrim($uri, '/');
         $client = new Zend_Http_Client($url);
+        $signature = $this->accessToken . $this->clientSecret . json_encode($payload);
         $headers = [
+            'Authorization' => "Bearer $this->accessToken",
             'X-API-KEY' => $this->apiKey,
+            'X-SIGNATURE' => hash("sha256", $signature),
             'Content-Type' => 'application/json',
-            'Authorization' => "Bearer $this->accessToken"
         ];
 
-        if ($isLoggedIn) {
-            $signature = $this->accessToken . $this->clientSecret . json_encode($payload);
-            $headers['X-SIGNATURE'] = hash("sha256", $signature);
-        }
+        // if ($isLoggedIn) {
+        //     $headers['X-SIGNATURE'] = hash("sha256", $signature);
+        // }
 
         $client->setHeaders($headers);
 
@@ -91,32 +97,19 @@ class App_Service_Api
     //     return $this->request('POST', '/service/inquiry-bulk', $payload);
     // }
 
-    public function disbursementBulk($credentialIdNonsnap, $id, $type, $approvedBy)
-    {
-        return $this->request(
-            'POST',
-            '/service/disburse',
-            [
-                "credentialIdNonsnap" => (string) $credentialIdNonsnap,
-                "disbursementId" => (string) $id,
-                "disbursementType" => $type,
-                // "accounts" => $accounts,
-                "approvedBy" => $approvedBy,
-            ]
-        );
-    }
-
     public function authorization()
     {
-        $path = '/service/authorization';
+        $path = '/auth/login';
         $url = rtrim($this->baseUrl, '/') . '/' . ltrim($path, '/');
         $client = new Zend_Http_Client($url);
         $payload = [
-            "grantType" => "client_credentials"
+            "Email" => "kanto@jatelindo.co.id",
+            "Password" => "123456"
         ];
         $headers = [
             'X-API-KEY' => $this->apiKey,
-            'Content-Type' => 'application/json'
+            'Content-Type' => 'application/json',
+            'Authorization' => 'Basic ' . base64_encode($this->getBasicAuthHeader())
         ];
         $client->setAuth($this->userAuth, $this->userPassword);
         $client->setHeaders($headers);
@@ -128,19 +121,19 @@ class App_Service_Api
         $ip = App_Log_Context::getIp();
         $jsonHeader = json_encode($headers);
         $jsonBody = json_encode($payload);
-        $this->logger->info("IP: $ip | ACTIVITY_ID: $this->activityId | REQUEST TO $url METHOD=GET BODY=$jsonBody HEADER=$jsonHeader");
+        $this->logger->info("IP: $ip | ACTIVITY_ID: $this->activityId | REQUEST TO $url METHOD=POST BODY=$jsonBody HEADER=$jsonHeader");
 
         try {
-            $response = $client->request('GET');
+            $response = $client->request('POST');
             $responseJson = $response->getBody();
             $responseArray = json_decode($responseJson, true);
-            $httpCode = $responseArray['responseCode'] ?? 'unknown';
+            $httpCode = $responseArray['code'] ?? 'unknown';
 
             $maskedResponse = App_Log_Context::mask($responseArray);
             $this->logger->info("IP: $ip | ACTIVITY_ID: $this->activityId | RESPONSE FROM $url METHOD=GET STATUS=$httpCode BODY=" . json_encode($maskedResponse));
 
-            if ($httpCode == '2002100') {
-                $this->setToken($responseArray['token']);
+            if ($httpCode == '200') {
+                $this->setToken($responseArray['msg']['access_token']);
             } else {
                 throw new Exception($responseArray['responseMessage']);
             }
