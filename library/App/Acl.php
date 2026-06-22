@@ -14,6 +14,7 @@ class App_Acl extends Zend_Acl
         $this->addRole(new Zend_Acl_Role('checker'), 'guest');
         $this->addRole(new Zend_Acl_Role('admin'), 'guest');
         $this->addRole(new Zend_Acl_Role('admin mis'), 'guest');
+        $this->addRole(new Zend_Acl_Role('guest mis'), 'guest');
 
         /**
          * ======================
@@ -66,9 +67,10 @@ class App_Acl extends Zend_Acl
 
         /**
          * ======================
-         * REKON
+         * GUEST MIS
          * ======================
          */
+        $this->allow('guest mis', 'default:index');
 
 
         /**
@@ -89,6 +91,7 @@ class App_Acl extends Zend_Acl
         $this->allow('checker', 'profile:index');
         $this->allow('admin', 'profile:index');
         $this->allow('admin mis', 'profile:index');
+        $this->allow('guest mis', 'profile:index');
 
         /**
          * ======================
@@ -99,5 +102,6 @@ class App_Acl extends Zend_Acl
         $this->allow('checker', 'auth:index', ['logout']);
         $this->allow('admin', 'auth:index', ['logout']);
         $this->allow('admin mis', 'auth:index', ['logout']);
+        $this->allow('guest mis', 'auth:index', ['logout']);
     }
 }
