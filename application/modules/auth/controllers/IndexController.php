@@ -44,6 +44,8 @@ class Auth_IndexController extends Zend_Controller_Action
         $payload = [
             'params' => $params
         ];
+        Zend_Debug::dump($payload);
+        exit;
 
         /**
          * Check email exists
@@ -66,7 +68,12 @@ class Auth_IndexController extends Zend_Controller_Action
         }
 
         if (!$response['msg'][0]['email']) {
-            $this->view->error = 'Invalid email or password';
+            if ($response['msg'][0]['ERROR'] == 'Invalid credentials') {
+                $this->view->error = 'Invalid email or password';
+                return;
+            }
+
+            $this->view->error = $response['msg'][0]['ERROR'];
             return;
         }
 
