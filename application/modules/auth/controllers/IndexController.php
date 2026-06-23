@@ -44,8 +44,6 @@ class Auth_IndexController extends Zend_Controller_Action
         $payload = [
             'params' => $params
         ];
-        Zend_Debug::dump($payload);
-        exit;
 
         /**
          * Check email exists
