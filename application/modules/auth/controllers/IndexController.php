@@ -61,7 +61,7 @@ class Auth_IndexController extends Zend_Controller_Action
         }
 
         if ($response['code'] != '200') {
-            $this->view->error = $response['responseMessage'];
+            $this->view->error = $response['msg'];
             return;
         }
 
