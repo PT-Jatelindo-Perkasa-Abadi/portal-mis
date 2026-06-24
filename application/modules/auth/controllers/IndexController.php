@@ -6,6 +6,9 @@ class Auth_IndexController extends Zend_Controller_Action
         $this->_helper->redirector->gotoUrl('/auth/login');
     }
 
+    /**
+     * @var Zend_Controller_Action
+     */
     public function loginAction()
     {
         $this->view->headTitle('Login');
@@ -41,9 +44,7 @@ class Auth_IndexController extends Zend_Controller_Action
             "@p_session_token",
             "@p_refresh_token"
         ];
-        $payload = [
-            'params' => $params
-        ];
+        $payload = $params;
 
         /**
          * Check email exists
@@ -70,84 +71,25 @@ class Auth_IndexController extends Zend_Controller_Action
             return;
         }
 
-        /**
-         * Get user data
-         */
-        // $result = $api->sp('sp_user_get_by_email', [$data['email']]);
-
-        // if (!$result['data']) {
-        //     $this->view->error = 'Invalid email or password';
-        //     return;
-        // }
-
         $user = $response['msg'][0];
 
-        /**
-         * Check status LOCKED
-         */
-        // if ($user['status'] === 'LOCKED') {
-        //     $this->view->error = 'Account has been locked. Please contact administrator.';
-        //     return;
-        // }
+        $userProfile = [
+            'id' => $user['id'],
+            'username' => $user['username'],
+            'fullName' => $user['full_name'],
+            'email' => $user['email'],
+            'role' => strtolower($user['role_name'])
+        ];
 
-        /**
-         * Check status INACTIVE
-         */
-        // if ($user['status'] === 'INACTIVE') {
-        //     $this->view->error = 'Account is inactive. Please contact administrator.';
-        //     return;
-        // }
-
-        /**
-         * Verify password
-         */
-        // if (password_verify($data['password'], $user['password'])) {
-            /**
-             * Reset failed login attempt
-             */
-            // $api->sp('user_reset_failed_login', [$data['email']]);
-
-            $userProfile = [
-                'id' => $user['id'],
-                'username' => $user['username'],
-                'fullName' => $user['full_name'],
-                'email' => $user['email'],
-                'role' => strtolower($user['role_name'])
-            ];
-
-            App_Service_Session::set('user', $userProfile);
-            App_Service_Session::refreshActivity();
-            if (strtolower($user['role_name']) === 'rekon') {
-                $this->_helper->redirector->gotoUrl('/history');
-            } else {
-                $redirectUrl = App_Service_Session::getRedirectUrl('/');
-                $this->_helper->redirector->gotoUrl($redirectUrl);
-            }
-        // }
-
-        /**
-         * Password invalid
-         */
-        // $api->sp('user_failed_login', [$data['email']]);
-
-        /**
-         * Re-fetch latest user state
-         */
-        // $latestResult = $api->sp('sp_user_get_by_email', [$data['email']]);
-        // $latestUser = $latestResult['data'][0];
-
-        /**
-         * User became LOCKED
-         */
-        // if ($latestUser['status'] === 'LOCKED') {
-        //     $this->view->error = 'Account has been locked because of 3 failed login attempts. Please contact administrator.';
-        //     return;
-        // }
-
-        // $attempt = (int) $latestUser['failed_login_attempt'];
-        // $remaining = 3 - $attempt;
-
-        // $this->view->error = "Invalid email or password. Remaining attempt: {$remaining}";
+        App_Service_Session::set('user', $userProfile);
+        App_Service_Session::refreshActivity();
+        
+        if (strtolower($user['role_name']) === 'rekon') {
+            $this->_helper->redirector->gotoUrl('/history');
+        } else {
+            // PERUBAHAN DI SINI: Memaksa redirect langsung ke halaman Kelola User agar tidak loop ke login kembali
+            $this->_helper->redirector->gotoUrl('/user/index/index');
+        }
     }
 
     public function forgotPasswordAction()
@@ -171,31 +113,6 @@ class Auth_IndexController extends Zend_Controller_Action
             $expiredAt = date('Y-m-d H:i:s', strtotime('+5 minutes'));
             $api = new App_Service_Api();
             $_ = $api->authorization();
-
-            // $response = $api->sp('sp_otp_create', [$email, $otp, $expiredAt]);
-
-            // if ($response['responseCode'] == '5002200') {
-            //     $errorMap = [
-            //         'ACCOUNT_LOCKED' => 'Account has been locked. Please contact administrator.',
-            //         'USER_NOT_FOUND' => 'Invalid email.',
-            //         'ACCOUNT_INACTIVE' => 'Account is inactive. Please contact administrator.',
-            //         'OTP_RESEND_LIMIT_EXCEEDED' => 'You have reached the maximum OTP resend limit. Please try again after 15 minutes.'
-            //     ];
-
-            //     $message = $response['responseMessage'];
-
-            //     foreach ($errorMap as $key => $value) {
-            //         if (str_contains($message, $key)) {
-            //             $message = $value;
-            //             break;
-            //         }
-            //     }
-
-            //     return $this->_helper->json([
-            //         'success' => false,
-            //         'message' => $message
-            //     ]);
-            // }
 
             $payload = [
                 'params' => [
@@ -258,7 +175,6 @@ class Auth_IndexController extends Zend_Controller_Action
         }
     }
 
-
     public function verifyOtpProcessAction()
     {
         $this->_helper->viewRenderer->setNoRender(true);
@@ -275,7 +191,6 @@ class Auth_IndexController extends Zend_Controller_Action
             $api = new App_Service_Api();
             $_ = $api->authorization();
 
-            // $response = $api->sp('sp_otp_verify', [$email, $otp]);
             $payload = [
                 'params' => [
                     $otp,
@@ -364,7 +279,6 @@ class Auth_IndexController extends Zend_Controller_Action
                 $api = new App_Service_Api();
                 $_ = $api->authorization();
 
-                // $response = $api->sp('user_update_password', [$session->email, $hashedPassword]);
                 $payload = [
                     'params' => [
                         $session->otp,

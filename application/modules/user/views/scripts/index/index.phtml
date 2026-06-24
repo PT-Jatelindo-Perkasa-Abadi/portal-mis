@@ -1,138 +1,234 @@
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <ul class="nav nav-tabs border-bottom-0">
-        <li class="nav-item">
-            <a class="nav-link active fw-bold text-primary border-0 border-bottom border-primary border-3 px-0 pb-2 fs-5" style="border-radius: 0;" href="#">User</a>
-        </li>
-    </ul>
-    <button class="btn btn-primary px-3 py-2 rounded-3 fw-bold d-flex align-items-center gap-2" style="background-color: #3b82f6; border: none;">
-        <span class="fs-5 lh-1">+</span> Tambah User
-    </button>
-</div>
+<?php // index.phtml ?>
 
-<div class="card border-0 shadow-sm rounded-4 mb-4 bg-white text-dark">
-    <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
-        <h5 class="fw-bold text-dark mb-0">List Data</h5>
-        <span class="text-secondary fs-5"><i class="bi bi-chevron-up"></i></span>
+<div class="container-fluid px-4 pt-4 bg-light min-vh-100 text-dark">
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <h2 class="fw-bold text-dark fs-3 mb-0">Kelola User</h2>
+        </div>
     </div>
 
-    <div class="card-body px-4 pb-4 bg-white text-dark">
-        <form method="GET" action="" class="row g-3 mb-3 align-items-center">
-            <div class="col-auto">
-                <select name="limit" class="form-select text-dark fw-semibold bg-white border-secondary-subtle rounded-3" style="width: 75px;">
-                    <option value="10">10</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <div class="input-group">
-                    <span class="input-group-text bg-white border-end-0 border-secondary-subtle text-secondary"><i class="bi bi-search"></i></span>
-                    <input type="text" name="search" class="form-control border-start-0 ps-0 text-dark bg-white border-secondary-subtle" placeholder="Cari" value="<?= isset($_GET['search']) ? $this->escape($_GET['search']) : ''; ?>">
+    <div class="d-flex justify-content-between align-items-center mb-4 position-relative">
+        <ul class="nav nav-tabs w-100 border-light-subtle" style="margin-bottom: -1px;">
+            <li class="nav-item">
+                <a class="nav-link active fw-bold text-primary border-0 border-bottom border-primary border-3 px-0 pb-2 fs-5 bg-transparent" style="border-radius: 0; margin-bottom: -1px;" href="#">User</a>
+            </li>
+        </ul>
+        <div class="position-absolute end-0 bottom-0 pb-1">
+            <a href="<?= $this->baseUrl('user/index/create'); ?>" class="btn btn-primary px-3 py-2 rounded-3 fw-bold d-flex align-items-center gap-2 text-white text-decoration-none" style="background-color: #3b82f6; border: none;">
+                <span class="fs-5 lh-1">+</span> Tambah User
+            </a>
+        </div>
+    </div>
+
+    <div class="card border border-light-subtle shadow-sm rounded-4 mb-4 bg-white text-dark overflow-hidden">
+        <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold text-dark mb-0">List Data</h5>
+            <span class="text-secondary fs-5"><i class="bi bi-chevron-up"></i></span>
+        </div>
+
+        <div class="card-body px-4 pb-4 bg-white text-dark">
+            
+            <form method="GET" action="" class="row g-3 mb-3 align-items-center w-100 mx-0">
+                <div class="col-auto ps-0">
+                    <select name="limit" class="form-select text-dark fw-semibold bg-white border-secondary-subtle rounded-3" style="width: 75px;">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                    </select>
                 </div>
-            </div>
-            <div class="col-md-2">
-                <select name="level" class="form-select text-secondary bg-white border-secondary-subtle rounded-3">
-                    <option value="">Pilih Level User</option>
-                    <option value="IT Provider">IT Provider</option>
-                    <option value="MIS">MIS</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <select name="role" class="form-select text-secondary bg-white border-secondary-subtle rounded-3">
-                    <option value="">Pilih Role</option>
-                    <option value="Administrator">Administrator</option>
-                    <option value="Viewer">Viewer</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <select name="status" class="form-select text-secondary bg-white border-secondary-subtle rounded-3">
-                    <option value="">Pilih Status</option>
-                    <option value="Aktif">Aktif</option>
-                    <option value="Non-Aktif">Non-Aktif</option>
-                    <option value="Blokir">Blokir</option>
-                </select>
-            </div>
-            <div class="col-auto">
-                <button type="submit" class="btn btn-outline-primary px-4 fw-bold rounded-3" style="min-width: 90px;">Search</button>
-            </div>
-        </form>
+                
+                <div class="col-md">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 border-secondary-subtle text-secondary">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                            </svg>
+                        </span>
+                        <input type="text" name="search" class="form-control border-start-0 ps-0 text-dark bg-white border-secondary-subtle" placeholder="Cari" value="<?= isset($_GET['search']) ? $this->escape($_GET['search']) : ''; ?>">
+                    </div>
+                </div>
+                
+                <div class="col-md-2">
+                    <select name="level" class="form-select text-secondary bg-white border-secondary-subtle rounded-3">
+                        <option value="">Pilih Level User</option>
+                        <option value="IT Provider">IT Provider</option>
+                        <option value="MIS">MIS</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-2">
+                    <select name="role" class="form-select text-secondary bg-white border-secondary-subtle rounded-3">
+                        <option value="">Pilih Role</option>
+                        <option value="Administrator">Administrator</option>
+                        <option value="Viewer">Viewer</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-2">
+                    <select name="status" class="form-select text-secondary bg-white border-secondary-subtle rounded-3">
+                        <option value="">Pilih Status</option>
+                        <option value="Aktif">Aktif</option>
+                        <option value="Non-Aktif">Non-Aktif</option>
+                        <option value="Blokir">Blokir</option>
+                    </select>
+                </div>
+                
+                <div class="col-auto pe-0">
+                    <button type="submit" class="btn btn-outline-primary px-4 fw-bold rounded-3" style="min-width: 90px; color: #3b82f6; border-color: #3b82f6;">Search</button>
+                </div>
+            </form>
 
-        <div class="d-flex align-items-center gap-3 mb-4">
-            <span class="badge px-3 py-2 rounded-3 fw-bold fs-7" style="background-color: #eff6ff; color: #1d4ed8;">Semua Level User</span>
-            <a href="<?= $this->baseUrl('user'); ?>" class="text-secondary text-decoration-none fw-semibold fs-7">Reset Data</a>
-        </div>
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <span class="badge px-3 py-2 rounded-3 fw-bold" style="background-color: #eff6ff; color: #12161C; font-size: 14px;">Semua Level User</span>
+                <a href="<?= $this->baseUrl('user'); ?>" class="text-secondary text-decoration-none fw-semibold" style="font-size: 14px;">Reset Data</a>
+            </div>
 
-        <div class="table-responsive">
-            <table class="table align-middle table-hover border-top border-light-subtle">
-                <thead>
-                    <tr class="text-secondary fs-7 fw-bold">
-                        <th class="bg-white text-secondary py-3">No <i class="bi bi-chevron-expand fs-8"></i></th>
-                        <th class="bg-white text-secondary py-3">ID User <i class="bi bi-chevron-expand fs-8"></i></th>
-                        <th class="bg-white text-secondary py-3">Nama <i class="bi bi-chevron-expand fs-8"></i></th>
-                        <th class="bg-white text-secondary py-3">Email <i class="bi bi-chevron-expand fs-8"></i></th>
-                        <th class="bg-white text-secondary py-3">Level User <i class="bi bi-chevron-expand fs-8"></i></th>
-                        <th class="bg-white text-secondary py-3">Role <i class="bi bi-chevron-expand fs-8"></i></th>
-                        <th class="bg-white text-secondary py-3">Status <i class="bi bi-chevron-expand fs-8"></i></th>
-                        <th class="bg-white text-secondary py-3">Action <i class="bi bi-chevron-expand fs-8"></i></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (count($this->users) > 0): ?>
-                        <?php $no = 1; foreach ($this->users as $user): ?>
-                            <tr class="fs-7 text-dark">
-                                <td class="text-secondary bg-white py-3"><?= $no++; ?></td>
-                                <td class="fw-bold bg-white"><?= $user['id_user']; ?></td>
-                                <td class="bg-white"><?= $user['fullName']; ?></td>
-                                <td class="text-secondary bg-white"><?= $user['email']; ?></td>
-                                <td class="bg-white"><?= $user['level_user']; ?></td>
-                                <td class="bg-white"><?= $user['role']; ?></td>
-                                <td class="bg-white">
-                                    <?php 
-                                        if ($user['status'] == 'Aktif') {
-                                            $badgeStyle = 'background-color: #e8f5e9; color: #2e7d32;'; 
-                                        } elseif ($user['status'] == 'Non-Aktif') {
-                                            $badgeStyle = 'background-color: #ffebee; color: #c62828;'; 
-                                        } else {
-                                            $badgeStyle = 'background-color: #f5f5f5; color: #616161;'; 
-                                        }
-                                    ?>
-                                    <span class="badge px-3 py-1.5 rounded-2 fw-bold" style="<?= $badgeStyle; ?>">
-                                        <?= $user['status']; ?>
-                                    </span>
-                                </td>
-                                <td class="bg-white">
-                                    <div class="d-flex gap-2">
-                                        <button class="btn btn-sm d-flex align-items-center gap-1 px-3 py-1.5 rounded-2 fw-semibold bg-white border border-warning text-warning">
-                                            <i class="bi bi-pencil-fill fs-8"></i> Edit
-                                        </button>
-                                        <button class="btn btn-sm d-flex align-items-center gap-1 px-3 py-1.5 rounded-2 fw-semibold bg-white border border-primary text-primary">
-                                            <i class="bi bi-eye-fill fs-8"></i> Detail
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="8" class="text-center py-5 text-secondary bg-white">Tidak ada data user.</td>
+            <div class="table-responsive border-0 w-100">
+                <table class="table align-middle table-hover mb-0 w-100" style="border: none; table-layout: fixed;">
+                    <thead>
+                        <tr class="text-secondary fs-7 fw-bold border-bottom border-light-subtle">
+                            <th class="bg-white text-secondary py-3 ps-3" style="width: 6%;">
+                                <div class="d-flex align-items-center justify-content-between w-100">
+                                    No 
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="text-muted flex-shrink-0" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M3.646 9.646a.5.5 0 0 1 .708 0L8 13.293l3.646-3.647a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 0-.708m0-3.292a.5.5 0 0 0 .708 0L8 2.707l3.646 3.647a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 0 0 0 .708"/>
+                                    </svg>
+                                </div>
+                            </th>
+                            <th class="bg-white text-secondary py-3" style="width: 10%;">
+                                <div class="d-flex align-items-center justify-content-between w-100">
+                                    ID User 
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="text-muted flex-shrink-0" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M3.646 9.646a.5.5 0 0 1 .708 0L8 13.293l3.646-3.647a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 0-.708m0-3.292a.5.5 0 0 0 .708 0L8 2.707l3.646 3.647a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 0 0 0 .708"/>
+                                    </svg>
+                                </div>
+                            </th>
+                            <th class="bg-white text-secondary py-3" style="width: 16%;">
+                                <div class="d-flex align-items-center justify-content-between w-100">
+                                    Nama 
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="text-muted flex-shrink-0" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M3.646 9.646a.5.5 0 0 1 .708 0L8 13.293l3.646-3.647a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 0-.708m0-3.292a.5.5 0 0 0 .708 0L8 2.707l3.646 3.647a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 0 0 0 .708"/>
+                                    </svg>
+                                </div>
+                            </th>
+                            <th class="bg-white text-secondary py-3" style="width: 24%;">
+                                <div class="d-flex align-items-center justify-content-between w-100">
+                                    Email 
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="text-muted flex-shrink-0" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M3.646 9.646a.5.5 0 0 1 .708 0L8 13.293l3.646-3.647a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 0-.708m0-3.292a.5.5 0 0 0 .708 0L8 2.707l3.646 3.647a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 0 0 0 .708"/>
+                                    </svg>
+                                </div>
+                            </th>
+                            <th class="bg-white text-secondary py-3" style="width: 14%;">
+                                <div class="d-flex align-items-center justify-content-between w-100">
+                                    Level User 
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="text-muted flex-shrink-0" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M3.646 9.646a.5.5 0 0 1 .708 0L8 13.293l3.646-3.647a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 0-.708m0-3.292a.5.5 0 0 0 .708 0L8 2.707l3.646 3.647a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 0 0 0 .708"/>
+                                    </svg>
+                                </div>
+                            </th>
+                            <th class="bg-white text-secondary py-3" style="width: 15%;">
+                                <div class="d-flex align-items-center justify-content-between w-100">
+                                    Role 
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="text-muted flex-shrink-0" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M3.646 9.646a.5.5 0 0 1 .708 0L8 13.293l3.646-3.647a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 0-.708m0-3.292a.5.5 0 0 0 .708 0L8 2.707l3.646 3.647a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 0 0 0 .708"/>
+                                    </svg>
+                                </div>
+                            </th>
+                            <th class="bg-white text-secondary py-3" style="width: 10%;">
+                                <div class="d-flex align-items-center justify-content-between w-100">
+                                    Status 
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="text-muted flex-shrink-0" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M3.646 9.646a.5.5 0 0 1 .708 0L8 13.293l3.646-3.647a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 0-.708m0-3.292a.5.5 0 0 0 .708 0L8 2.707l3.646 3.647a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 0 0 0 .708"/>
+                                    </svg>
+                                </div>
+                            </th>
+                            <th class="bg-white text-secondary py-3 pe-3" style="width: 15%;">
+                                <div class="d-flex align-items-center justify-content-between w-100">
+                                    Action
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="text-muted flex-shrink-0" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M3.646 9.646a.5.5 0 0 1 .708 0L8 13.293l3.646-3.647a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 0-.708m0-3.292a.5.5 0 0 0 .708 0L8 2.707l3.646 3.647a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 0 0 0 .708"/>
+                                    </svg>
+                                </div>
+                            </th>
                         </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                        <?php if (isset($this->users) && count($this->users) > 0): ?>
+                            <?php $no = 1;
+                            foreach ($this->users as $user): ?>
+                                <tr class="fs-7 text-dark border-bottom border-light-subtle">
+                                    <td class="text-secondary bg-white py-3 ps-3"><?= $no++; ?></td>
+                                    <td class="fw-bold bg-white"><?= isset($user['id_user']) ? $user['id_user'] : '-'; ?></td>
+                                    <td class="bg-white text-truncate" style="max-width: 150px;"><?= isset($user['fullName']) ? $user['fullName'] : '-'; ?></td>
+                                    <td class="text-secondary bg-white text-truncate" style="max-width: 200px;"><?= isset($user['email']) ? $user['email'] : '-'; ?></td>
+                                    <td class="bg-white"><?= isset($user['level_user']) ? $user['level_user'] : '-'; ?></td>
+                                    <td class="bg-white"><?= isset($user['role']) ? $user['role'] : '-'; ?></td>
+                                    <td class="bg-white">
+                                        <?php
+                                        $statusText = 'Non-Aktif';
+                                        $badgeStyle = 'background-color: #ffebee; color: #c62828;';
 
-        <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top border-light-subtle">
-            <span class="text-secondary fs-7">Menampilkan 1 sampai <?= count($this->users); ?> dari <?= count($this->users); ?> data</span>
-            <nav>
-                <ul class="pagination pagination-sm mb-0 gap-1">
-                    <li class="page-item disabled"><a class="page-link rounded-2 border-light-subtle text-muted" href="#"><i class="bi bi-chevron-double-left"></i></a></li>
-                    <li class="page-item disabled"><a class="page-link rounded-2 border-light-subtle text-muted" href="#"><i class="bi bi-chevron-left"></i></a></li>
-                    <li class="page-item active"><a class="page-link rounded-2 px-3 fw-bold bg-primary border-primary" href="#">1</a></li>
-                    <li class="page-item disabled"><a class="page-link rounded-2 border-light-subtle text-muted" href="#"><i class="bi bi-chevron-right"></i></a></li>
-                    <li class="page-item disabled"><a class="page-link rounded-2 border-light-subtle text-muted" href="#"><i class="bi bi-chevron-double-right"></i></a></li>
-                </ul>
-            </nav>
-        </div>
+                                        if (isset($user['is_blocked']) && $user['is_blocked'] == 1) {
+                                            $statusText = 'Blokir';
+                                            $badgeStyle = 'background-color: #e2e8f0; color: #475569;';
+                                        } elseif (isset($user['is_active']) && $user['is_active'] == 1) {
+                                            $statusText = 'Aktif';
+                                            $badgeStyle = 'background-color: #e8f5e9; color: #2e7d32;';
+                                        }
+                                        ?>
+                                        <span class="badge px-3 py-1.5 rounded-2 fw-bold" style="<?= $badgeStyle; ?>">
+                                            <?= $statusText; ?>
+                                        </span>
+                                    </td>
+                                    <td class="bg-white pe-3">
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-sm d-flex align-items-center gap-1 px-3 py-1.5 rounded-2 fw-semibold bg-white border border-warning text-warning" style="font-size: 13px;">
+                                                Edit
+                                            </button>
+                                            <a href="<?= $this->baseUrl('user/index/detail/id/' . (isset($user['id_user']) ? $user['id_user'] : '')); ?>" class="btn btn-sm d-flex align-items-center gap-1 px-3 py-1.5 rounded-2 fw-semibold bg-white border border-primary text-primary text-decoration-none" style="font-size: 13px;">
+                                                Detail
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="8" class="text-center py-5 text-secondary bg-white">Tidak ada data user.</td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
 
+            <div class="d-flex justify-content-between align-items-center mt-4 pt-3">
+                <span class="text-secondary fs-7">
+                    Menampilkan 1 sampai <?= (isset($this->users) && is_array($this->users)) ? count($this->users) : 0; ?> dari <?= (isset($this->users) && is_array($this->users)) ? count($this->users) : 0; ?> data
+                </span>
+
+                <nav>
+                    <ul class="pagination pagination-sm mb-0 gap-2">
+                        <li class="page-item disabled">
+                            <a class="page-link rounded-3 border-light-subtle text-secondary bg-white d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-weight: bold; font-size: 11px;" href="#">&laquo;</a>
+                        </li>
+                        <li class="page-item disabled">
+                            <a class="page-link rounded-3 border-light-subtle text-secondary bg-white d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-weight: bold; font-size: 11px;" href="#">&lsaquo;</a>
+                        </li>
+                        <li class="page-item active">
+                            <a class="page-link rounded-3 px-0 fw-bold bg-primary border-primary d-flex align-items-center justify-content-center text-white" style="width: 32px; height: 32px; background-color: #3b82f6 !important;" href="#">1</a>
+                        </li>
+                        <li class="page-item disabled">
+                            <a class="page-link rounded-3 border-light-subtle text-secondary bg-white d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-weight: bold; font-size: 11px;" href="#">&rsaquo;</a>
+                        </li>
+                        <li class="page-item disabled">
+                            <a class="page-link rounded-3 border-light-subtle text-secondary bg-white d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-weight: bold; font-size: 11px;" href="#">&raquo;</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+        </div>
     </div>
 </div>

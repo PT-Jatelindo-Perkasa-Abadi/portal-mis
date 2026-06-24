@@ -34,6 +34,7 @@ class App_Service_Api
 
     public function request($method, $uri, $payload = [], $isLoggedIn = true)
     {
+        $payload = ["params"=> $payload];
         $url = rtrim($this->baseUrl, '/') . '/' . ltrim($uri, '/');
         $client = new Zend_Http_Client($url);
         $signature = $this->accessToken . $this->clientSecret . json_encode($payload);
