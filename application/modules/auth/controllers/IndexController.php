@@ -13,8 +13,6 @@ class Auth_IndexController extends Zend_Controller_Action
     {
         $this->view->headTitle('Login');
 
-        Zend_Session::namespaceUnset('forgot_password');
-
         if (App_Service_Session::getExpiredFlag()) {
             $this->view->errorMessage = 'Session expired, silakan login kembali';
         }
@@ -48,9 +46,6 @@ class Auth_IndexController extends Zend_Controller_Action
         ];
         $payload = $params;
 
-        /**
-         * Check email exists
-         */
         $response = $api->request(
             'POST',
             '/service/proxy/service/alias/login-session',
@@ -86,76 +81,11 @@ class Auth_IndexController extends Zend_Controller_Action
             $session->verified = true;
             $session->email = $user['email'];
             $session->verified_at = time();
-            // $this->_helper->redirector->gotoUrl('/auth/reset-password');
             $this->view->isNewUser = true;
 
             return;
         }
 
-        /**
-         * Check status LOCKED
-         */
-        // if ($user['status'] === 'LOCKED') {
-        //     $this->view->error = 'Account has been locked. Please contact administrator.';
-        //     return;
-        // }
-
-        /**
-         * Check status INACTIVE
-         */
-        // if ($user['status'] === 'INACTIVE') {
-        //     $this->view->error = 'Account is inactive. Please contact administrator.';
-        //     return;
-        // }
-
-        /**
-         * Verify password
-         */
-        // if (password_verify($data['password'], $user['password'])) {
-            /**
-             * Reset failed login attempt
-             */
-            // $api->sp('user_reset_failed_login', [$data['email']]);
-
-            $userProfile = [
-                'id' => $user['id'],
-                'username' => $user['username'],
-                'fullName' => $user['full_name'],
-                'email' => $user['email'],
-                'role' => strtolower($user['role_name'])
-            ];
-
-            App_Service_Session::set('user', $userProfile);
-            App_Service_Session::refreshActivity();
-            if (strtolower($user['role_name']) === 'rekon') {
-                $this->_helper->redirector->gotoUrl('/history');
-            } else {
-                $redirectUrl = App_Service_Session::getRedirectUrl('/');
-                $this->_helper->redirector->gotoUrl($redirectUrl);
-            }
-        // }
-
-        /**
-         * Password invalid
-         */
-        // $api->sp('user_failed_login', [$data['email']]);
-
-        /**
-         * Re-fetch latest user state
-         */
-        // $latestResult = $api->sp('sp_user_get_by_email', [$data['email']]);
-        // $latestUser = $latestResult['data'][0];
-
-        /**
-         * User became LOCKED
-         */
-        // if ($latestUser['status'] === 'LOCKED') {
-        //     $this->view->error = 'Account has been locked because of 3 failed login attempts. Please contact administrator.';
-        //     return;
-        // }
-
-        // $attempt = (int) $latestUser['failed_login_attempt'];
-        // $remaining = 3 - $attempt;
         $userProfile = [
             'id' => $user['id'],
             'username' => $user['username'],
