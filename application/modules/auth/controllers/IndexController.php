@@ -10,6 +10,8 @@ class Auth_IndexController extends Zend_Controller_Action
     {
         $this->view->headTitle('Login');
 
+        Zend_Session::namespaceUnset('forgot_password');
+
         if (App_Service_Session::getExpiredFlag()) {
             $this->view->errorMessage = 'Session expired, silakan login kembali';
         }
@@ -86,6 +88,18 @@ class Auth_IndexController extends Zend_Controller_Action
         // }
 
         $user = $response['msg'][0];
+
+        if ($user['has_changed_password'] == 0) {
+            $session = new Zend_Session_Namespace('forgot_password');
+            $session->otp = true;
+            $session->verified = true;
+            $session->email = $user['email'];
+            $session->verified_at = time();
+            // $this->_helper->redirector->gotoUrl('/auth/reset-password');
+            $this->view->isNewUser = true;
+
+            return;
+        }
 
         /**
          * Check status LOCKED

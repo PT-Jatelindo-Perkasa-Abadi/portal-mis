@@ -38,11 +38,42 @@
     </div>
 </form>
 
+<div id="modalRedirect" class="modal fade" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+    data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="d-flex flex-column align-items-center py-4 gap-4">
+                    <img src="<?= $this->baseUrl('assets/img/img-new-password.svg'); ?>" alt="image new password" />
+                    <div class="d-flex flex-column align-items-center gap-2">
+                        <h3 class="text-neutral-100 fs-5 fw-bold mb-0">
+                            Perbarui Kata Sandi
+                        </h3>
+                        <p class="text-neutral-70 text-sm text-center">
+                            Akun pertama kali digunakan, silakan melakukan perubahan kata sandi dengan yang baru
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <a href="<?= $this->baseUrl('/auth/reset-password'); ?>" class="btn btn-primary flex-fill">
+                    Perbarui Kata Sandi
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <p class="auth-tos"></p>
 
 <script type="text/javascript">
 $(document).ready(function() {
     app.FormValidation.init("#login-form");
+
+    <?php if ($this->isNewUser) : ?>
+    $('#modalRedirect').modal('show');
+    <?php endif; ?>
 
     <?php if ($this->error) : ?>
     app.FormValidation.feedback('#password', '<?= $this->error; ?>');
