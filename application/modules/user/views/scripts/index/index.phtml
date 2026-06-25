@@ -1,4 +1,5 @@
-<?php // index.phtml ?>
+<?php // index.phtml 
+?>
 
 <div class="container-fluid px-4 pt-4 bg-light min-vh-100 text-dark">
 
@@ -24,58 +25,104 @@
     <div class="card border border-light-subtle shadow-sm rounded-4 mb-4 bg-white text-dark overflow-hidden">
         <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
             <h5 class="fw-bold text-dark mb-0">List Data</h5>
-            <span class="text-secondary fs-5"><i class="bi bi-chevron-up"></i></span>
         </div>
 
         <div class="card-body px-4 pb-4 bg-white text-dark">
-            
+
             <form method="GET" action="" class="row g-3 mb-3 align-items-center w-100 mx-0">
+                <input type="hidden" name="level" id="input-level" value="<?= (isset($_GET['level']) && $_GET['level'] !== '') ? $this->escape($_GET['level']) : ''; ?>">
+                <input type="hidden" name="role" id="input-role" value="<?= (isset($_GET['role']) && $_GET['role'] !== '') ? $this->escape($_GET['role']) : ''; ?>">
+                <input type="hidden" name="status" id="input-status" value="<?= (isset($_GET['status']) && $_GET['status'] !== '') ? $this->escape($_GET['status']) : ''; ?>">
+
                 <div class="col-auto ps-0">
-                    <select name="limit" class="form-select text-dark fw-semibold bg-white border-secondary-subtle rounded-3" style="width: 75px;">
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
+                    <select name="limit" class="form-select text-dark fw-semibold bg-white border-secondary-subtle rounded-3" style="width: 75px;" onchange="this.form.submit()">
+                        <option value="10" <?= (isset($_GET['limit']) && $_GET['limit'] == 10) ? 'selected' : ''; ?>>10</option>
+                        <option value="25" <?= (isset($_GET['limit']) && $_GET['limit'] == 25) ? 'selected' : ''; ?>>25</option>
+                        <option value="50" <?= (isset($_GET['limit']) && $_GET['limit'] == 50) ? 'selected' : ''; ?>>50</option>
                     </select>
                 </div>
-                
+
                 <div class="col-md">
                     <div class="input-group">
                         <span class="input-group-text bg-white border-end-0 border-secondary-subtle text-secondary">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
                             </svg>
                         </span>
                         <input type="text" name="search" class="form-control border-start-0 ps-0 text-dark bg-white border-secondary-subtle" placeholder="Cari" value="<?= isset($_GET['search']) ? $this->escape($_GET['search']) : ''; ?>">
                     </div>
                 </div>
-                
-                <div class="col-md-2">
-                    <select name="level" class="form-select text-secondary bg-white border-secondary-subtle rounded-3">
-                        <option value="">Pilih Level User</option>
-                        <option value="IT Provider">IT Provider</option>
-                        <option value="MIS">MIS</option>
-                    </select>
+
+                <div class="col-md-2" id="ctx-level">
+                    <div class="dropdown">
+                        <?php $hasLevel = (isset($_GET['level']) && $_GET['level'] !== ''); ?>
+                        <button class="btn btn-white border border-secondary-subtle rounded-3 w-100 py-2 px-3 d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 14px; height: 40px; background-color: #fff;">
+                            <span id="label-level" style="color: <?= $hasLevel ? '#12161C' : '#B8B9BB'; ?>; font-weight: <?= $hasLevel ? '600' : '500'; ?>;">
+                                <?= $hasLevel ? $this->escape($_GET['level']) : 'Pilih Level User'; ?>
+                            </span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#4A5568" stroke-width="2.5" style="margin-top: 1px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                            </svg>
+                        </button>
+                        <ul class="dropdown-menu w-100 shadow-sm border-light-subtle rounded-3">
+                            <li><a class="dropdown-item py-2 text-secondary fs-7" href="#" data-value="">Pilih Level User</a></li>
+                            <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#" data-value="IT Provider">IT Provider</a></li>
+                            <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#" data-value="MIS">MIS</a></li>
+                        </ul>
+                    </div>
                 </div>
-                
-                <div class="col-md-2">
-                    <select name="role" class="form-select text-secondary bg-white border-secondary-subtle rounded-3">
-                        <option value="">Pilih Role</option>
-                        <option value="Administrator">Administrator</option>
-                        <option value="Viewer">Viewer</option>
-                    </select>
+
+                <div class="col-md-2" id="ctx-role">
+                    <div class="dropdown">
+                        <?php $hasRole = (isset($_GET['role']) && $_GET['role'] !== ''); ?>
+                        <button class="btn btn-white border border-secondary-subtle rounded-3 w-100 py-2 px-3 d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 14px; height: 40px; background-color: #fff;">
+                            <span id="label-role" style="color: <?= $hasRole ? '#12161C' : '#B8B9BB'; ?>; font-weight: <?= $hasRole ? '600' : '500'; ?>;">
+                                <?= $hasRole ? $this->escape($_GET['role']) : 'Pilih Role'; ?>
+                            </span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#4A5568" stroke-width="2.5" style="margin-top: 1px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                            </svg>
+                        </button>
+                        <ul class="dropdown-menu w-100 shadow-sm border-light-subtle rounded-3">
+                            <li><a class="dropdown-item py-2 text-secondary fs-7" href="#" data-value="">Pilih Role</a></li>
+                            <?php if (isset($this->rolesData) && is_array($this->rolesData) && count($this->rolesData) > 0): ?>
+                                <?php foreach ($this->rolesData as $roleItem): ?>
+                                    <?php
+                                    // Catatan: Jika isi array berupa string biasa (cth: ["Admin", "Viewer"]), ganti $roleItem['role_name'] menjadi $roleItem murni
+                                    $valRole = is_array($roleItem) && isset($roleItem['role_name']) ? $roleItem['role_name'] : $roleItem;
+                                    ?>
+                                    <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#" data-value="<?= $this->escape($valRole); ?>"><?= $this->escape($valRole); ?></a></li>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#" data-value="Administrator">Administrator</a></li>
+                                <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#" data-value="Viewer">Viewer</a></li>
+                            <?php endif; ?>
+                        </ul>
+                    </div>
                 </div>
-                
-                <div class="col-md-2">
-                    <select name="status" class="form-select text-secondary bg-white border-secondary-subtle rounded-3">
-                        <option value="">Pilih Status</option>
-                        <option value="Aktif">Aktif</option>
-                        <option value="Non-Aktif">Non-Aktif</option>
-                        <option value="Blokir">Blokir</option>
-                    </select>
+
+                <div class="col-md-2" id="ctx-status">
+                    <div class="dropdown">
+                        <?php $hasStatus = (isset($_GET['status']) && $_GET['status'] !== ''); ?>
+                        <button class="btn btn-white border border-secondary-subtle rounded-3 w-100 py-2 px-3 d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 14px; height: 40px; background-color: #fff;">
+                            <span id="label-status" style="color: <?= $hasStatus ? '#12161C' : '#B8B9BB'; ?>; font-weight: <?= $hasStatus ? '600' : '500'; ?>;">
+                                <?= $hasStatus ? $this->escape($_GET['status']) : 'Pilih Status'; ?>
+                            </span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#4A5568" stroke-width="2.5" style="margin-top: 1px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                            </svg>
+                        </button>
+                        <ul class="dropdown-menu w-100 shadow-sm border-light-subtle rounded-3">
+                            <li><a class="dropdown-item py-2 text-secondary fs-7" href="#" data-value="">Pilih Status</a></li>
+                            <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#" data-value="Aktif">Aktif</a></li>
+                            <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#" data-value="Non-Aktif">Non-Aktif</a></li>
+                            <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#" data-value="Blokir">Blokir</a></li>
+                        </ul>
+                    </div>
                 </div>
-                
+
                 <div class="col-auto pe-0">
-                    <button type="submit" class="btn btn-outline-primary px-4 fw-bold rounded-3" style="min-width: 90px; color: #3b82f6; border-color: #3b82f6;">Search</button>
+                    <button type="submit" class="btn btn-outline-primary px-4 fw-bold rounded-3" style="min-width: 90px; color: #3b82f6; border-color: #3b82f6; height: 40px;">Search</button>
                 </div>
             </form>
 
@@ -88,75 +135,24 @@
                 <table class="table align-middle table-hover mb-0 w-100" style="border: none; table-layout: fixed;">
                     <thead>
                         <tr class="text-secondary fs-7 fw-bold border-bottom border-light-subtle">
-                            <th class="bg-white text-secondary py-3 ps-3" style="width: 6%;">
-                                <div class="d-flex align-items-center justify-content-between w-100">
-                                    No 
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="text-muted flex-shrink-0" viewBox="0 0 16 16">
-                                        <path fill-rule="evenodd" d="M3.646 9.646a.5.5 0 0 1 .708 0L8 13.293l3.646-3.647a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 0-.708m0-3.292a.5.5 0 0 0 .708 0L8 2.707l3.646 3.647a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 0 0 0 .708"/>
-                                    </svg>
-                                </div>
-                            </th>
-                            <th class="bg-white text-secondary py-3" style="width: 10%;">
-                                <div class="d-flex align-items-center justify-content-between w-100">
-                                    ID User 
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="text-muted flex-shrink-0" viewBox="0 0 16 16">
-                                        <path fill-rule="evenodd" d="M3.646 9.646a.5.5 0 0 1 .708 0L8 13.293l3.646-3.647a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 0-.708m0-3.292a.5.5 0 0 0 .708 0L8 2.707l3.646 3.647a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 0 0 0 .708"/>
-                                    </svg>
-                                </div>
-                            </th>
-                            <th class="bg-white text-secondary py-3" style="width: 16%;">
-                                <div class="d-flex align-items-center justify-content-between w-100">
-                                    Nama 
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="text-muted flex-shrink-0" viewBox="0 0 16 16">
-                                        <path fill-rule="evenodd" d="M3.646 9.646a.5.5 0 0 1 .708 0L8 13.293l3.646-3.647a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 0-.708m0-3.292a.5.5 0 0 0 .708 0L8 2.707l3.646 3.647a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 0 0 0 .708"/>
-                                    </svg>
-                                </div>
-                            </th>
-                            <th class="bg-white text-secondary py-3" style="width: 24%;">
-                                <div class="d-flex align-items-center justify-content-between w-100">
-                                    Email 
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="text-muted flex-shrink-0" viewBox="0 0 16 16">
-                                        <path fill-rule="evenodd" d="M3.646 9.646a.5.5 0 0 1 .708 0L8 13.293l3.646-3.647a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 0-.708m0-3.292a.5.5 0 0 0 .708 0L8 2.707l3.646 3.647a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 0 0 0 .708"/>
-                                    </svg>
-                                </div>
-                            </th>
-                            <th class="bg-white text-secondary py-3" style="width: 14%;">
-                                <div class="d-flex align-items-center justify-content-between w-100">
-                                    Level User 
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="text-muted flex-shrink-0" viewBox="0 0 16 16">
-                                        <path fill-rule="evenodd" d="M3.646 9.646a.5.5 0 0 1 .708 0L8 13.293l3.646-3.647a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 0-.708m0-3.292a.5.5 0 0 0 .708 0L8 2.707l3.646 3.647a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 0 0 0 .708"/>
-                                    </svg>
-                                </div>
-                            </th>
-                            <th class="bg-white text-secondary py-3" style="width: 15%;">
-                                <div class="d-flex align-items-center justify-content-between w-100">
-                                    Role 
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="text-muted flex-shrink-0" viewBox="0 0 16 16">
-                                        <path fill-rule="evenodd" d="M3.646 9.646a.5.5 0 0 1 .708 0L8 13.293l3.646-3.647a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 0-.708m0-3.292a.5.5 0 0 0 .708 0L8 2.707l3.646 3.647a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 0 0 0 .708"/>
-                                    </svg>
-                                </div>
-                            </th>
-                            <th class="bg-white text-secondary py-3" style="width: 10%;">
-                                <div class="d-flex align-items-center justify-content-between w-100">
-                                    Status 
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="text-muted flex-shrink-0" viewBox="0 0 16 16">
-                                        <path fill-rule="evenodd" d="M3.646 9.646a.5.5 0 0 1 .708 0L8 13.293l3.646-3.647a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 0-.708m0-3.292a.5.5 0 0 0 .708 0L8 2.707l3.646 3.647a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 0 0 0 .708"/>
-                                    </svg>
-                                </div>
-                            </th>
-                            <th class="bg-white text-secondary py-3 pe-3" style="width: 15%;">
-                                <div class="d-flex align-items-center justify-content-between w-100">
-                                    Action
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="text-muted flex-shrink-0" viewBox="0 0 16 16">
-                                        <path fill-rule="evenodd" d="M3.646 9.646a.5.5 0 0 1 .708 0L8 13.293l3.646-3.647a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 0-.708m0-3.292a.5.5 0 0 0 .708 0L8 2.707l3.646 3.647a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 0 0 0 .708"/>
-                                    </svg>
-                                </div>
-                            </th>
+                            <th class="bg-white text-secondary py-3 ps-3" style="width: 6%;">No</th>
+                            <th class="bg-white text-secondary py-3" style="width: 10%;">ID User</th>
+                            <th class="bg-white text-secondary py-3" style="width: 16%;">Nama</th>
+                            <th class="bg-white text-secondary py-3" style="width: 24%;">Email</th>
+                            <th class="bg-white text-secondary py-3" style="width: 14%;">Level User</th>
+                            <th class="bg-white text-secondary py-3" style="width: 15%;">Role</th>
+                            <th class="bg-white text-secondary py-3" style="width: 10%;">Status</th>
+                            <th class="bg-white text-secondary py-3 pe-3" style="width: 15%;">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php if (isset($this->users) && count($this->users) > 0): ?>
-                            <?php $no = 1;
+                            <?php
+                            $no = 1;
+                            if ($this->users instanceof Zend_Paginator) {
+                                $pages = $this->users->getPages();
+                                $no = (($pages->current - 1) * $pages->itemCountPerPage) + 1;
+                            }
                             foreach ($this->users as $user): ?>
                                 <tr class="fs-7 text-dark border-bottom border-light-subtle">
                                     <td class="text-secondary bg-white py-3 ps-3"><?= $no++; ?></td>
@@ -184,9 +180,9 @@
                                     </td>
                                     <td class="bg-white pe-3">
                                         <div class="d-flex gap-2">
-                                            <button class="btn btn-sm d-flex align-items-center gap-1 px-3 py-1.5 rounded-2 fw-semibold bg-white border border-warning text-warning" style="font-size: 13px;">
+                                            <a href="<?= $this->baseUrl('user/index/edit/id/' . (isset($user['id_user']) ? $user['id_user'] : '')); ?>" class="btn btn-sm d-flex align-items-center gap-1 px-3 py-1.5 rounded-2 fw-semibold bg-white border border-warning text-warning text-decoration-none" style="font-size: 13px;">
                                                 Edit
-                                            </button>
+                                            </a>
                                             <a href="<?= $this->baseUrl('user/index/detail/id/' . (isset($user['id_user']) ? $user['id_user'] : '')); ?>" class="btn btn-sm d-flex align-items-center gap-1 px-3 py-1.5 rounded-2 fw-semibold bg-white border border-primary text-primary text-decoration-none" style="font-size: 13px;">
                                                 Detail
                                             </a>
@@ -205,30 +201,87 @@
 
             <div class="d-flex justify-content-between align-items-center mt-4 pt-3">
                 <span class="text-secondary fs-7">
-                    Menampilkan 1 sampai <?= (isset($this->users) && is_array($this->users)) ? count($this->users) : 0; ?> dari <?= (isset($this->users) && is_array($this->users)) ? count($this->users) : 0; ?> data
+                    <?php if (isset($this->users) && $this->users instanceof Zend_Paginator): ?>
+                        <?php $pages = $this->users->getPages(); ?>
+                        Menampilkan <?= $pages->firstItemNumber; ?> sampai <?= $pages->lastItemNumber; ?> dari <?= $pages->totalItemCount; ?> data
+                    <?php else: ?>
+                        Menampilkan 0 sampai 0 dari 0 data
+                    <?php endif; ?>
                 </span>
 
-                <nav>
-                    <ul class="pagination pagination-sm mb-0 gap-2">
-                        <li class="page-item disabled">
-                            <a class="page-link rounded-3 border-light-subtle text-secondary bg-white d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-weight: bold; font-size: 11px;" href="#">&laquo;</a>
-                        </li>
-                        <li class="page-item disabled">
-                            <a class="page-link rounded-3 border-light-subtle text-secondary bg-white d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-weight: bold; font-size: 11px;" href="#">&lsaquo;</a>
-                        </li>
-                        <li class="page-item active">
-                            <a class="page-link rounded-3 px-0 fw-bold bg-primary border-primary d-flex align-items-center justify-content-center text-white" style="width: 32px; height: 32px; background-color: #3b82f6 !important;" href="#">1</a>
-                        </li>
-                        <li class="page-item disabled">
-                            <a class="page-link rounded-3 border-light-subtle text-secondary bg-white d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-weight: bold; font-size: 11px;" href="#">&rsaquo;</a>
-                        </li>
-                        <li class="page-item disabled">
-                            <a class="page-link rounded-3 border-light-subtle text-secondary bg-white d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-weight: bold; font-size: 11px;" href="#">&raquo;</a>
-                        </li>
-                    </ul>
-                </nav>
+                <?php if (isset($this->users) && $this->users instanceof Zend_Paginator): ?>
+                    <?php
+                    $pages = $this->users->getPages();
+                    $currentUrl = $this->baseUrl('user/index/index');
+                    $queryParams = $_GET;
+                    ?>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0 gap-2">
+                            <li class="page-item <?= (!isset($pages->previous)) ? 'disabled' : ''; ?>">
+                                <?php $queryParams['page'] = $pages->first; ?>
+                                <a class="page-link rounded-3 border-light-subtle text-secondary bg-white d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-weight: bold; font-size: 11px;" href="<?= $currentUrl . '?' . http_build_query($queryParams); ?>">&laquo;</a>
+                            </li>
+                            <li class="page-item <?= (!isset($pages->previous)) ? 'disabled' : ''; ?>">
+                                <?php $queryParams['page'] = $pages->previous ?? $pages->first; ?>
+                                <a class="page-link rounded-3 border-light-subtle text-secondary bg-white d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-weight: bold; font-size: 11px;" href="<?= $currentUrl . '?' . http_build_query($queryParams); ?>">&lsaquo;</a>
+                            </li>
+                            <?php foreach ($pages->pagesInRange as $page): ?>
+                                <?php $queryParams['page'] = $page; ?>
+                                <li class="page-item <?= ($page == $pages->current) ? 'active' : ''; ?>">
+                                    <a class="page-link rounded-3 px-0 fw-bold d-flex align-items-center justify-content-center <?= ($page == $pages->current) ? 'text-white' : 'text-secondary bg-white border-light-subtle'; ?>" style="width: 32px; height: 32px; <?= ($page == $pages->current) ? 'background-color: #3b82f6 !important; border-color: #3b82f6;' : ''; ?>" href="<?= $currentUrl . '?' . http_build_query($queryParams); ?>">
+                                        <?= $page; ?>
+                                    </a>
+                                </li>
+                            <?php endforeach; ?>
+                            <li class="page-item <?= (!isset($pages->next)) ? 'disabled' : ''; ?>">
+                                <?php $queryParams['page'] = $pages->next ?? $pages->last; ?>
+                                <a class="page-link rounded-3 border-light-subtle text-secondary bg-white d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-weight: bold; font-size: 11px;" href="<?= $currentUrl . '?' . http_build_query($queryParams); ?>">&rsaquo;</a>
+                            </li>
+                            <li class="page-item <?= (!isset($pages->next)) ? 'disabled' : ''; ?>">
+                                <?php $queryParams['page'] = $pages->last; ?>
+                                <a class="page-link rounded-3 border-light-subtle text-secondary bg-white d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-weight: bold; font-size: 11px;" href="<?= $currentUrl . '?' . http_build_query($queryParams); ?>">&raquo;</a>
+                            </li>
+                        </ul>
+                    </nav>
+                <?php endif; ?>
             </div>
 
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        const dropdownItems = document.querySelectorAll(".dropdown-menu a");
+
+        dropdownItems.forEach(item => {
+            item.addEventListener("click", function(e) {
+                e.preventDefault();
+
+                const value = this.getAttribute("data-value");
+                const text = this.textContent;
+
+                const dropdownContainer = this.closest(".col-md-2");
+                const buttonLabel = dropdownContainer.querySelector("button span");
+
+                if (value !== "") {
+                    buttonLabel.style.setProperty('color', '#12161C', 'important');
+                    buttonLabel.style.fontWeight = "600";
+                } else {
+                    buttonLabel.style.setProperty('color', '#B8B9BB', 'important');
+                    buttonLabel.style.fontWeight = "500";
+                }
+
+                buttonLabel.textContent = text;
+
+                if (dropdownContainer.id === "ctx-level") {
+                    document.getElementById("input-level").value = value;
+                } else if (dropdownContainer.id === "ctx-role") {
+                    document.getElementById("input-role").value = value;
+                } else if (dropdownContainer.id === "ctx-status") {
+                    document.getElementById("input-status").value = value;
+                }
+            });
+        });
+    });
+</script>
