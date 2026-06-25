@@ -122,8 +122,6 @@ class Auth_IndexController extends Zend_Controller_Action
                 throw new Exception('Email is required');
             }
 
-            $otp = (string) rand(100000, 999999);
-            $expiredAt = date('Y-m-d H:i:s', strtotime('+5 minutes'));
             $api = new App_Service_Api();
             $_ = $api->authorization();
 
@@ -145,11 +143,26 @@ class Auth_IndexController extends Zend_Controller_Action
                 ]);
             }
 
+            if ($response['msg'][0]['ERROR']) {
+                return $this->_helper->json([
+                    'success' => false,
+                    'message' => $response['msg'][0]['ERROR']
+                ]);
+            }
+
+            if ($response['code'] != '200') {
+                return $this->_helper->json([
+                    'success' => false,
+                    'message' => $response['msg']
+                ]);
+            }
+
             $body = App_Service_EmailTemplate::render(
                 'otp',
                 [
                     'title' => 'Reset Password OTP',
                     'email' => $email,
+                    'name' => $response['msg'][0]['username'],
                     'otp' => $response['msg'][0]['reset_token']
                 ],
                 'Kode OTP'
@@ -224,6 +237,13 @@ class Auth_IndexController extends Zend_Controller_Action
                 return $this->_helper->json([
                     'success' => false,
                     'message' => $response['msg']
+                ]);
+            }
+
+            if ($response['msg'][0]['ERROR']) {
+                return $this->_helper->json([
+                    'success' => false,
+                    'message' => $response['msg'][0]['ERROR']
                 ]);
             }
 
