@@ -42,14 +42,15 @@
     data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-body">
+            <div class="modal-body pb-0">
                 <div class="d-flex flex-column align-items-center py-4 gap-4">
-                    <img src="<?= $this->baseUrl('assets/img/img-new-password.svg'); ?>" alt="image new password" />
+                    <img src="<?= $this->baseUrl('assets/img/img-reset-new-password.svg'); ?>"
+                        alt="image new password" />
                     <div class="d-flex flex-column align-items-center gap-2">
                         <h3 class="text-neutral-100 fs-5 fw-bold mb-0">
                             Perbarui Kata Sandi
                         </h3>
-                        <p class="text-neutral-70 text-sm text-center">
+                        <p class="text-neutral-70 text-sm text-center px-2">
                             Akun pertama kali digunakan, silakan melakukan perubahan kata sandi dengan yang baru
                         </p>
                     </div>
@@ -77,19 +78,6 @@ $(document).ready(function() {
 
     <?php if ($this->error) : ?>
     app.FormValidation.feedback('#password', '<?= $this->error; ?>');
-    <?php endif; ?>
-
-    <?php if ($this->connectionError) : ?>
-    app.Toast.fire({
-        icon: "error",
-        iconHtml: '<img src="<?= $this->baseUrl('/assets/img/ic-toast-error.svg'); ?>" />',
-        text: "<?= $this->connectionError; ?>",
-        timer: 3000,
-        timerProgressBar: true,
-        customClass: {
-            container: "swal2-custom",
-        },
-    });
     <?php endif; ?>
 });
 </script>

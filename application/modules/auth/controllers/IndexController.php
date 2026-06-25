@@ -52,11 +52,6 @@ class Auth_IndexController extends Zend_Controller_Action
         );
         $this->view->email = $data['email'] ?? '';
 
-        if ($response['error']) {
-            $this->view->connectionError = 'Error : Connection refused';
-            return;
-        }
-
         if ($response['code'] != '200') {
             $this->view->error = $response['msg'];
             return;
@@ -64,7 +59,7 @@ class Auth_IndexController extends Zend_Controller_Action
 
         if (!$response['msg'][0]['email']) {
             if ($response['msg'][0]['ERROR'] == 'Invalid credentials') {
-                $this->view->error = 'Invalid email or password';
+                $this->view->error = "Kata Sandi Salah. Coba lagi atau klik 'Lupa kata sandi' untuk mengatur ulang.";
                 return;
             }
 
