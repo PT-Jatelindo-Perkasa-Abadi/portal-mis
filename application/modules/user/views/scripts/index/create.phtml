@@ -1,5 +1,4 @@
-<?php // create.phtml 
-?>
+<?php // create.phtml ?>
 
 <div style="margin-top: -8px; padding-top: 24px; padding-bottom: 24px; line-height: 1;">
     <a href="<?= $this->baseUrl('user'); ?>" class="text-decoration-none fw-semibold d-inline-flex align-items-center gap-2" style="font-size: 14px; color: #595C60;">
@@ -10,68 +9,222 @@
     </a>
 </div>
 
-<form method="POST" action="<?= $this->baseUrl('user/index/save'); ?>">
+<form id="formTambahUser" method="POST" action="<?= $this->baseUrl('user/index/save'); ?>">
+    
+    <input type="hidden" name="status" id="input-status" value="1">
+    <input type="hidden" name="level_user" id="input-level" value="1">
+    <input type="hidden" name="role" id="input-role" value="1">
+
     <div class="card border border-light-subtle shadow-sm rounded-4 bg-white text-dark overflow-hidden" style="margin-top: 0px; margin-bottom: 160px;">
         <div class="card-body p-4 p-md-5 bg-white text-dark">
             <h3 class="fw-bold text-dark mb-1 fs-4">Tambah User</h3>
             <p class="text-secondary mb-4 mb-md-5" style="font-size: 14px;">Lengkapi data pembuatan akun</p>
 
             <div class="row g-4">
-                <div class="col-md-6">
+                
+                <div class="col-md-6" id="ctx-status">
                     <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Status User <span class="text-danger">*</span></label>
-                    <select name="status" class="form-select border-0 py-3 px-3 text-dark fw-bold rounded-3" style="background-color: #f1f3f9; font-size: 14px;" required>
-                        <option value="1" selected>Aktif</option>
-                        <option value="0">Non-Aktif</option>
-                    </select>
-                </div>
-
-                <div class="col-md-6">
-                    <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">ID User</label>
-                    <input type="text" name="id_user" class="form-control border-0 py-3 px-3 rounded-3 text-dark fw-bold" style="background-color: #f1f3f9; color: #1e293b !important; font-size: 14px;" value="77DC886Y" readonly>
-                </div>
-
-                <div class="col-md-6">
-                    <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Nama <span class="text-danger">*</span></label>
-                    <input type="text" name="fullName" class="form-control border border-light-subtle py-3 px-3 rounded-3 text-dark fw-semibold" style="font-size: 14px;" placeholder="User MIS" required>
+                    <div class="dropdown">
+                        <button class="btn border-0 py-3 px-3 text-dark fw-bold rounded-3 w-100 d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #f1f3f9; font-size: 14px; height: 48px;">
+                            <span id="label-status" style="color: #12161C;">Aktif</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#4A5568" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                            </svg>
+                        </button>
+                        <ul class="dropdown-menu w-100 shadow-sm border-light-subtle rounded-3">
+                            <li><a class="dropdown-item py-2 text-dark fw-medium" href="#" data-value="1">Aktif</a></li>
+                            <li><a class="dropdown-item py-2 text-dark fw-medium" href="#" data-value="0">Non-Aktif</a></li>
+                        </ul>
+                    </div>
                 </div>
 
                 <div class="col-md-6">
                     <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Email <span class="text-danger">*</span></label>
-                    <input type="email" name="email" class="form-control border border-light-subtle py-3 px-3 rounded-3 text-dark fw-semibold" style="font-size: 14px;" placeholder="usermis@gmail.com" required>
+                    <input type="email" name="email" id="email" class="form-control border border-light-subtle py-3 px-3 rounded-3 text-dark fw-semibold" style="font-size: 14px; height: 48px;" placeholder="usermis@gmail.com" required>
                 </div>
 
                 <div class="col-md-6">
-                    <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Level User <span class="text-danger">*</span></label>
-                    <select name="level_user" class="form-select border-0 py-3 px-3 text-dark fw-bold rounded-3" style="background-color: #f1f3f9; font-size: 14px;" required>
-                        <option value="">Pilih Level User</option>
-                        <option value="MIS" selected>MIS</option>
-                        <option value="IT Provider">IT Provider</option>
-                    </select>
+                    <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Nama <span class="text-danger">*</span></label>
+                    <input type="text" name="fullName" id="fullName" class="form-control border border-light-subtle py-3 px-3 rounded-3 text-dark fw-semibold" style="font-size: 14px; height: 48px;" placeholder="User MIS" required>
                 </div>
 
-                <div class="col-md-6">
+                <div class="col-md-6" id="ctx-role">
                     <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Role <span class="text-danger">*</span></label>
-                    <select name="role" class="form-select border-0 py-3 px-3 text-dark fw-bold rounded-3" style="background-color: #f1f3f9; font-size: 14px;" required>
-                        <option value="">Pilih Role</option>
-                        <option value="Administrator" selected>Administrator</option>
-                        <option value="Viewer">Viewer</option>
-                    </select>
+                    <div class="dropdown">
+                        <button class="btn border-0 py-3 px-3 text-dark fw-bold rounded-3 w-100 d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #f1f3f9; font-size: 14px; height: 48px;">
+                            <span id="label-role" style="color: #12161C;">Administrator</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#4A5568" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                            </svg>
+                        </button>
+                        <ul class="dropdown-menu w-100 shadow-sm border-light-subtle rounded-3">
+                            <li><a class="dropdown-item py-2 text-dark fw-medium" href="#" data-value="1">Administrator</a></li>
+                            <li><a class="dropdown-item py-2 text-dark fw-medium" href="#" data-value="0">Viewer</a></li>
+                        </ul>
+                    </div>
                 </div>
+
+                <div class="col-md-6" id="ctx-level">
+                    <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Level User <span class="text-danger">*</span></label>
+                    <div class="dropdown">
+                        <button class="btn border-0 py-3 px-3 text-dark fw-bold rounded-3 w-100 d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #f1f3f9; font-size: 14px; height: 48px;">
+                            <span id="label-level" style="color: #12161C;">Admin MIS</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#4A5568" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                            </svg>
+                        </button>
+                        <ul class="dropdown-menu w-100 shadow-sm border-light-subtle rounded-3">
+                            <li><a class="dropdown-item py-2 text-dark fw-medium" href="#" data-value="1">Admin MIS</a></li>
+                            <li><a class="dropdown-item py-2 text-dark fw-medium" href="#" data-value="2">IT Provider</a></li>
+                            <li><a class="dropdown-item py-2 text-dark fw-medium" href="#" data-value="8">Guest MIS</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-md-6 d-none d-md-block"></div>
+
             </div>
         </div>
     </div>
 
     <div style="position: fixed; bottom: 0; left: 152px; right: 0; background-color: #f8fafc; border-top: 1px solid #dee2e6; z-index: 99; box-sizing: border-box;">
-    <div class="d-flex justify-content-between align-items-center gap-3 py-3 px-4">
-        <span class="text-secondary fw-medium text-start" style="font-size: 14px; white-space: nowrap;">Klik tombol “Tambah User” untuk menambahkan user baru</span>
-        <div class="d-flex gap-3 align-items-center">
-            <button type="submit" class="btn px-4 py-2 rounded-3 fw-bold d-flex align-items-center gap-2 text-white shadow-sm" style="background-color: #3b82f6; border: none; font-size: 14px; height: 40px; white-space: nowrap;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
-                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3z" />
-                </svg>
-                Tambah User
-            </button>
+        <div class="d-flex justify-content-between align-items-center gap-3 py-3 px-4">
+            <span class="text-secondary fw-medium text-start" style="font-size: 14px; white-space: nowrap;">Klik tombol “Tambah User” untuk menambahkan user baru</span>
+            <div class="d-flex gap-3 align-items-center">
+                <button type="submit" class="btn px-4 py-2 rounded-3 fw-bold d-flex align-items-center gap-2 text-white shadow-sm" style="background-color: #3b82f6; border: none; font-size: 14px; height: 40px; white-space: nowrap;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3z" />
+                    </svg>
+                    Tambah User
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="modal fade" id="modalKonfirmasi" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+        <div class="modal-content border-0 rounded-4 shadow p-4 bg-white text-dark">
+            <div class="modal-body text-center p-0">
+                <div class="mb-4">
+                    <img src="<?= $this->baseUrl('assets/img/img-create.svg'); ?>" alt="Konfirmasi" style="width: 220px; height: auto;">
+                </div>
+                <h4 class="fw-bold text-dark mb-2" style="font-size: 20px;">Tambah User Baru?</h4>
+                <p class="text-secondary mb-4 px-2" style="font-size: 14px;">Pastikan semua data yang diisi telah sesuai</p>
+
+                <div class="row g-3">
+                    <div class="col-6">
+                        <button type="button" class="btn w-100 py-2.5 fw-bold bg-white text-dark border border-light-subtle rounded-3" data-bs-dismiss="modal" style="font-size: 14px; height: 44px;">
+                            Batal
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button type="button" id="btnProsesSubmit" class="btn w-100 py-2.5 fw-bold text-white rounded-3 shadow-sm" style="background-color: #3b82f6; border: none; font-size: 14px; height: 44px;">
+                            Tambah
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-</form>
+
+<div class="modal fade" id="modalLoading" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 120px;">
+        <div class="modal-content border-0 rounded-4 shadow p-4 bg-white text-dark text-center">
+            <div class="modal-body p-0 d-flex flex-column align-items-center justify-content-center">
+                <div class="spinner-border text-primary mb-2" role="status" style="width: 2.5rem; height: 2.5rem; stroke-width: 3;"></div>
+                <span class="text-secondary fw-bold" style="font-size: 13px;">Loading</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalSukses" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+        <div class="modal-content border-0 rounded-4 shadow p-4 bg-white text-dark">
+            <div class="modal-body text-center p-0">
+                <div class="mb-4">
+                    <img src="<?= $this->baseUrl('assets/img/img-create.svg'); ?>" alt="Sukses" style="width: 220px; height: auto;">
+                </div>
+                <h4 class="fw-bold text-dark mb-2" style="font-size: 20px;">Berhasil Ditambahkan</h4>
+                <p class="text-secondary mb-4 px-2" style="font-size: 14px;">Data user telah berhasil ditambahkan</p>
+                <button type="button" id="btnSuksesOke" class="btn w-100 py-2.5 fw-bold text-white rounded-3 shadow-sm" style="background-color: #3b82f6; border: none; font-size: 14px; height: 44px;">
+                    Oke
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function() {
+    const modalKonfirmasi = new bootstrap.Modal(document.getElementById('modalKonfirmasi'));
+    const modalLoading = new bootstrap.Modal(document.getElementById('modalLoading'));
+    const modalSukses = new bootstrap.Modal(document.getElementById('modalSukses'));
+
+    const dropdownItems = document.querySelectorAll(".dropdown-menu a");
+    dropdownItems.forEach(item => {
+        item.addEventListener("click", function(e) {
+            e.preventDefault();
+            const value = this.getAttribute("data-value");
+            const text = this.textContent;
+            const dropdownContainer = this.closest(".col-md-6");
+            const buttonLabel = dropdownContainer.querySelector("button span");
+            
+            buttonLabel.textContent = text;
+            buttonLabel.style.setProperty('color', '#12161C', 'important');
+            
+            if (dropdownContainer.id === "ctx-status") {
+                document.getElementById("input-status").value = value;
+            } else if (dropdownContainer.id === "ctx-level") {
+                document.getElementById("input-level").value = value;
+            } else if (dropdownContainer.id === "ctx-role") {
+                document.getElementById("input-role").value = value;
+            }
+        });
+    });
+
+    document.getElementById('formTambahUser').addEventListener('submit', function(event) {
+        event.preventDefault(); 
+        modalKonfirmasi.show();
+    });
+
+    document.getElementById('btnProsesSubmit').addEventListener('click', function() {
+        modalKonfirmasi.hide();
+        modalLoading.show();
+
+        const formData = new FormData();
+        formData.append('status', document.getElementById('input-status').value);
+        formData.append('level_user', document.getElementById('input-level').value);
+        formData.append('role', document.getElementById('input-role').value);
+        formData.append('email', document.getElementById('email').value);
+        formData.append('fullName', document.getElementById('fullName').value);
+
+        fetch('<?= $this->baseUrl("user/index/save"); ?>', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            setTimeout(() => {
+                modalLoading.hide();
+                if (data.success) {
+                    modalSukses.show();
+                } else {
+                    alert("Gagal menambahkan user: " + data.msg);
+                }
+            }, 600);
+        })
+        .catch(error => {
+            modalLoading.hide();
+            alert("Terjadi kendala koneksi ke server backend.");
+        });
+    });
+
+    document.getElementById('btnSuksesOke').addEventListener('click', function() {
+        modalSukses.hide();
+        window.location.href = '<?= $this->baseUrl("user/index/index"); ?>';
+    });
+});
+</script>
