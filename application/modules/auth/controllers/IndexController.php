@@ -32,7 +32,7 @@ class Auth_IndexController extends Zend_Controller_Action
         $api = new App_Service_Api();
         $_ = $api->authorization();
         $ip = App_Log_Context::getIp();
-        $params = [
+        $payload = [
             $data['email'],
             hash('sha256', $data['password']),
             $ip,
@@ -44,7 +44,6 @@ class Auth_IndexController extends Zend_Controller_Action
             "@p_session_token",
             "@p_refresh_token"
         ];
-        $payload = $params;
 
         $response = $api->request(
             'POST',
@@ -77,10 +76,11 @@ class Auth_IndexController extends Zend_Controller_Action
 
         if ($user['has_changed_password'] == 0) {
             $session = new Zend_Session_Namespace('forgot_password');
-            $session->otp = true;
+            $session->otp = $user['session_id'];
             $session->verified = true;
             $session->email = $user['email'];
             $session->verified_at = time();
+            $session->isNewUser = true;
             $this->view->isNewUser = true;
 
             return;
@@ -128,11 +128,9 @@ class Auth_IndexController extends Zend_Controller_Action
             $_ = $api->authorization();
 
             $payload = [
-                'params' => [
-                    $email,
-                    App_Log_Context::getIp(),
-                    App_Log_Context::getUserAgent(),
-                ]
+                $email,
+                App_Log_Context::getIp(),
+                App_Log_Context::getUserAgent(),
             ];
             $response = $api->request(
                 'POST',
@@ -205,11 +203,9 @@ class Auth_IndexController extends Zend_Controller_Action
             $_ = $api->authorization();
 
             $payload = [
-                'params' => [
-                    $otp,
-                    App_Log_Context::getIp(),
-                    App_Log_Context::getUserAgent(),
-                ]
+                $otp,
+                App_Log_Context::getIp(),
+                App_Log_Context::getUserAgent(),
             ];
             $response = $api->request(
                 'POST',
@@ -293,16 +289,20 @@ class Auth_IndexController extends Zend_Controller_Action
                 $_ = $api->authorization();
 
                 $payload = [
-                    'params' => [
-                        $session->otp,
-                        $hashedPassword,
-                        App_Log_Context::getIp(),
-                        App_Log_Context::getUserAgent()
-                    ]
+                    $session->otp,
+                    $hashedPassword,
+                    App_Log_Context::getIp(),
+                    App_Log_Context::getUserAgent()
                 ];
+                $url = '/service/proxy/service/alias/forgotpassword';
+
+                if ($session->isNewUser) {
+                    $url = '/service/proxy/service/alias/reset-password-newuser';
+                }
+
                 $response = $api->request(
                     'POST',
-                    '/service/proxy/service/alias/forgotpassword',
+                    $url,
                     $payload
                 );
 
