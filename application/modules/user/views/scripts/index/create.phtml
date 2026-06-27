@@ -52,14 +52,34 @@
                     <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Role <span class="text-danger">*</span></label>
                     <div class="dropdown">
                         <button class="btn border-0 py-3 px-3 text-dark fw-bold rounded-3 w-100 d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #f1f3f9; font-size: 14px; height: 48px;">
-                            <span id="label-role" style="color: #12161C;">Administrator</span>
+                            <span id="label-role" style="color: #12161C;">Pilih Role</span>
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#4A5568" stroke-width="2.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                             </svg>
                         </button>
                         <ul class="dropdown-menu w-100 shadow-sm border-light-subtle rounded-3">
-                            <li><a class="dropdown-item py-2 text-dark fw-medium" href="#" data-value="1">Administrator</a></li>
-                            <li><a class="dropdown-item py-2 text-dark fw-medium" href="#" data-value="0">Viewer</a></li>
+                            <?php if (!empty($this->listRoles) && is_array($this->listRoles)): ?>
+                                <?php foreach ($this->listRoles as $role): ?>
+                                    <?php 
+                                        
+                                        $originalName = strtolower($role['role_name']); 
+                                        
+                                        if ($originalName === 'admin') {
+                                            $displayName = 'Administrator';
+                                        } else {
+                                            $displayName = ucwords($originalName);
+                                        }
+                                    ?>
+                                    <li>
+                                        <a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#" data-value="<?= $role['id']; ?>">
+                                            <?= $displayName; ?>
+                                        </a>
+                                    </li>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#" data-value="1">Administrator</a></li>
+                                <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#" data-value="2">Viewer</a></li>
+                            <?php endif; ?>
                         </ul>
                     </div>
                 </div>
