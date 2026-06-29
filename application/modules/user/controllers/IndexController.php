@@ -152,6 +152,82 @@ class User_IndexController extends App_Controller_Base
         $this->view->userDetail = $userDetail;
     }
 
+    // public function detailAction()
+    // {
+    //     $api = new App_Service_Api();
+
+    //     // 1. Tembak langsung ke library authorization global Anda untuk menarik token JWT yang asli & fresh
+    //     $sessionData = $api->authorization();
+
+    //     $sessionToken = '';
+    //     if (is_array($sessionData)) {
+    //         if (isset($sessionData['access_token'])) {
+    //             $sessionToken = $sessionData['access_token'];
+    //         } elseif (isset($sessionData['session'])) {
+    //             $sessionToken = $sessionData['session'];
+    //         } elseif (isset($sessionData['token'])) {
+    //             $sessionToken = $sessionData['token'];
+    //         }
+    //     }
+
+    //     // Fallback 1: Jika di dalam root array tidak ketemu, coba cek di dalam sub-key 'msg' (seperti log login Anda)
+    //     if (empty($sessionToken) && isset($sessionData['msg']['access_token'])) {
+    //         $sessionToken = $sessionData['msg']['access_token'];
+    //     }
+
+    //     // Fallback 2: Cadangan darurat jika token API kosong, gunakan session local sebagai pertahanan terakhir
+    //     if (empty($sessionToken) && isset($this->currentUser()['session_token'])) {
+    //         $sessionToken = $this->currentUser()['session_token'];
+    //     }
+
+    //     // 2. Tangkap ID user yang dilempar dari parameter URL list utama (index)
+    //     $idUser = (int) $this->_getParam('id', 0);
+
+    //     // 3. 🔥 KUNCI UTAMA: Susun FLAT PAYLOAD (Menggunakan variabel $sessionToken yang sudah divalidasi)
+    //     $payload = [
+    //         // $idUser,
+    //         // $sessionToken
+    //         $this->currentUserId(),
+    //         $this->currentUser()['session_token'],
+    //     ];
+
+    //     // 4. Hit ke API Detail User Spesifik ke Backend Go
+    //     $response = $api->request('POST', '/service/proxy/service/alias/get-user-detail', $payload);
+
+    //     $userDetail = null;
+
+    //     // 5. Validasi response sukses dari backend Go (pastikan membalas 200 OK dan bukan array ERROR)
+    //     if (isset($response['code']) && $response['code'] == 200 && isset($response['msg']) && is_array($response['msg'])) {
+    //         // Jika backend membalas data normal tanpa flag ERROR di index pertama
+    //         if (!isset($response['msg'][0]['ERROR'])) {
+    //             $userDetail = isset($response['msg'][0]) ? $response['msg'][0] : null;
+    //         } else {
+    //             // Untuk kebutuhan tracking log developer jika session tetap dinilai expired oleh Go
+    //             Zend_Debug::dump($response['msg'][0]['ERROR']);
+    //         }
+    //     }
+
+    //     // 6. Parsing label status visual untuk kebutuhan tampilan text badge di detail.phtml
+    //     if ($userDetail !== null) {
+    //         if (isset($userDetail['is_blocked']) && $userDetail['is_blocked'] == 1) {
+    //             $userDetail['status'] = 'Blokir';
+    //         } elseif (isset($userDetail['is_active']) && $userDetail['is_active'] == 1) {
+    //             $userDetail['status'] = 'Aktif';
+    //         } else {
+    //             $userDetail['status'] = 'Non-Aktif';
+    //         }
+    //     }
+
+    //     // 7. Simpan ke Zend Session Namespace (Opsional - bawaan kodingan lama Anda)
+    //     if ($userDetail !== null) {
+    //         $userSession = new Zend_Session_Namespace('UserDetailCache');
+    //         $userSession->data = $userDetail;
+    //     }
+
+    //     // 8. Kirim object array data user ke file detail.phtml
+    //     $this->view->userDetail = $userDetail;
+    // }
+
     public function createAction()
     {
         $api = new App_Service_Api();
