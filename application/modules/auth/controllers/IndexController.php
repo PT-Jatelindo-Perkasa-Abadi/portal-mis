@@ -25,7 +25,7 @@ class Auth_IndexController extends Zend_Controller_Action
         $validator = new Zend_Validate_EmailAddress();
 
         if (!$validator->isValid($data['email'])) {
-            $this->view->error = 'Invalid email format';
+            $this->view->error = 'Format email salah.';
             return;
         }
 
@@ -57,13 +57,18 @@ class Auth_IndexController extends Zend_Controller_Action
             return;
         }
 
-        if (!$response['msg'][0]['email']) {
-            if ($response['msg'][0]['ERROR'] == 'Invalid credentials') {
-                $this->view->error = "Kata Sandi Salah. Coba lagi atau klik 'Lupa kata sandi' untuk mengatur ulang.";
-                return;
-            }
+        if ($response['msg'][0]['ERROR'] == 'Kata Sandi Salah.') {
+            $this->view->errorPassword = "Kata Sandi Salah. Coba lagi atau klik 'Lupa kata sandi' untuk mengatur ulang.";
+            return;
+        }
 
-            $this->view->error = $response['msg'][0]['ERROR'];
+        if ($response['msg'][0]['ERROR'] == 'Akun Tidak Ditemukan') {
+            $this->view->errorAccount = $response['msg'][0]['ERROR'];
+            return;
+        }
+
+        if ($response['msg'][0]['ERROR'] == 'User sudah gagal login 3 kali, akun diblokir') {
+            $this->view->errorBlocked = $response['msg'][0]['ERROR'];
             return;
         }
 
