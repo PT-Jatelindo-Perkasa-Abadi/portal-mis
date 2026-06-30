@@ -93,7 +93,6 @@ class User_IndexController extends App_Controller_Base
     {
         $api = new App_Service_Api();
 
-        // 1. Tembak langsung ke library authorization global Anda untuk menarik token JWT yang asli
         $sessionData = $api->authorization();
 
         $sessionToken = '';
@@ -107,32 +106,26 @@ class User_IndexController extends App_Controller_Base
             }
         }
 
-        // Fallback: Jika di dalam root array tidak ketemu, coba cek di dalam sub-key 'msg' (seperti log login Anda)
         if (empty($sessionToken) && isset($sessionData['msg']['access_token'])) {
             $sessionToken = $sessionData['msg']['access_token'];
         }
 
-        // 2. Tangkap ID user yang dilempar dari parameter URL list utama
         $idUser = (int) $this->_getParam('id', 0);
 
-        // 3. Susun FLAT PAYLOAD (Total 2 indeks: ID User dan Token JWT Panjang)
         $payload = [
             $idUser,
             // $this->currentUserId(),
             $this->currentUser()['session_token'],
         ];
 
-        // 4. Hit ke API Detail User Spesifik
         $response = $api->request('POST', '/service/proxy/service/alias/get-user-detail', $payload);
 
         $userDetail = null;
 
-        // 5. Validasi response sukses dari backend Go
         if (isset($response['code']) && $response['code'] == 200 && isset($response['msg']) && is_array($response['msg'])) {
             $userDetail = isset($response['msg'][0]) ? $response['msg'][0] : null;
         }
 
-        // 6. Parsing label status visual untuk kebutuhan tampilan detail.phtml
         if ($userDetail !== null) {
             if (isset($userDetail['is_blocked']) && $userDetail['is_blocked'] == 1) {
                 $userDetail['status'] = 'Blokir';
@@ -148,97 +141,24 @@ class User_IndexController extends App_Controller_Base
             $userSession->data = $userDetail;
         }
 
-        // Kirim object array data user ke file detail.phtml
         $this->view->userDetail = $userDetail;
     }
-
-    // public function detailAction()
-    // {
-    //     $api = new App_Service_Api();
-
-    //     // 1. Tembak langsung ke library authorization global Anda untuk menarik token JWT yang asli & fresh
-    //     $sessionData = $api->authorization();
-
-    //     $sessionToken = '';
-    //     if (is_array($sessionData)) {
-    //         if (isset($sessionData['access_token'])) {
-    //             $sessionToken = $sessionData['access_token'];
-    //         } elseif (isset($sessionData['session'])) {
-    //             $sessionToken = $sessionData['session'];
-    //         } elseif (isset($sessionData['token'])) {
-    //             $sessionToken = $sessionData['token'];
-    //         }
-    //     }
-
-    //     // Fallback 1: Jika di dalam root array tidak ketemu, coba cek di dalam sub-key 'msg' (seperti log login Anda)
-    //     if (empty($sessionToken) && isset($sessionData['msg']['access_token'])) {
-    //         $sessionToken = $sessionData['msg']['access_token'];
-    //     }
-
-    //     // Fallback 2: Cadangan darurat jika token API kosong, gunakan session local sebagai pertahanan terakhir
-    //     if (empty($sessionToken) && isset($this->currentUser()['session_token'])) {
-    //         $sessionToken = $this->currentUser()['session_token'];
-    //     }
-
-    //     // 2. Tangkap ID user yang dilempar dari parameter URL list utama (index)
-    //     $idUser = (int) $this->_getParam('id', 0);
-
-    //     // 3. 🔥 KUNCI UTAMA: Susun FLAT PAYLOAD (Menggunakan variabel $sessionToken yang sudah divalidasi)
-    //     $payload = [
-    //         // $idUser,
-    //         // $sessionToken
-    //         $this->currentUserId(),
-    //         $this->currentUser()['session_token'],
-    //     ];
-
-    //     // 4. Hit ke API Detail User Spesifik ke Backend Go
-    //     $response = $api->request('POST', '/service/proxy/service/alias/get-user-detail', $payload);
-
-    //     $userDetail = null;
-
-    //     // 5. Validasi response sukses dari backend Go (pastikan membalas 200 OK dan bukan array ERROR)
-    //     if (isset($response['code']) && $response['code'] == 200 && isset($response['msg']) && is_array($response['msg'])) {
-    //         // Jika backend membalas data normal tanpa flag ERROR di index pertama
-    //         if (!isset($response['msg'][0]['ERROR'])) {
-    //             $userDetail = isset($response['msg'][0]) ? $response['msg'][0] : null;
-    //         } else {
-    //             // Untuk kebutuhan tracking log developer jika session tetap dinilai expired oleh Go
-    //             Zend_Debug::dump($response['msg'][0]['ERROR']);
-    //         }
-    //     }
-
-    //     // 6. Parsing label status visual untuk kebutuhan tampilan text badge di detail.phtml
-    //     if ($userDetail !== null) {
-    //         if (isset($userDetail['is_blocked']) && $userDetail['is_blocked'] == 1) {
-    //             $userDetail['status'] = 'Blokir';
-    //         } elseif (isset($userDetail['is_active']) && $userDetail['is_active'] == 1) {
-    //             $userDetail['status'] = 'Aktif';
-    //         } else {
-    //             $userDetail['status'] = 'Non-Aktif';
-    //         }
-    //     }
-
-    //     // 7. Simpan ke Zend Session Namespace (Opsional - bawaan kodingan lama Anda)
-    //     if ($userDetail !== null) {
-    //         $userSession = new Zend_Session_Namespace('UserDetailCache');
-    //         $userSession->data = $userDetail;
-    //     }
-
-    //     // 8. Kirim object array data user ke file detail.phtml
-    //     $this->view->userDetail = $userDetail;
-    // }
 
     public function createAction()
     {
         $api = new App_Service_Api();
-        
+
         $api->authorization();
 
         $sessionToken = $this->currentUser()['session_token'];
         $payload = [$sessionToken];
 
         $responseRoles = $api->request('POST', '/service/proxy/service/alias/get-roles', $payload);
-        
+
+        if ($responseRoles['msg'][0]['ERROR'] == 'Invalid or expired session') {
+            return $this->_redirect('/auth/logout');
+        }
+
         $rolesData = [];
         if (isset($responseRoles['code']) && $responseRoles['code'] == 200 && isset($responseRoles['msg'])) {
             $rolesData = $responseRoles['msg'];
@@ -265,6 +185,10 @@ class User_IndexController extends App_Controller_Base
                 }
             }
 
+            if (App_Service_Session::getExpiredFlag()) {
+                $this->view->errorMessage = 'Session expired, silakan login kembali';
+            }
+
             $fullName  = (string)$this->_getParam('fullName', '');
             $email     = (string)$this->_getParam('email', '');
             $levelUser = (int)$this->_getParam('level_user', 1);
@@ -277,7 +201,6 @@ class User_IndexController extends App_Controller_Base
             if ($ipAddress === '::1') {
                 $ipAddress = '127.0.0.1';
             }
-            // 🔥 KUNCI DISINI: Samakan string pendek agar database Go tidak mengalami crash log 500
             $userAgent = "google chrome";
 
             $payload = [
@@ -344,13 +267,13 @@ class User_IndexController extends App_Controller_Base
             // Ambil session token andalan Anda
             $sessionToken = $this->currentUser()['session_token'];
             $idUser = (int)$this->_getParam('id', 0);
-            
+
             // Susun payload flat ke API detail
             $payload = [$idUser, $sessionToken];
-            
+
             // Hit ke API Detail User Spesifik
             $response = $api->request('POST', '/service/proxy/service/alias/get-user-detail', $payload);
-            
+
             if (isset($response['code']) && $response['code'] == 200 && isset($response['msg'][0])) {
                 $userDetail = $response['msg'][0];
             }
@@ -384,16 +307,16 @@ class User_IndexController extends App_Controller_Base
             $userAgent = "google chrome";
 
             $payload = [
-                $idUser,                               
-                $email,                                
-                $fullName,                             
-                $roleValue,                            
-                $levelUser,                            
-                $isActive,                             
-                (int)$this->currentUserId(),           
-                $this->currentUser()['session_token'], 
-                $ipAddress,                            
-                $userAgent                             
+                $idUser,
+                $email,
+                $fullName,
+                $roleValue,
+                $levelUser,
+                $isActive,
+                (int)$this->currentUserId(),
+                $this->currentUser()['session_token'],
+                $ipAddress,
+                $userAgent
             ];
 
             $response = $api->request('POST', '/service/proxy/service/alias/update-user', $payload);
@@ -432,5 +355,78 @@ class User_IndexController extends App_Controller_Base
         }
 
         return $this->_helper->redirector->gotoUrl('user/index/index');
+    }
+
+    public function sendMailAction()
+    {
+        $this->_helper->viewRenderer->setNoRender(true);
+        $this->getResponse()->setHeader('Content-Type', 'application/json');
+
+        try {
+            $idUser    = (int)$this->_getParam('id_user', 0);
+            $fullName  = (string)$this->_getParam('fullName', '');
+            $email = trim($this->_getParam('email'));
+            $roleValue = (int)$this->_getParam('role', 1);
+
+
+            if (empty($email)) {
+                throw new Exception('Email is required');
+            }
+
+            $api = new App_Service_Api();
+            $_ = $api->authorization();
+
+            $defaultPassword = "!#(@snb83";
+            // $passwordHash    = hash('sha256', $defaultPassword);
+
+            $payload = [
+                'params' => [
+                    $email,
+                    App_Log_Context::getIp(),
+                    App_Log_Context::getUserAgent(),
+                ]
+            ];
+
+            $body = App_Service_EmailTemplate::render(
+                'success_create',
+                [
+                    'misId' => $idUser,
+                    'misName' => $fullName,
+                    'misEmail' => $email,
+                    'misRole' => $roleValue,
+                    'misPassword' => $defaultPassword,
+                ],
+                'Kode OTP'
+            );
+            $emailPayload = [
+                'to' => [$email],
+                'subject' => 'sent Email',
+                'body' => $body,
+                'isHtml' => true
+            ];
+
+            $emailResponse = $api->request(
+                'POST',
+                '/service/email',
+                $emailPayload
+            );
+
+            return $this->_helper->json([
+                'success' => true,
+                'message' => 'Email has been sent'
+            ]);
+        } catch (Exception $e) {
+            if (strpos($e->getMessage(), 'USER_NOT_FOUND') !== false) {
+                return $this->_helper->json([
+                    'success' => true,
+                    'message' => 'Email has been sent'
+                ]);
+            }
+
+            return $this->_helper->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 }
