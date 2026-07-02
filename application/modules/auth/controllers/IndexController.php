@@ -88,7 +88,7 @@ class Auth_IndexController extends Zend_Controller_Action
         if (strtolower($user['role_name']) === 'rekon') {
             $this->_helper->redirector->gotoUrl('/history');
         } else {
-            // PERUBAHAN DI SINI: Memaksa redirect langsung ke halaman Kelola User agar tidak loop ke login kembali
+            
             $this->_helper->redirector->gotoUrl('/user/index/index');
         }
     }

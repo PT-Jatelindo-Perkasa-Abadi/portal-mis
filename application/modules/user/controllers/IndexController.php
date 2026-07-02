@@ -33,62 +33,6 @@ class User_IndexController extends App_Controller_Base
         }
     }
 
-    // public function indexAction()
-    // {
-    //     $api = new App_Service_Api();
-    //     $_ = $api->authorization();
-
-    //     // 1. Ambil limit dan halaman paginator
-    //     $limit = (int) $this->_getParam('limit', 10);
-    //     $page  = (int) $this->_getParam('page', 1);
-
-    //     // 2. Tangkap parameter filter URL dan bersihkan dari spasi liar
-    //     $searchName  = trim((string) $this->_getParam('search', ''));
-    //     $filterLevel = trim((string) $this->_getParam('level', ''));
-    //     $filterRole  = trim((string) $this->_getParam('role', ''));
-    //     $filterStatus= trim((string) $this->_getParam('status', ''));
-
-    //     // 3. Ambil token session aktif
-    //     $sessionToken = $this->currentUser()['session_token'];
-
-    //     // 4. 🔥 VALIDASI MUTLAK: Jika tidak ada filter aktif, potong payload menjadi 1 parameter saja!
-    //     if (empty($searchName) && empty($filterLevel) && empty($filterRole) && empty($filterStatus)) {
-    //         // JALUR NORMAL (Pasti Sukses): Sesuai dengan spesifikasi awal API Go Anda
-    //         $payloadList = [$sessionToken];
-    //     } else {
-    //         // JALUR PENCARIAN AKTIF: Mengirimkan parameter filter terisi
-    //         $payloadList = [
-    //             $sessionToken,
-    //             $searchName,
-    //             $filterLevel,
-    //             $filterRole,
-    //             ($filterStatus !== '') ? (int)$filterStatus : 1
-    //         ];
-    //     }
-
-    //     // Tembak API utama list data user
-    //     $response = $api->request('POST', '/service/proxy/service/alias/get-all-user', $payloadList);
-
-    //     // 5. Hit API Master Data Pendukung Dropdown Filter Pencarian
-    //     $levels = $api->request('POST', '/service/proxy/service/alias/get-levels', [$sessionToken]);
-    //     $roles  = $api->request('POST', '/service/proxy/service/alias/get-roles', [$sessionToken]);
-
-    //     // Lempar master data dropdown ke view index.phtml
-    //     $this->view->levelsData = (isset($levels['code']) && $levels['code'] == 200 && isset($levels['msg'])) ? $levels['msg'] : [];
-    //     $this->view->rolesData  = (isset($roles['code']) && $roles['code'] == 200 && isset($roles['msg'])) ? $roles['msg'] : [];
-
-    //     // 6. Olah response list user ke Paginator tabel
-    //     if (isset($response['code']) && $response['code'] == 200 && isset($response['msg']) && is_array($response['msg'])) {
-    //         $paginator = Zend_Paginator::factory($response['msg']);
-    //         $paginator->setItemCountPerPage($limit);
-    //         $paginator->setCurrentPageNumber($page);
-
-    //         $this->view->users = $paginator;
-    //     } else {
-    //         $this->view->users = [];
-    //     }
-    // }
-
     public function detailAction()
     {
         $api = new App_Service_Api();
@@ -169,30 +113,25 @@ class User_IndexController extends App_Controller_Base
 
     public function saveAction()
     {
+        $this->_helper->viewRenderer->setNoRender(true);
+        $this->getResponse()->setHeader('Content-Type', 'application/json');
+
         if ($this->_request->isPost()) {
             $api = new App_Service_Api();
-
             $sessionData = $api->authorization();
 
-            $sessionToken = '';
-            if (is_array($sessionData)) {
-                if (isset($sessionData['access_token'])) {
-                    $sessionToken = $sessionData['access_token'];
-                } elseif (isset($sessionData['session'])) {
-                    $sessionToken = $sessionData['session'];
-                } elseif (isset($sessionData['token'])) {
-                    $sessionToken = $sessionData['token'];
-                }
-            }
-
-            if (App_Service_Session::getExpiredFlag()) {
-                $this->view->errorMessage = 'Session expired, silakan login kembali';
-            }
-
             $fullName  = (string)$this->_getParam('fullName', '');
-            $email     = (string)$this->_getParam('email', '');
+            $email     = trim((string)$this->_getParam('email', ''));
             $levelUser = (int)$this->_getParam('level_user', 1);
             $roleValue = (int)$this->_getParam('role', 1);
+
+            if (empty($email) || empty($fullName)) {
+                return $this->_helper->json([
+                    'success' => false,
+                    'code'    => 400,
+                    'msg'     => 'Nama dan Email wajib diisi!'
+                ]);
+            }
 
             $defaultPassword = "Biller123!";
             $passwordHash    = hash('sha256', $defaultPassword);
@@ -203,7 +142,7 @@ class User_IndexController extends App_Controller_Base
             }
             $userAgent = "google chrome";
 
-            $payload = [
+            $dbPayload = [
                 $email,
                 $passwordHash,
                 $fullName,
@@ -217,38 +156,116 @@ class User_IndexController extends App_Controller_Base
                 "@p_reset_token"
             ];
 
-            $response = $api->request('POST', '/service/proxy/service/alias/create-user', $payload);
+            $response = $api->request('POST', '/service/proxy/service/alias/create-user', $dbPayload);
 
             if (isset($response['code']) && $response['code'] == 200) {
 
                 if (isset($response['msg'][0]['ERROR'])) {
-                    $this->_helper->json([
+                    return $this->_helper->json([
                         'success' => false,
                         'code'    => 400,
                         'msg'     => $response['msg'][0]['ERROR']
                     ]);
-                    exit;
                 }
 
-                $this->_helper->json([
+                try {
+                    $newUserId = 0;
+                    if (isset($response['msg'][0]['id'])) {
+                        $newUserId = $response['msg'][0]['id'];
+                    } elseif (isset($response['msg']['id'])) {
+                        $newUserId = $response['msg']['id'];
+                    }
+
+                    $roleDisplay = ($roleValue === 1) ? 'Administrator' : 'Viewer';
+                    $loginUrl = $this->getBaseUrl() . '/auth/login';
+
+                    // Render template .phtml
+                    $body = App_Service_EmailTemplate::render(
+                        'success_create',
+                        [
+                            'misId'       => $newUserId,
+                            'misName'     => $fullName,
+                            'misEmail'    => $email,
+                            'misRole'     => $roleDisplay,
+                            'misPassword' => $defaultPassword,
+                            'misUrl'      => $loginUrl
+                        ],
+                        'Kode OTP'
+                    );
+
+                    $emailPayload = [
+                        'to'      => [$email],
+                        'subject' => 'Informasi Akun Baru - Portal MIS',
+                        'body'    => $body,
+                        'isHtml'  => true
+                    ];
+
+                    // Kirim ke API Email
+                    $emailResponse = $api->request('POST', '/service/email', $emailPayload);
+
+                    // Cetak log pengiriman email untuk pelacakan internal Anda
+                    error_log("=== HIT EMAIL LOG ===");
+                    error_log("EMAIL RESP: " . json_encode($emailResponse));
+                } catch (Exception $e) {
+                    // Jika gagal, log error asli akan tercetak di terminal server PHP Anda
+                    error_log("CRITICAL ERROR DI BLOK EMAIL: " . $e->getMessage());
+                }
+
+                return $this->_helper->json([
                     'success' => true,
                     'code'    => 200,
-                    'msg'     => 'User berhasil ditambahkan.'
+                    'msg'     => 'User berhasil ditambahkan dan email kredensial telah dikirim.'
                 ]);
-                exit;
             } else {
                 $msgError = isset($response['msg']) ? $response['msg'] : 'Gagal memproses data ke server backend.';
-                $this->_helper->json([
+                return $this->_helper->json([
                     'success' => false,
                     'code'    => isset($response['code']) ? $response['code'] : 404,
                     'msg'     => $msgError
                 ]);
-                exit;
             }
         }
 
         return $this->_helper->redirector->gotoUrl('user/index/index');
     }
+
+    // public function saveAction()
+    // {
+    //     // Pastikan respons dalam format JSON murni agar AJAX di HTML tidak crash
+    //     $this->_helper->viewRenderer->setNoRender(true);
+    //     $this->getResponse()->setHeader('Content-Type', 'application/json');
+
+    //     if ($this->_request->isPost()) {
+    //         try {
+    //             $fullName  = (string)$this->_getParam('fullName', 'User Test');
+    //             $email     = trim((string)$this->_getParam('email', ''));
+    //             $roleValue = (int)$this->_getParam('role', 1);
+
+    //             if (empty($email)) {
+    //                 return $this->_helper->json(['success' => false, 'msg' => 'Email wajib diisi!']);
+    //                 exit;
+    //             }
+
+    //             // 2. 🚧 BYPASS DATABASE: Kunci utama agar user tidak bertambah terus!
+    //             // Kita langsung alihkan (forward) prosesnya ke fungsi sendMailAction
+    //             // tanpa memanggil API /create-user ke database Go.
+    //             return $this->_forward('send-mail', 'index', 'user', [
+    //                 'id_user'  => 999, // Dummy ID untuk sekadar isi variabel template email
+    //                 'fullName' => $fullName,
+    //                 'email'    => $email,
+    //                 'role'     => $roleValue
+    //             ]);
+    //         } catch (Exception $e) {
+    //             return $this->_helper->json([
+    //                 'success' => false,
+    //                 'msg'     => 'Bypass system error: ' . $e->getMessage()
+    //             ]);
+    //             exit;
+    //         }
+    //     }
+
+    //     return $this->_helper->redirector->gotoUrl('user/index/index');
+    // }
 
     public function editAction()
     {
@@ -367,6 +384,7 @@ class User_IndexController extends App_Controller_Base
             $fullName  = (string)$this->_getParam('fullName', '');
             $email = trim($this->_getParam('email'));
             $roleValue = (int)$this->_getParam('role', 1);
+            $roleDisplay = ($roleValue === 1) ? 'Administrator' : 'Viewer';
 
 
             if (empty($email)) {
@@ -380,12 +398,11 @@ class User_IndexController extends App_Controller_Base
             // $passwordHash    = hash('sha256', $defaultPassword);
 
             $payload = [
-                'params' => [
-                    $email,
-                    App_Log_Context::getIp(),
-                    App_Log_Context::getUserAgent(),
-                ]
+                $email,
+                App_Log_Context::getIp(),
+                App_Log_Context::getUserAgent(),
             ];
+
 
             $body = App_Service_EmailTemplate::render(
                 'success_create',
@@ -393,14 +410,14 @@ class User_IndexController extends App_Controller_Base
                     'misId' => $idUser,
                     'misName' => $fullName,
                     'misEmail' => $email,
-                    'misRole' => $roleValue,
+                    'misRole' => $roleDisplay,
                     'misPassword' => $defaultPassword,
                 ],
                 'Kode OTP'
             );
             $emailPayload = [
                 'to' => [$email],
-                'subject' => 'sent Email',
+                'subject' => 'Informasi Akun Baru - Portal MIS',
                 'body' => $body,
                 'isHtml' => true
             ];
@@ -428,5 +445,106 @@ class User_IndexController extends App_Controller_Base
                 'message' => $e->getMessage()
             ]);
         }
+    }
+
+    public function resetPasswordAction()
+    {
+        $this->_helper->viewRenderer->setNoRender(true);
+        $this->getResponse()->setHeader('Content-Type', 'application/json');
+
+        if ($this->_request->isPost()) {
+            $api = new App_Service_Api();
+            $sessionData = $api->authorization();
+
+            $idUser      = (int)$this->_getParam('id_user', 0);
+            $fullName    = (string)$this->_getParam('fullName', '');
+            $email       = trim((string)$this->_getParam('email', ''));
+            $roleValue   = (int)$this->_getParam('role', 1);
+            $roleDisplay = ($roleValue === 1) ? 'Administrator' : 'Viewer';
+
+            if (empty($email)) {
+                return $this->_helper->json([
+                    'success' => false,
+                    'code'    => 400,
+                    'msg'     => 'Data email tidak ditemukan!'
+                ]);
+            }
+
+            $newPassword  = "!#(@snb83";
+            $passwordHash = hash('sha256', $newPassword);
+
+            $ipAddress = $this->_request->getServer('REMOTE_ADDR', '127.0.0.1');
+            if ($ipAddress === '::1') {
+                $ipAddress = '127.0.0.1';
+            }
+            $userAgent = "google chrome";
+
+            $dbPayload = [
+                $this->currentUser()['session_token'],
+                $passwordHash,
+                $email,
+                $ipAddress,
+                $userAgent
+            ];
+
+            $response = $api->request('POST', '/service/proxy/service/alias/admin-change-password', $dbPayload);
+
+            if (isset($response['code']) && $response['code'] == 200) {
+
+                if (isset($response['msg'][0]['ERROR'])) {
+                    return $this->_helper->json([
+                        'success' => false,
+                        'code'    => 400,
+                        'msg'     => $response['msg'][0]['ERROR']
+                    ]);
+                }
+
+               try {
+                    $realIdUser = isset($response['msg'][0]['user_id']) ? $response['msg'][0]['user_id'] : $idUser;
+
+                    $loginUrl = $this->getBaseUrl() . '/auth/login';
+
+                    $body = App_Service_EmailTemplate::render(
+                        'reset_password_admin',
+                        [
+                            'misId'       => $realIdUser,
+                            'misName'     => $fullName,
+                            'misEmail'    => $email,
+                            'misRole'     => $roleDisplay,
+                            'misPassword' => $newPassword, 
+                            'misUrl'      => $loginUrl
+                        ],
+                        'Reset Kata Sandi'
+                    );
+
+                    $emailPayload = [
+                        'to'      => [$email],
+                        'subject' => 'Pemberitahuan Perubahan Kata Sandi - Portal MIS',
+                        'body'    => $body,
+                        'isHtml'  => true
+                    ];
+
+                    $api->request('POST', '/service/email', $emailPayload);
+
+                } catch (Exception $e) {
+                    error_log("Gagal memproses notifikasi email reset password: " . $e->getMessage());
+                }
+
+                return $this->_helper->json([
+                    'success' => true,
+                    'code'    => 200,
+                    'msg'     => 'Kata sandi berhasil disetel ulang dan email notifikasi telah dikirim.'
+                ]);
+            } else {
+                $msgError = isset($response['msg']) ? $response['msg'] : 'Gagal memproses reset password ke server backend.';
+                return $this->_helper->json([
+                    'success' => false,
+                    'code'    => isset($response['code']) ? $response['code'] : 404,
+                    'msg'     => $msgError
+                ]);
+            }
+        }
+
+        return $this->_helper->redirector->gotoUrl('user/index/index');
     }
 }
