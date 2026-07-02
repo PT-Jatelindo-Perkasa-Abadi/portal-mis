@@ -152,35 +152,34 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalLoading" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 120px;">
-        <div class="modal-content border-0 rounded-4 shadow p-4 bg-white text-dark text-center">
-            <div class="modal-body p-0 d-flex flex-column align-items-center justify-content-center">
-                <div class="spinner-border text-primary mb-2" role="status" style="width: 2.5rem; height: 2.5rem; stroke-width: 3;"></div>
-                <span class="text-secondary fw-bold" style="font-size: 13px;">Loading</span>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="modalSukses" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="modalStatus" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
-        <div class="modal-content border-0 rounded-4 shadow p-4 bg-white text-dark">
-            <div class="modal-body text-center p-0">
-                <div class="mb-4">
-                    <img src="<?= $this->baseUrl('assets/img/img-create.svg'); ?>" alt="Sukses" style="width: 220px; height: auto;">
+        <div class="modal-content border-0 rounded-4 shadow p-4 bg-white text-dark" style="min-height: 320px; transition: all 0.3s ease-in-out;">
+            <div class="modal-body p-0 d-flex flex-column align-items-center justify-content-center position-relative" style="min-height: 280px;">
+                
+                <div id="contentLoading" class="text-center w-100 position-absolute top-50 start-50 translate-middle" style="transition: opacity 0.2s ease-in-out; opacity: 1;">
+                    <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem; stroke-width: 3;"></div>
+                    <div class="text-secondary fw-bold" style="font-size: 14px; letter-spacing: 0.5px;">Memproses Data...</div>
                 </div>
-                <h4 class="fw-bold text-dark mb-2" style="font-size: 20px;">Berhasil Ditambahkan</h4>
-                <p class="text-secondary mb-4 px-2" style="font-size: 14px;">Data user telah berhasil ditambahkan</p>
-                <button type="button" id="btnSuksesOke" class="btn w-100 py-2.5 fw-bold text-white rounded-3 shadow-sm" style="background-color: #3b82f6; border: none; font-size: 14px; height: 44px;">
-                    Oke
-                </button>
+
+                <div id="contentResponse" class="d-none w-100 text-center" style="transition: opacity 0.3s ease-in-out; opacity: 0;">
+                    <div class="mb-4">
+                        <img id="statusImage" src="" alt="Status" style="width: 200px; height: auto;">
+                    </div>
+                    <h4 id="statusTitle" class="fw-bold text-dark mb-2" style="font-size: 20px;"></h4>
+                    <p id="statusMessage" class="text-secondary mb-4 px-3" style="font-size: 14px; line-height: 1.5;"></p>
+                    <button type="button" id="btnStatusOke" class="btn w-100 py-2.5 fw-bold text-white rounded-3 shadow-sm" style="background-color: #3b82f6; border: none; font-size: 14px; height: 44px; transition: background 0.2s;">
+                        Oke
+                    </button>
+                </div>
+
             </div>
         </div>
     </div>
 </div>
 
-<script type="text/javascript">
+
+<!-- <script type="text/javascript">
     document.addEventListener("DOMContentLoaded", function() {
         const modalKonfirmasi = new bootstrap.Modal(document.getElementById('modalKonfirmasi'));
         const modalLoading = new bootstrap.Modal(document.getElementById('modalLoading'));
@@ -230,24 +229,144 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    setTimeout(() => {
-                        modalLoading.hide();
-                        if (data.success) {
-                            modalSukses.show();
-                        } else {
-                            alert("Gagal menambahkan user: " + data.msg);
-                        }
-                    }, 600);
+                
+                    if (data.success || data.code == 200) {
+                        modalSukses.show();
+                    } else {
+                        alert("Gagal memproses: " + data.msg);
+                    }
+                    $('#modalLoading').modal('hide');
                 })
                 .catch(error => {
                     modalLoading.hide();
-                    alert("Terjadi kendala koneksi ke server backend.");
+                    alert("Terjadi kendala koneksi ke server.");
                 });
         });
 
         document.getElementById('btnSuksesOke').addEventListener('click', function() {
             modalSukses.hide();
             window.location.href = '<?= $this->baseUrl("user/index/index"); ?>';
+        });
+    });
+</script> -->
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        const modalKonfirmasi = new bootstrap.Modal(document.getElementById('modalKonfirmasi'));
+        const modalStatus = new bootstrap.Modal(document.getElementById('modalStatus'));
+
+        let isActionSuccess = false;
+
+        // Handle Pilihan Dropdown Menu
+        const dropdownItems = document.querySelectorAll(".dropdown-menu a");
+        dropdownItems.forEach(item => {
+            item.addEventListener("click", function(e) {
+                e.preventDefault();
+                const value = this.getAttribute("data-value");
+                const text = this.textContent;
+                const dropdownContainer = this.closest(".col-md-6");
+                const buttonLabel = dropdownContainer.querySelector("button span");
+
+                buttonLabel.textContent = text;
+                buttonLabel.style.setProperty('color', '#12161C', 'important');
+
+                if (dropdownContainer.id === "ctx-status") {
+                    document.getElementById("input-status").value = value;
+                } else if (dropdownContainer.id === "ctx-level") {
+                    document.getElementById("input-level").value = value;
+                } else if (dropdownContainer.id === "ctx-role") {
+                    document.getElementById("input-role").value = value;
+                }
+            });
+        });
+
+        // Intercept Submit Form untuk Memunculkan Modal Konfirmasi
+        document.getElementById('formTambahUser').addEventListener('submit', function(event) {
+            event.preventDefault();
+            modalKonfirmasi.show();
+        });
+
+        // Eksekusi Submit Saat Tombol Proses di Modal Konfirmasi di-Klik
+        document.getElementById('btnProsesSubmit').addEventListener('click', function() {
+            modalKonfirmasi.hide();
+            
+            // Set ke state Loading awal sebelum modal dibuka
+            const loadingArea = document.getElementById('contentLoading');
+            const responseArea = document.getElementById('contentResponse');
+            
+            loadingArea.style.opacity = '1';
+            loadingArea.classList.remove('d-none');
+            responseArea.classList.add('d-none');
+            responseArea.style.opacity = '0';
+            
+            modalStatus.show();
+
+            // Susun Data Form
+            const formData = new FormData();
+            formData.append('status', document.getElementById('input-status').value);
+            formData.append('level_user', document.getElementById('input-level').value);
+            formData.append('role', document.getElementById('input-role').value);
+            formData.append('email', document.getElementById('email').value);
+            formData.append('fullName', document.getElementById('fullName').value);
+
+            // Kirim Data via Fetch API ke Backend
+            fetch('<?= $this->baseUrl("user/index/save"); ?>', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Jalankan skenario transisi pudar (Fade out loading -> Fade in response)
+                    loadingArea.style.opacity = '0';
+                    
+                    setTimeout(function() {
+                        loadingArea.classList.add('d-none');
+                        
+                        // Siapkan konten respons di latar belakang
+                        if (data.success || data.code == 200) {
+                            isActionSuccess = true;
+                            document.getElementById('statusImage').src = '<?= $this->baseUrl("assets/img/img-create.svg"); ?>';
+                            document.getElementById('statusTitle').textContent = 'Berhasil Ditambahkan';
+                            document.getElementById('statusMessage').textContent = 'Data user telah berhasil ditambahkan';
+                        } else {
+                            isActionSuccess = false;
+                            document.getElementById('statusImage').src = '<?= $this->baseUrl("assets/img/img-confirm-failed.svg"); ?>';
+                            document.getElementById('statusTitle').textContent = 'Gagal Ditambahkan';
+                            document.getElementById('statusMessage').textContent = data.msg ? data.msg : "Terjadi kesalahan saat menambahkan user";
+                        }
+                        
+                        // Pemicu Fade In Elemen Respons
+                        responseArea.classList.remove('d-none');
+                        setTimeout(function() {
+                            responseArea.style.opacity = '1';
+                        }, 50);
+
+                    }, 200); // Sinkron dengan durasi CSS transition opacity loading
+                })
+                .catch(error => {
+                    loadingArea.style.opacity = '0';
+                    setTimeout(function() {
+                        loadingArea.classList.add('d-none');
+                        
+                        isActionSuccess = false;
+                        document.getElementById('statusImage').src = '<?= $this->baseUrl("assets/img/img-confirm-failed.svg"); ?>';
+                        document.getElementById('statusTitle').textContent = 'Gagal Ditambahkan';
+                        document.getElementById('statusMessage').textContent = "Terjadi kendala koneksi ke server.";
+                        
+                        responseArea.classList.remove('d-none');
+                        setTimeout(function() {
+                            responseArea.style.opacity = '1';
+                        }, 50);
+                    }, 200);
+                });
+        });
+
+        // Handle Aksi Tombol Oke pada Modal Status
+        document.getElementById('btnStatusOke').addEventListener('click', function() {
+            modalStatus.hide();
+            if (isActionSuccess) {
+                window.location.href = '<?= $this->baseUrl("user/index/index"); ?>';
+            }
         });
     });
 </script>
