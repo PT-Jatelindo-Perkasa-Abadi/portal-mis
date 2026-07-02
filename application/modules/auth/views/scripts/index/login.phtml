@@ -38,27 +38,114 @@
     </div>
 </form>
 
+<div id="modalRedirect" class="modal fade" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+    data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body pb-0">
+                <div class="d-flex flex-column align-items-center py-4 gap-4">
+                    <img src="<?= $this->baseUrl('assets/img/img-reset-new-password.svg'); ?>"
+                        alt="image new password" />
+                    <div class="d-flex flex-column align-items-center gap-2">
+                        <h3 class="text-neutral-100 fs-5 fw-bold mb-0">
+                            Perbarui Kata Sandi
+                        </h3>
+                        <p class="text-neutral-70 text-sm text-center px-2">
+                            Akun pertama kali digunakan, silakan melakukan perubahan kata sandi dengan yang baru
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <a href="<?= $this->baseUrl('/auth/reset-password'); ?>" class="btn btn-primary flex-fill">
+                    Perbarui Kata Sandi
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modalErrorAccount" class="modal fade" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+    data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body pb-0">
+                <div class="d-flex flex-column align-items-center py-4 gap-4">
+                    <img src="<?= $this->baseUrl('assets/img/img-account-not-found.svg'); ?>"
+                        alt="image account not found" />
+                    <div class="d-flex flex-column align-items-center gap-2">
+                        <h3 class="text-neutral-100 fs-5 fw-bold mb-0">
+                            Akun Tidak Ditemukan
+                        </h3>
+                        <p class="text-neutral-70 text-sm text-center px-2">
+                            Email belum terdaftar, Silahkan lakukan pendaftaran terlebih dahulu.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary flex-fill" data-bs-dismiss="modal">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modalErrorBlocked" class="modal fade" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+    data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body pb-0">
+                <div class="d-flex flex-column align-items-center py-4 gap-4">
+                    <img src="<?= $this->baseUrl('assets/img/img-failed-new-password.svg'); ?>"
+                        alt="image account blocked" />
+                    <div class="d-flex flex-column align-items-center gap-2">
+                        <h3 class="text-neutral-100 fs-5 fw-bold mb-0">
+                            Akun Terblokir
+                        </h3>
+                        <p class="text-neutral-70 text-sm text-center px-2">
+                            Silakan hubungi kami untuk melakukan reset kata sandi
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary flex-fill" data-bs-dismiss="modal">
+                    Oke
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <p class="auth-tos"></p>
 
 <script type="text/javascript">
 $(document).ready(function() {
     app.FormValidation.init("#login-form");
 
-    <?php if ($this->error) : ?>
-    app.FormValidation.feedback('#password', '<?= $this->error; ?>');
+    <?php if ($this->isNewUser) : ?>
+    $('#modalRedirect').modal('show');
     <?php endif; ?>
 
-    <?php if ($this->connectionError) : ?>
-    app.Toast.fire({
-        icon: "error",
-        iconHtml: '<img src="<?= $this->baseUrl('/assets/img/ic-toast-error.svg'); ?>" />',
-        text: "<?= $this->connectionError; ?>",
-        timer: 3000,
-        timerProgressBar: true,
-        customClass: {
-            container: "swal2-custom",
-        },
-    });
+    <?php if ($this->error) : ?>
+    app.FormValidation.feedback('#password', "<?= $this->error; ?>");
+    <?php endif; ?>
+
+    <?php if ($this->errorPassword) : ?>
+    app.FormValidation.feedback('#password', "<?= $this->errorPassword; ?>");
+    <?php endif; ?>
+
+    <?php if($this->errorAccount) : ?>
+    $('#modalErrorAccount').modal('show');
+    <?php endif; ?>
+
+    <?php if($this->errorBlocked) : ?>
+    $('#modalErrorBlocked').modal('show');
     <?php endif; ?>
 });
 </script>

@@ -14,6 +14,8 @@ class App_Acl extends Zend_Acl
         $this->addRole(new Zend_Acl_Role('checker'), 'guest');
         $this->addRole(new Zend_Acl_Role('admin'), 'guest');
         $this->addRole(new Zend_Acl_Role('admin mis'), 'guest');
+        $this->addRole(new Zend_Acl_Role('guest mis'), 'guest');
+        $this->addRole(new Zend_Acl_Role('viewer'), 'guest');
 
         /**
          * ======================
@@ -24,6 +26,7 @@ class App_Acl extends Zend_Acl
         $this->add(new Zend_Acl_Resource('default:index'));
         $this->add(new Zend_Acl_Resource('profile:index'));
         $this->add(new Zend_Acl_Resource('error:index'));
+        $this->add(new Zend_Acl_Resource('user:index'));
 
         /**
          * ======================
@@ -66,9 +69,17 @@ class App_Acl extends Zend_Acl
 
         /**
          * ======================
-         * REKON
+         * GUEST MIS
          * ======================
          */
+        $this->allow('guest mis', 'default:index');
+
+        /**
+         * ======================
+         * VIEWER
+         * ======================
+         */
+        $this->allow('viewer', 'default:index');
 
 
         /**
@@ -89,6 +100,20 @@ class App_Acl extends Zend_Acl
         $this->allow('checker', 'profile:index');
         $this->allow('admin', 'profile:index');
         $this->allow('admin mis', 'profile:index');
+        $this->allow('guest mis', 'profile:index');
+        $this->allow('viewer', 'profile:index');
+
+        /**
+         * ======================
+         * USER
+         * ======================
+         */
+        $this->allow('maker', 'user:index');
+        $this->allow('checker', 'user:index');
+        $this->allow('admin', 'user:index');
+        $this->allow('admin mis', 'user:index');
+        $this->allow('guest mis', 'user:index');
+        $this->allow('viewer', 'user:index');
 
         /**
          * ======================
@@ -99,5 +124,7 @@ class App_Acl extends Zend_Acl
         $this->allow('checker', 'auth:index', ['logout']);
         $this->allow('admin', 'auth:index', ['logout']);
         $this->allow('admin mis', 'auth:index', ['logout']);
+        $this->allow('guest mis', 'auth:index', ['logout']);
+        $this->allow('viewer', 'auth:index', ['logout']);
     }
 }

@@ -25,14 +25,14 @@ class Auth_IndexController extends Zend_Controller_Action
         $validator = new Zend_Validate_EmailAddress();
 
         if (!$validator->isValid($data['email'])) {
-            $this->view->error = 'Invalid email format';
+            $this->view->error = 'Format email salah.';
             return;
         }
 
         $api = new App_Service_Api();
         $_ = $api->authorization();
         $ip = App_Log_Context::getIp();
-        $params = [
+        $payload = [
             $data['email'],
             hash('sha256', $data['password']),
             $ip,
@@ -44,11 +44,7 @@ class Auth_IndexController extends Zend_Controller_Action
             "@p_session_token",
             "@p_refresh_token"
         ];
-        $payload = $params;
 
-        /**
-         * Check email exists
-         */
         $response = $api->request(
             'POST',
             '/service/proxy/service/alias/login-session',
@@ -56,22 +52,39 @@ class Auth_IndexController extends Zend_Controller_Action
         );
         $this->view->email = $data['email'] ?? '';
 
-        if ($response['error']) {
-            $this->view->connectionError = 'Error : Connection refused';
-            return;
-        }
-
         if ($response['code'] != '200') {
-            $this->view->error = $response['responseMessage'];
+            $this->view->error = $response['msg'];
             return;
         }
 
-        if (!$response['msg'][0]['email']) {
-            $this->view->error = 'Invalid email or password';
+        if ($response['msg'][0]['ERROR'] == 'Kata Sandi Salah.') {
+            $this->view->errorPassword = "Kata Sandi Salah. Coba lagi atau klik 'Lupa kata sandi' untuk mengatur ulang.";
+            return;
+        }
+
+        if ($response['msg'][0]['ERROR'] == 'Akun Tidak Ditemukan') {
+            $this->view->errorAccount = $response['msg'][0]['ERROR'];
+            return;
+        }
+
+        if ($response['msg'][0]['ERROR'] == 'User sudah gagal login 3 kali, akun diblokir') {
+            $this->view->errorBlocked = $response['msg'][0]['ERROR'];
             return;
         }
 
         $user = $response['msg'][0];
+
+        if ($user['has_changed_password'] == 0) {
+            $session = new Zend_Session_Namespace('forgot_password');
+            $session->otp = $user['session_id'];
+            $session->verified = true;
+            $session->email = $user['email'];
+            $session->verified_at = time();
+            $session->isNewUser = true;
+            $this->view->isNewUser = true;
+
+            return;
+        }
 
         $userProfile = [
             'id' => $user['id'],
@@ -110,17 +123,13 @@ class Auth_IndexController extends Zend_Controller_Action
                 throw new Exception('Email is required');
             }
 
-            $otp = (string) rand(100000, 999999);
-            $expiredAt = date('Y-m-d H:i:s', strtotime('+5 minutes'));
             $api = new App_Service_Api();
             $_ = $api->authorization();
 
             $payload = [
-                'params' => [
-                    $email,
-                    App_Log_Context::getIp(),
-                    App_Log_Context::getUserAgent(),
-                ]
+                $email,
+                App_Log_Context::getIp(),
+                App_Log_Context::getUserAgent(),
             ];
             $response = $api->request(
                 'POST',
@@ -135,11 +144,26 @@ class Auth_IndexController extends Zend_Controller_Action
                 ]);
             }
 
+            if ($response['msg'][0]['ERROR']) {
+                return $this->_helper->json([
+                    'success' => false,
+                    'message' => $response['msg'][0]['ERROR']
+                ]);
+            }
+
+            if ($response['code'] != '200') {
+                return $this->_helper->json([
+                    'success' => false,
+                    'message' => $response['msg']
+                ]);
+            }
+
             $body = App_Service_EmailTemplate::render(
                 'otp',
                 [
                     'title' => 'Reset Password OTP',
                     'email' => $email,
+                    'name' => $response['msg'][0]['username'],
                     'otp' => $response['msg'][0]['reset_token']
                 ],
                 'Kode OTP'
@@ -193,11 +217,9 @@ class Auth_IndexController extends Zend_Controller_Action
             $_ = $api->authorization();
 
             $payload = [
-                'params' => [
-                    $otp,
-                    App_Log_Context::getIp(),
-                    App_Log_Context::getUserAgent(),
-                ]
+                $otp,
+                App_Log_Context::getIp(),
+                App_Log_Context::getUserAgent(),
             ];
             $response = $api->request(
                 'POST',
@@ -216,6 +238,13 @@ class Auth_IndexController extends Zend_Controller_Action
                 return $this->_helper->json([
                     'success' => false,
                     'message' => $response['msg']
+                ]);
+            }
+
+            if ($response['msg'][0]['ERROR']) {
+                return $this->_helper->json([
+                    'success' => false,
+                    'message' => $response['msg'][0]['ERROR']
                 ]);
             }
 
@@ -281,16 +310,20 @@ class Auth_IndexController extends Zend_Controller_Action
                 $_ = $api->authorization();
 
                 $payload = [
-                    'params' => [
-                        $session->otp,
-                        $hashedPassword,
-                        App_Log_Context::getIp(),
-                        App_Log_Context::getUserAgent()
-                    ]
+                    $session->otp,
+                    $hashedPassword,
+                    App_Log_Context::getIp(),
+                    App_Log_Context::getUserAgent()
                 ];
+                $url = '/service/proxy/service/alias/forgotpassword';
+
+                if ($session->isNewUser) {
+                    $url = '/service/proxy/service/alias/reset-password-newuser';
+                }
+
                 $response = $api->request(
                     'POST',
-                    '/service/proxy/service/alias/forgotpassword',
+                    $url,
                     $payload
                 );
 

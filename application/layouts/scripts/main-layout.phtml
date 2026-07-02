@@ -101,16 +101,16 @@
         tabindex="-1" aria-labelledby="modalLogoutLabel">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-body">
+                <div class="modal-body pb-0">
                     <div class="d-flex flex-column align-items-center py-4 gap-4">
                         <img src="<?= $this->baseUrl('/assets/img/img-confirm-logout.svg'); ?>"
                             alt="image confirm logout" />
                         <div class="d-flex flex-column align-items-center gap-2">
                             <h3 class="text-neutral-100 fs-5 fw-bold mb-0">
-                                Are you sure you want to logout?
+                                Yakin ingin keluar?
                             </h3>
                             <p class="text-neutral-70 text-sm text-center">
-                                To monitor ongoing disbursements, please log in again
+                                Anda perlu masuk dengan akun kembali jika keluar
                             </p>
                         </div>
                     </div>
@@ -118,10 +118,10 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-base flex-fit" data-bs-toggle="modal"
                         data-bs-target="#modalLogout">
-                        No
+                        Batal
                     </button>
                     <a href="/auth/logout" class="btn btn-danger flex-fit">
-                        Yes, Log out
+                        Keluar
                     </a>
                 </div>
             </div>

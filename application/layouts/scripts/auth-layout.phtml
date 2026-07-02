@@ -17,6 +17,22 @@
 </head>
 
 <body>
+    <div class="modal fade" id="modalLoading" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="modalLoadingLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-fit">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="d-flex flex-column align-items-center gap-2">
+                        <span class="spinner-progress"></span>
+                        <h3 id="modalLoadingTitle" class="text-neutral-100 fs-7 fw-bold mb-0">
+                            Loading
+                        </h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="main">
         <div class="auth-side-cover">
             <div class="d-flex align-items-start">
