@@ -1,0 +1,197 @@
+<div class="content-header">
+    <div class="d-flex">
+        <div class="d-flex flex-column flex-fill">
+            <h1 class="header-title">Dashboard</h1>
+            <p class="header-sub fs-7">Data Transaksi - <span class="text-primary">Senin, 01 Juni 2026</span></p>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center">
+                <select name="" id="" class="form-select">
+                    <option value="">Hari ini</option>
+                    <option value="">Kemarin</option>
+                </select>
+            </div>
+            <div class="d-flex align-items-center bg-blue-light-90 rounded">
+                <div class="d-flex px-3 py-2 gap-2">
+                    <span class="fs-7 text-neutral-70">Terakhir diperbarui</span>
+                    <span class="fs-7 fw-bold text-primary">14:00</span>
+                </div>
+                <span class="divider bg-primary"></span>
+                <button type="button" class="btn btn-link p-2">
+                    <span class="icon-menu ic-refresh mx-1"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="content-body">
+    <div class="container">
+        <div class="row bg-blue-light-90 gap-4 mb-4 p-4 rounded">
+            <div class="col d-flex bg-white gap-4 p-4 rounded-3">
+                <img src="<?= $this->baseUrl('/assets/img/img-total-amount.svg'); ?>" alt="image total transaction" />
+                <div class="d-flex flex-column align-item-center justify-content-between flex-fill">
+                    <h5 class="fs-7 text-neutral-70 mb-0">Total Nominal Transaksi</h5>
+                    <h2 class="fs-5 fw-bold text-neutral-100 mb-0" data-field="total_transaction">
+                        <div class="skeleton-cell w-100 float-end"></div>
+                    </h2>
+                </div>
+            </div>
+            <div class="col d-flex bg-white gap-4 p-4 rounded-3">
+                <img src="<?= $this->baseUrl('/assets/img/img-fee-transaction.svg'); ?>" alt="image total income" />
+                <div class="d-flex flex-column align-item-center justify-content-between flex-fill">
+                    <h5 class="fs-7 text-neutral-70 mb-0">Total Pendapatan</h5>
+                    <h2 class="fs-5 fw-bold text-neutral-100 mb-0" data-field="total_income">
+                        <div class="skeleton-cell w-100 float-end"></div>
+                    </h2>
+                </div>
+            </div>
+            <div class="col d-flex bg-white gap-4 p-4 rounded-3">
+                <img src="<?= $this->baseUrl('/assets/img/img-total-disbursement.svg'); ?>" alt="image total file" />
+                <div class="d-flex flex-column align-item-center justify-content-between flex-fill">
+                    <h5 class="fs-7 text-neutral-70 mb-0">Total Lembar</h5>
+                    <h2 class="fs-5 fw-bold text-neutral-100 mb-0" data-field="total_sheet">
+                        <div class="skeleton-cell w-100 float-end"></div>
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row gap-4 mb-4 p-4 border border-neutral-10 rounded-3">
+            <div class="col d-flex flex-column gap-2 bg-white px-4 py-3 rounded-3">
+                <h5 class="fs-7 text-neutral-70 mb-0">Rata-Rata Transaksi perDetik</h5>
+                <h2 class="fs-5 fw-bold text-neutral-100 mb-0">340</h2>
+            </div>
+            <div class="col d-flex flex-column gap-2 bg-success-subtle px-4 py-3 rounded-3">
+                <h5 class="fs-7 text-neutral-70 mb-0">Persentase Transaksi Sukses</h5>
+                <h2 class="fs-5 fw-bold text-neutral-100 mb-0">98%</h2>
+            </div>
+            <div class="col d-flex flex-column gap-2 bg-warning-subtle px-4 py-3 rounded-3">
+                <h5 class="fs-7 text-neutral-70 mb-0">Persentase Transaksi Pending</h5>
+                <h2 class="fs-5 fw-bold text-neutral-100 mb-0">1%</h2>
+            </div>
+            <div class="col d-flex flex-column gap-2 bg-danger-subtle px-4 py-3 rounded-3">
+                <h5 class="fs-7 text-neutral-70 mb-0">Persentase Transaksi Gagal</h5>
+                <h2 class="fs-5 fw-bold text-neutral-100 mb-0">1%</h2>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row gap-4 mb-4">
+            <div class="col p-4 border border-neutral-10 rounded-3">
+                <div class="d-flex flex-column gap-4">
+                    <h2 class="fs-6 text-neutral-100 fw-bold mb-0">Grafik Pendapatan</h2>
+                    <div class="container">
+                        <div class="row gap-4">
+                            <div class="col d-flex flex-column gap-2 p-3 border border-neutral-10 rounded-3">
+                                <div class="d-flex flex-column gap-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="square bg-primary"></span>
+                                        <span class="fs-7 text-neutral-70">IT Provider</span>
+                                    </div>
+                                    <h5 class="fs-7 fw-semibold text-neutral-100 mb-0">Rp620Jt</h5>
+                                </div>
+                            </div>
+                            <div class="col d-flex flex-column gap-2 p-3 border border-neutral-10 rounded-3">
+                                <div class="d-flex flex-column gap-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="square bg-purple"></span>
+                                        <span class="fs-7 text-neutral-70">Mitra</span>
+                                    </div>
+                                    <h5 class="fs-7 fw-semibold text-neutral-100 mb-0">Rp420Jt</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col p-4 border border-neutral-10 rounded-3">
+                <div class="d-flex flex-column gap-4">
+                    <h2 class="fs-6 text-neutral-100 fw-bold mb-0">Grafik Layanan</h2>
+                    <div class="container">
+                        <div class="row gap-4">
+                            <div class="col d-flex flex-column gap-2 p-3 border border-neutral-10 rounded-3">
+                                <div class="d-flex flex-column gap-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="square bg-yellow-dark-30"></span>
+                                        <span class="fs-7 text-neutral-70">Prepaid</span>
+                                    </div>
+                                    <h5 class="fs-7 fw-semibold text-neutral-100 mb-0">2.340</h5>
+                                </div>
+                            </div>
+                            <div class="col d-flex flex-column gap-2 p-3 border border-neutral-10 rounded-3">
+                                <div class="d-flex flex-column gap-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="square bg-warning"></span>
+                                        <span class="fs-7 text-neutral-70">Postpaid</span>
+                                    </div>
+                                    <h5 class="fs-7 fw-semibold text-neutral-100 mb-0">1.890</h5>
+                                </div>
+                            </div>
+                            <div class="col d-flex flex-column gap-2 p-3 border border-neutral-10 rounded-3">
+                                <div class="d-flex flex-column gap-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="square bg-yellow-light-70"></span>
+                                        <span class="fs-7 text-neutral-70">Non-Taglist</span>
+                                    </div>
+                                    <h5 class="fs-7 fw-semibold text-neutral-100 mb-0">1.020</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row gap-4 mb-4">
+            <div class="col p-4 border border-neutral-10 rounded-3">
+                <div class="d-flex flex-column gap-4">
+                    <h2 class="fs-6 text-neutral-100 fw-bold mb-0">Grafik Latency</h2>
+                    <div class="container">
+                        <div class="row gap-4">
+                            <div class="col d-flex flex-column gap-2 p-3 border border-neutral-10 rounded-3">
+                                <div class="d-flex flex-column gap-2">
+                                    <div class="d-flex align-items-start gap-2">
+                                        <span class="square bg-primary"></span>
+                                        <span class="fs-7 text-neutral-70">Latency (msec)</span>
+                                    </div>
+                                    <h5 class="fs-7 fw-semibold text-neutral-100 mb-0">32 ms</h5>
+                                </div>
+                            </div>
+                            <div class="col d-flex flex-column gap-2 p-3 border border-neutral-10 rounded-3">
+                                <div class="d-flex flex-column gap-2">
+                                    <div class="d-flex align-items-start gap-2">
+                                        <span class="square bg-cyan"></span>
+                                        <span class="fs-7 text-neutral-70">Rata-Rata Request</span>
+                                    </div>
+                                    <h5 class="fs-7 fw-semibold text-neutral-100 mb-0">48 ms</h5>
+                                </div>
+                            </div>
+                            <div class="col d-flex flex-column gap-2 p-3 border border-neutral-10 rounded-3">
+                                <div class="d-flex flex-column gap-2">
+                                    <div class="d-flex align-items-start gap-2">
+                                        <span class="square bg-cyan-blue"></span>
+                                        <span class="fs-7 text-neutral-70">Rata-Rata Response</span>
+                                    </div>
+                                    <h5 class="fs-7 fw-semibold text-neutral-100 mb-0">32 ms</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col p-4 border border-neutral-10 rounded-3"></div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function() {
+    setTimeout(() => {
+        $('[data-field="total_transaction"]').text('Rp1.790M');
+        $('[data-field="total_income"]').text('Rp470Jt');
+        $('[data-field="total_sheet"]').text('5.250');
+    }, 1500);
+});
+</script>
