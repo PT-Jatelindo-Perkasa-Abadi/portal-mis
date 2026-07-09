@@ -8,9 +8,10 @@ class App_Plugin_Layout extends Zend_Controller_Plugin_Abstract
         if ($module != 'auth') {
             $view = Zend_Layout::getMvcInstance()->getView();
             $user = App_Service_Session::get('user');
-    
+
             $view->user = $user;
             $view->initialUser = $this->_initial($user['fullName']) ?? "";
+            $view->menus = App_Service_Session::get('menus');
         }
     }
     public function postDispatch(Zend_Controller_Request_Abstract $request)

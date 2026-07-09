@@ -97,12 +97,43 @@ class Auth_IndexController extends Zend_Controller_Action
 
         App_Service_Session::set('user', $userProfile);
         App_Service_Session::refreshActivity();
-        
+
+        /**
+         * ======================
+         * Fetch permission rows (sp_get_acl_config) & cache ACL config
+         * ======================
+         */
+        try {
+            $aclResponse = $api->request(
+                'POST',
+                '/service/proxy/service/alias/get-acl-config',
+                [$user['session_token']]
+            );
+
+            if (
+                isset($aclResponse['code']) && $aclResponse['code'] == 200
+                && !empty($aclResponse['msg']) && is_array($aclResponse['msg'])
+                && empty($aclResponse['msg'][0]['ERROR'])
+            ) {
+                $aclRows = $aclResponse['msg'];
+
+                App_Service_Session::set(
+                    'acl_config',
+                    App_Service_AclBuilder::build($aclRows, $userProfile['role'])
+                );
+                App_Service_Session::set(
+                    'menus',
+                    App_Service_MenuBuilder::build($aclRows)
+                );
+            }
+        } catch (Exception $e) {
+            // ACL fetch failed — App_Acl will use hardcoded fallback
+        }
+
         if (strtolower($user['role_name']) === 'rekon') {
             $this->_helper->redirector->gotoUrl('/history');
         } else {
-            
-            $this->_helper->redirector->gotoUrl('/user/index/index');
+            $this->_helper->redirector->gotoUrl('/');
         }
     }
 

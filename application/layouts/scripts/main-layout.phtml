@@ -57,30 +57,42 @@
             </div>
             <div class="sidebar-body">
                 <ul id="sidebarMenu" class="sidebar-menu-group">
-                    <li class="menu-item <?= $this->activeMenu('default', 'index', 'index', 'active'); ?>">
-                        <a href="/">
-                            <span class="icon-menu ic-dashboard"></span>
-                            <span>Dashboard</span>
-                        </a>
-                    </li>
-                    <li class="menu-item <?= $this->activeMenu('summary', 'index', 'index', 'active'); ?>">
-                        <a href="/">
-                            <span class="icon-menu ic-summary"></span>
-                            <span>Rangkuman Distribusi</span>
-                        </a>
-                    </li>
-                    <li class="menu-item <?= $this->activeMenu('history', 'index', 'index', 'active'); ?>">
-                        <a href="/">
-                            <span class="icon-menu ic-report"></span>
-                            <span>Laporan Transaksi</span>
-                        </a>
-                    </li>
-                    <li class="menu-item <?= $this->activeMenu('user', 'index', 'index', 'active'); ?>">
-                        <a href="/user/index/index">
-                            <span class="icon-menu ic-users"></span>
-                            <span>Kelola User</span>
-                        </a>
-                    </li>
+                    <?php if (!empty($this->menus)): ?>
+                        <?php foreach ($this->menus as $menu): ?>
+                            <li class="menu-item <?= $this->activeMenu($menu['module'], $menu['controller']); ?>">
+                                <a href="<?= $this->baseUrl($menu['url']); ?>">
+                                    <span class="icon-menu <?= $this->escape($menu['icon']); ?>"></span>
+                                    <span><?= $this->escape($menu['name']); ?></span>
+                                </a>
+                            </li>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <!-- Fallback: no menu data in session (menus/level_menus not seeded yet) -->
+                        <li class="menu-item <?= $this->activeMenu('default', 'index', 'index', 'active'); ?>">
+                            <a href="/">
+                                <span class="icon-menu ic-dashboard"></span>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="menu-item <?= $this->activeMenu('summary', 'index', 'index', 'active'); ?>">
+                            <a href="/">
+                                <span class="icon-menu ic-summary"></span>
+                                <span>Rangkuman Distribusi</span>
+                            </a>
+                        </li>
+                        <li class="menu-item <?= $this->activeMenu('history', 'index', 'index', 'active'); ?>">
+                            <a href="/">
+                                <span class="icon-menu ic-report"></span>
+                                <span>Laporan Transaksi</span>
+                            </a>
+                        </li>
+                        <li class="menu-item <?= $this->activeMenu('users', 'index', 'index', 'active'); ?>">
+                            <a href="/user/index/index">
+                                <span class="icon-menu ic-users"></span>
+                                <span>Kelola User</span>
+                            </a>
+                        </li>
+                    <?php endif; ?>
                 </ul>
             </div>
         </div>
