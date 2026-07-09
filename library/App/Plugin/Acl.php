@@ -11,12 +11,12 @@ class App_Plugin_Acl extends Zend_Controller_Plugin_Abstract
 
     public function preDispatch(Zend_Controller_Request_Abstract $request)
     {
-        $role    = App_Auth::role();
+        $role = App_Auth::role();
         $isLogin = App_Auth::check();
 
-        $module     = $request->getModuleName();
+        $module = $request->getModuleName();
         $controller = $request->getControllerName();
-        $action     = $request->getActionName();
+        $action = $request->getActionName();
 
         /**
          * =========================
@@ -56,14 +56,16 @@ class App_Plugin_Acl extends Zend_Controller_Plugin_Abstract
                 exit;
             }
 
-            if (in_array($action, [
-                'login',
-                'forgot-password',
-                'verify-otp',
-                'reset-password',
-                'send-otp',
-                'verify-otp-process'
-            ])) {
+            if (
+                in_array($action, [
+                    'login',
+                    'forgot-password',
+                    'verify-otp',
+                    'reset-password',
+                    'send-otp',
+                    'verify-otp-process'
+                ])
+            ) {
                 $this->getResponse()
                     ->setRedirect('/')
                     ->sendResponse();
@@ -128,10 +130,12 @@ class App_Plugin_Acl extends Zend_Controller_Plugin_Abstract
         }
 
         // 3. file umum
-        if (in_array($uri, [
-            '/favicon.ico',
-            '/robots.txt'
-        ])) {
+        if (
+            in_array($uri, [
+                '/favicon.ico',
+                '/robots.txt'
+            ])
+        ) {
             return true;
         }
 
