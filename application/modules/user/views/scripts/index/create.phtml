@@ -20,7 +20,7 @@
     <input type="hidden" name="status" id="input-status" value="1">
     <input type="hidden" name="level_user" id="input-level" value="1">
     <input type="hidden" name="role" id="input-role" value="1">
-    <input type="hidden" name="itp_id" id="input-itp" value="">
+    <input type="hidden" name="itp_code" id="input-itp" value="">
 
     <div class="card border border-light-subtle shadow-sm rounded-4 bg-white text-dark overflow-hidden"
         style="margin-top: 0px; margin-bottom: 160px;">
@@ -160,8 +160,8 @@
                             <?php if (!empty($this->listItp) && is_array($this->listItp)): ?>
                                 <?php foreach ($this->listItp as $itp): ?>
                                     <li><a class="dropdown-item py-2 text-dark fw-medium" href="#"
-                                            data-value="<?= $itp['id']; ?>">
-                                            <?= $this->escape($itp['itp_name']); ?>
+                                            data-value="<?= $itp['technical_provider_code']; ?>">
+                                            <?= $this->escape($itp['nama_technical_provider']); ?>
                                         </a></li>
                                 <?php endforeach; ?>
                             <?php else: ?>
@@ -441,7 +441,7 @@
             formData.append('status', document.getElementById('input-status').value);
             formData.append('level_user', document.getElementById('input-level').value);
             formData.append('role', document.getElementById('input-role').value);
-            formData.append('itp_id', inputItp.value);
+            formData.append('itp_code', inputItp.value);
             formData.append('email', document.getElementById('email').value);
             formData.append('fullName', document.getElementById('fullName').value);
 

@@ -99,7 +99,7 @@ class User_IndexController extends App_Controller_Base
 
         $responseRoles = $api->request('POST', '/service/proxy/service/alias/get-roles', $payload);
         $responseLevel = $api->request('POST', '/service/proxy/service/alias/get-levels', $payload);
-        $listItp = $api->request('POST', '/service/proxy/service/alias/get-all-itp', $payload);
+        $listItp = $api->request('POST', '/service/proxy/service/alias/get-all-itp');
 
         // Zend_Debug::dump($responseLevel);
         // Zend_Debug::dump($listItp);
@@ -131,8 +131,7 @@ class User_IndexController extends App_Controller_Base
             $email = trim((string) $this->_getParam('email', ''));
             $levelUser = (int) $this->_getParam('level_user', 1);
             $roleValue = (int) $this->_getParam('role', 1);
-            $itpValue = trim((string) $this->_getParam('itp_id', ''));
-            $itpId = $itpValue !== '' ? (int) $itpValue : null;
+            $itpCode = trim((string) $this->_getParam('itp_code', ''));
 
             if (empty($email) || empty($fullName)) {
                 return $this->_helper->json([
@@ -161,7 +160,7 @@ class User_IndexController extends App_Controller_Base
                 $userAgent,
                 $this->currentUser()['session_token'],
                 $roleValue,
-                $itpId,
+                $itpCode,
                 "@p_user_id",
                 "@p_reset_token"
             ];
