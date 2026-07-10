@@ -1,55 +1,77 @@
 <?php
 $user = (isset($this->userDetail) && is_array($this->userDetail)) ? $this->userDetail : [];
 
-$currentId        = isset($user['id']) ? $user['id'] : '';
-$currentFullName  = isset($user['full_name']) ? $user['full_name'] : '';
-$currentEmail     = isset($user['email']) ? $user['email'] : '';
+$currentId = isset($user['id']) ? $user['id'] : '';
+$currentFullName = isset($user['full_name']) ? $user['full_name'] : '';
+$currentEmail = isset($user['email']) ? $user['email'] : '';
 $currentLevelName = isset($user['level_name']) ? trim($user['level_name']) : '';
-$currentRoleName  = isset($user['role_name']) ? trim($user['role_name']) : '';
+$currentRoleName = isset($user['role_name']) ? trim($user['role_name']) : '';
 
-$isActive  = isset($user['is_active']) ? $user['is_active'] : 0;
+$isActive = isset($user['is_active']) ? $user['is_active'] : 0;
 $isBlocked = isset($user['is_blocked']) ? $user['is_blocked'] : 0;
 
 $statusText = 'Non-Aktif';
-$statusVal  = '0';
+$statusVal = '0';
 if ($isBlocked == 1) {
     $statusText = 'Blokir';
-    $statusVal  = 'block';
+    $statusVal = 'block';
 } elseif ($isActive == 1) {
     $statusText = 'Aktif';
-    $statusVal  = '1';
+    $statusVal = '1';
 }
 
 $levelText = 'Pilih Level User';
-$levelVal  = '';
+$levelVal = '';
 
 if (strcasecmp($currentLevelName, 'Admin MIS') === 0 || strcasecmp($currentLevelName, 'MIS') === 0) {
     $levelText = 'Admin MIS';
-    $levelVal  = '1';
+    $levelVal = '1';
 } elseif (strcasecmp($currentLevelName, 'IT Provider') === 0) {
     $levelText = 'IT Provider';
-    $levelVal  = '2';
+    $levelVal = '2';
 } elseif (strcasecmp($currentLevelName, 'Guest MIS') === 0) {
     $levelText = 'Guest MIS';
-    $levelVal  = '8';
+    $levelVal = '8';
 }
 
 // 3. Normalisasi Role (Administrator = 2, Viewer = 1)
 $roleText = 'Pilih Role';
-$roleVal  = '';
+$roleVal = '';
 if (strcasecmp($currentRoleName, 'admin') === 0 || strcasecmp($currentRoleName, 'administrator') === 0) {
     $roleText = 'Administrator';
-    $roleVal  = '2'; // ID Baru untuk Administrator
+    $roleVal = '2'; // ID Baru untuk Administrator
 } elseif (strcasecmp($currentRoleName, 'viewer') === 0 || strcasecmp($currentRoleName, 'user') === 0) {
     $roleText = 'Viewer';
-    $roleVal  = '1'; // ID Baru untuk Viewer
+    $roleVal = '1'; // ID Baru untuk Viewer
+}
+
+// 4. IT Provider: preselect dari additional_info.tp_code, tampil jika level IT Provider
+$listItp = (isset($this->listItp) && is_array($this->listItp)) ? $this->listItp : [];
+$tpCode = isset($this->tpCode) ? $this->tpCode : null;
+$itpVisible = ($levelVal === '2');
+
+$itpVal = '';
+$itpText = 'Pilih IT provider';
+if ($itpVisible && $tpCode !== null) {
+    foreach ($listItp as $itp) {
+        if ($itp['code'] == $tpCode) {
+            $itpVal = $itp['code'];
+            $itpText = $itp['name'];
+            break;
+        }
+    }
 }
 ?>
 
 <div style="margin-top: -8px; padding-top: 24px; padding-bottom: 24px; line-height: 1;">
-    <a href="<?= $this->baseUrl('user'); ?>" class="text-decoration-none fw-semibold d-inline-flex align-items-center gap-2" style="font-size: 14px; color: #595C60;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-top: -1px;">
-            <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" stroke="#595C60" stroke-width="0.5" />
+    <a href="<?= $this->baseUrl('user'); ?>"
+        class="text-decoration-none fw-semibold d-inline-flex align-items-center gap-2"
+        style="font-size: 14px; color: #595C60;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"
+            style="margin-top: -1px;">
+            <path fill-rule="evenodd"
+                d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"
+                stroke="#595C60" stroke-width="0.5" />
         </svg>
         Kembali
     </a>
@@ -59,92 +81,183 @@ if (strcasecmp($currentRoleName, 'admin') === 0 || strcasecmp($currentRoleName, 
     <input type="hidden" name="status" id="input-status" value="<?= $statusVal; ?>">
     <input type="hidden" name="level_user" id="input-level" value="<?= $levelVal; ?>">
     <input type="hidden" name="role" id="input-role" value="<?= $roleVal; ?>">
+    <input type="hidden" name="itp_code" id="input-itp" value="<?= htmlspecialchars($itpVal, ENT_QUOTES, 'UTF-8'); ?>">
 
-    <div class="card border border-light-subtle shadow-sm rounded-4 bg-white text-dark overflow-hidden" style="margin-top: 0px; margin-bottom: 160px;">
+    <div class="card border border-light-subtle shadow-sm rounded-4 bg-white text-dark overflow-hidden"
+        style="margin-top: 0px; margin-bottom: 160px;">
         <div class="card-body p-4 p-md-5 bg-white text-dark">
             <h3 class="fw-bold text-dark mb-1 fs-4">Edit User</h3>
             <p class="text-secondary mb-4 mb-md-5" style="font-size: 14px;">Data informasi akun user</p>
 
             <div class="row g-4">
                 <div class="col-md-6" id="ctx-status">
-                    <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Status User <span class="text-danger">*</span></label>
+                    <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Status User <span
+                            class="text-danger">*</span></label>
                     <div class="dropdown">
-                        <button class="btn border border-light-subtle py-3 px-3 rounded-3 w-100 d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #ffffff; font-size: 14px; height: 48px;">
+                        <button
+                            class="btn border border-light-subtle py-3 px-3 rounded-3 w-100 d-flex justify-content-between align-items-center"
+                            type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                            style="background-color: #ffffff; font-size: 14px; height: 48px;">
                             <span id="label-status"><?= $statusText; ?></span>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#4A5568" stroke-width="2.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none"
+                                viewBox="0 0 24 24" stroke="#4A5568" stroke-width="2.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                             </svg>
                         </button>
                         <ul class="dropdown-menu w-100 shadow-sm border-light-subtle rounded-3">
-                            <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#" data-value="1">Aktif</a></li>
-                            <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#" data-value="0">Non-Aktif</a></li>
-                            <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#" data-value="block">Blokir</a></li>
+                            <li>
+                                <a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#" data-value="1">Aktif</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#"
+                                    data-value="0">Non-Aktif</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#"
+                                    data-value="block">Blokir</a>
+                            </li>
                         </ul>
                     </div>
                 </div>
 
                 <div class="col-md-6">
-                    <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">ID User <span class="text-danger">*</span></label>
-                    <input type="text" name="id_user" class="form-control border border-light-subtle py-3 px-3 rounded-3 text-dark fw-bold" style="background-color: #F3F3F7; color: #1e293b !important; height: 48px; font-size: 14px;" value="<?= htmlspecialchars($currentId, ENT_QUOTES, 'UTF-8'); ?>" readonly>
+                    <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">ID User <span
+                            class="text-danger">*</span></label>
+                    <input type="text" name="id_user"
+                        class="form-control border border-light-subtle py-3 px-3 rounded-3 text-dark fw-bold"
+                        style="background-color: #F3F3F7; color: #1e293b !important; height: 48px; font-size: 14px;"
+                        value="<?= htmlspecialchars($currentId, ENT_QUOTES, 'UTF-8'); ?>" readonly>
                 </div>
 
                 <div class="col-md-6">
-                    <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Nama <span class="text-danger">*</span></label>
-                    <input type="text" name="fullName" class="form-control border border-light-subtle py-3 px-3 rounded-3 text-dark fw-semibold" style="font-size: 14px; height: 48px; background-color: #F3F3F7;" value="<?= htmlspecialchars($currentFullName, ENT_QUOTES, 'UTF-8'); ?>" required>
+                    <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Nama <span
+                            class="text-danger">*</span></label>
+                    <input type="text" name="fullName"
+                        class="form-control border border-light-subtle py-3 px-3 rounded-3 text-dark fw-semibold"
+                        style="font-size: 14px; height: 48px; background-color: #F3F3F7;"
+                        value="<?= htmlspecialchars($currentFullName, ENT_QUOTES, 'UTF-8'); ?>" required>
                 </div>
 
                 <div class="col-md-6">
-                    <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Email <span class="text-danger">*</span></label>
-                    <input type="email" name="email" class="form-control border border-light-subtle py-3 px-3 rounded-3 text-dark fw-semibold" style="font-size: 14px; height: 48px; background-color: #F3F3F7;" value="<?= htmlspecialchars($currentEmail, ENT_QUOTES, 'UTF-8'); ?>" required>
+                    <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Email <span
+                            class="text-danger">*</span></label>
+                    <input type="email" name="email"
+                        class="form-control border border-light-subtle py-3 px-3 rounded-3 text-dark fw-semibold"
+                        style="font-size: 14px; height: 48px; background-color: #F3F3F7;"
+                        value="<?= htmlspecialchars($currentEmail, ENT_QUOTES, 'UTF-8'); ?>" required>
                 </div>
 
                 <div class="col-md-6" id="ctx-level">
-                    <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Level User <span class="text-danger">*</span></label>
+                    <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Level User <span
+                            class="text-danger">*</span></label>
                     <div class="dropdown">
-                        <button class="btn border border-light-subtle py-3 px-3 rounded-3 w-100 d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #F3F3F7; font-size: 14px; height: 48px;">
+                        <button
+                            class="btn border border-light-subtle py-3 px-3 rounded-3 w-100 d-flex justify-content-between align-items-center"
+                            type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                            style="background-color: #F3F3F7; font-size: 14px; height: 48px;">
                             <span id="label-level"><?= $levelText; ?></span>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#4A5568" stroke-width="2.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none"
+                                viewBox="0 0 24 24" stroke="#4A5568" stroke-width="2.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                             </svg>
                         </button>
                         <ul class="dropdown-menu w-100 shadow-sm border-light-subtle rounded-3">
-                            <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#" data-value="1">Admin MIS</a></li>
-                            <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#" data-value="2">IT Provider</a></li>
-                            <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#" data-value="8">Guest MIS</a></li>
+                            <?php foreach ($this->listLevel as $level): ?>
+                                <li>
+                                    <a class="dropdown-item py-2 text-dark fw-medium" href="#"
+                                        data-value="<?= $level['id']; ?>">
+                                        <?= $level['level_name']; ?>
+                                    </a>
+                                </li>
+                            <?php endforeach; ?>
                         </ul>
                     </div>
                 </div>
 
                 <div class="col-md-6" id="ctx-role">
-                    <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Role <span class="text-danger">*</span></label>
-
-                    <input type="hidden" name="role" id="input-role" value="<?= $roleVal; ?>">
+                    <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Role <span
+                            class="text-danger">*</span></label>
 
                     <div class="dropdown">
-                        <button class="btn border border-light-subtle py-3 px-3 rounded-3 w-100 d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #F3F3F7;; font-size: 14px; height: 48px;">
+                        <button
+                            class="btn border border-light-subtle py-3 px-3 rounded-3 w-100 d-flex justify-content-between align-items-center"
+                            type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                            style="background-color: #F3F3F7;; font-size: 14px; height: 48px;">
                             <span id="label-role"><?= $roleText; ?></span>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#4A5568" stroke-width="2.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none"
+                                viewBox="0 0 24 24" stroke="#4A5568" stroke-width="2.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                             </svg>
                         </button>
                         <ul class="dropdown-menu w-100 shadow-sm border-light-subtle rounded-3">
-                            <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#" data-value="2">Administrator</a></li>
-                            <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#" data-value="1">Viewer</a></li>
+                            <?php foreach ($this->listRoles as $role): ?>
+                                <?php
+
+                                $originalName = strtolower($role['role_name']);
+                                $displayName = ucwords($originalName);
+
+                                ?>
+                                <li>
+                                    <a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#"
+                                        data-value="<?= $role['id']; ?>">
+                                        <?= $displayName; ?>
+                                    </a>
+                                </li>
+                            <?php endforeach; ?>
                         </ul>
+                    </div>
+                </div>
+
+                <div class="col-md-6 <?= $itpVisible ? '' : 'd-none'; ?>" id="ctx-itp">
+                    <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">IT Provider <span
+                            class="text-danger">*</span></label>
+                    <div class="dropdown">
+                        <button id="btn-itp"
+                            class="btn border border-light-subtle py-3 px-3 rounded-3 w-100 d-flex justify-content-between align-items-center"
+                            type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                            style="background-color: #F3F3F7; font-size: 14px; height: 48px;">
+                            <span id="label-itp" <?= $itpVal === '' ? 'style="color: #B8B9BB;"' : ''; ?>><?= htmlspecialchars($itpText, ENT_QUOTES, 'UTF-8'); ?></span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none"
+                                viewBox="0 0 24 24" stroke="#4A5568" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                            </svg>
+                        </button>
+                        <ul class="dropdown-menu w-100 shadow-sm border-light-subtle rounded-3">
+                            <?php if (!empty($listItp)): ?>
+                                <?php foreach ($listItp as $itp): ?>
+                                    <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#"
+                                            data-value="<?= htmlspecialchars($itp['code'], ENT_QUOTES, 'UTF-8'); ?>"><?= htmlspecialchars($itp['name'], ENT_QUOTES, 'UTF-8'); ?></a>
+                                    </li>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <li><span class="dropdown-item py-2 text-secondary fw-medium">Tidak ada IT provider</span>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+                    </div>
+                    <div id="itp-error" class="text-danger d-none mt-1" style="font-size: 13px;">
+                        IT Provider wajib dipilih untuk level ini
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div style="position: fixed; bottom: 0; left: 152px; right: 0; background-color: #f8fafc; border-top: 1px solid #dee2e6; z-index: 99; box-sizing: border-box;">
+    <div
+        style="position: fixed; bottom: 0; left: 152px; right: 0; background-color: #f8fafc; border-top: 1px solid #dee2e6; z-index: 99; box-sizing: border-box;">
         <div class="d-flex justify-content-between align-items-center gap-3 py-3 px-4">
-            <span class="text-secondary fw-medium text-start" style="font-size: 14px; white-space: nowrap;">Klik Edit untuk mengubah data user atau reset kata sandi</span>
+            <span class="text-secondary fw-medium text-start" style="font-size: 14px; white-space: nowrap;">Klik Edit
+                untuk mengubah data user atau reset kata sandi</span>
             <div class="d-flex gap-3 align-items-center">
-                <button type="button" class="btn bg-white px-4 py-2 rounded-3 fw-bold d-flex align-items-center gap-2 text-dark border border-light-subtle shadow-sm" style="font-size: 14px; height: 40px; white-space: nowrap;" data-bs-toggle="modal" data-bs-target="#modalBatalEdit">
+                <button type="button"
+                    class="btn bg-white px-4 py-2 rounded-3 fw-bold d-flex align-items-center gap-2 text-dark border border-light-subtle shadow-sm"
+                    style="font-size: 14px; height: 40px; white-space: nowrap;" data-bs-toggle="modal"
+                    data-bs-target="#modalBatalEdit">
                     <i class="bi bi-dash-circle"></i> Batal
                 </button>
-                <button type="submit" class="btn px-4 py-2 rounded-3 fw-bold d-flex align-items-center gap-2 text-white shadow-sm" style="background-color: #3b82f6; border: none; font-size: 14px; height: 40px; white-space: nowrap;">
+                <button type="submit"
+                    class="btn px-4 py-2 rounded-3 fw-bold d-flex align-items-center gap-2 text-white shadow-sm"
+                    style="background-color: #3b82f6; border: none; font-size: 14px; height: 40px; white-space: nowrap;">
                     <i class="bi bi-check-circle-fill"></i> Simpan
                 </button>
             </div>
@@ -152,24 +265,30 @@ if (strcasecmp($currentRoleName, 'admin') === 0 || strcasecmp($currentRoleName, 
     </div>
 </form>
 
-<div class="modal fade" id="modalKonfirmasiEdit" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="modalKonfirmasiEdit" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
         <div class="modal-content border-0 rounded-4 shadow p-4 bg-white text-dark">
             <div class="modal-body text-center p-0">
                 <div class="mb-4">
-                    <img src="<?= $this->baseUrl('assets/img/img-create.svg'); ?>" alt="Konfirmasi Perubahan" style="width: 220px; height: auto;">
+                    <img src="<?= $this->baseUrl('assets/img/img-create.svg'); ?>" alt="Konfirmasi Perubahan"
+                        style="width: 220px; height: auto;">
                 </div>
                 <h4 class="fw-bold text-dark mb-2" style="font-size: 20px;">Simpan Perubahan?</h4>
                 <p class="text-secondary mb-4 px-2" style="font-size: 14px;">Semua perubahan data akan disimpan</p>
 
                 <div class="row g-3">
                     <div class="col-6">
-                        <button type="button" class="btn w-100 py-2.5 fw-bold bg-white text-dark border border-light-subtle rounded-3" data-bs-dismiss="modal" style="font-size: 14px; height: 44px;">
+                        <button type="button"
+                            class="btn w-100 py-2.5 fw-bold bg-white text-dark border border-light-subtle rounded-3"
+                            data-bs-dismiss="modal" style="font-size: 14px; height: 44px;">
                             Batal
                         </button>
                     </div>
                     <div class="col-6">
-                        <button type="button" id="btnProsesUpdate" class="btn w-100 py-2.5 fw-bold text-white rounded-3 shadow-sm" style="background-color: #3b82f6; border: none; font-size: 14px; height: 44px;">
+                        <button type="button" id="btnProsesUpdate"
+                            class="btn w-100 py-2.5 fw-bold text-white rounded-3 shadow-sm"
+                            style="background-color: #3b82f6; border: none; font-size: 14px; height: 44px;">
                             Simpan
                         </button>
                     </div>
@@ -179,24 +298,31 @@ if (strcasecmp($currentRoleName, 'admin') === 0 || strcasecmp($currentRoleName, 
     </div>
 </div>
 
-<div class="modal fade" id="modalBatalEdit" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="modalBatalEdit" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
         <div class="modal-content border-0 rounded-4 shadow p-4 bg-white text-dark">
             <div class="modal-body text-center p-0">
                 <div class="mb-4">
-                    <img src="<?= $this->baseUrl('assets/img/img-confirm-delete.svg'); ?>" alt="Buang Perubahan" style="width: 220px; height: auto;">
+                    <img src="<?= $this->baseUrl('assets/img/img-confirm-delete.svg'); ?>" alt="Buang Perubahan"
+                        style="width: 220px; height: auto;">
                 </div>
                 <h4 class="fw-bold text-dark mb-2" style="font-size: 20px;">Buang Perubahan?</h4>
-                <p class="text-secondary mb-4 px-2" style="font-size: 14px;">Data yang telah diubah tidak akan disimpan</p>
+                <p class="text-secondary mb-4 px-2" style="font-size: 14px;">Data yang telah diubah tidak akan disimpan
+                </p>
 
                 <div class="row g-3">
                     <div class="col-6">
-                        <button type="button" class="btn w-100 py-2.5 fw-bold bg-white text-dark border border-light-subtle rounded-3" data-bs-dismiss="modal" style="font-size: 14px; height: 44px;">
+                        <button type="button"
+                            class="btn w-100 py-2.5 fw-bold bg-white text-dark border border-light-subtle rounded-3"
+                            data-bs-dismiss="modal" style="font-size: 14px; height: 44px;">
                             Batal
                         </button>
                     </div>
                     <div class="col-6">
-                        <a href="<?= $this->baseUrl('user'); ?>" class="btn w-100 py-2.5 fw-bold text-white rounded-3 shadow-sm d-flex align-items-center justify-content-center text-decoration-none" style="background-color: #3b82f6; border: none; font-size: 14px; height: 44px;">
+                        <a href="<?= $this->baseUrl('user'); ?>"
+                            class="btn w-100 py-2.5 fw-bold text-white rounded-3 shadow-sm d-flex align-items-center justify-content-center text-decoration-none"
+                            style="background-color: #3b82f6; border: none; font-size: 14px; height: 44px;">
                             Proses
                         </a>
                     </div>
@@ -206,11 +332,13 @@ if (strcasecmp($currentRoleName, 'admin') === 0 || strcasecmp($currentRoleName, 
     </div>
 </div>
 
-<div class="modal fade" id="modalLoadingEdit" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="modalLoadingEdit" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 300px;">
         <div class="modal-content border-0 rounded-4 shadow p-4 bg-white text-dark">
             <div class="modal-body text-center p-0 d-flex flex-column align-items-center justify-content-center gap-3">
-                <div class="spinner-border text-primary" role="status" style="width: 3.5rem; height: 3.5rem; stroke-width: 3;">
+                <div class="spinner-border text-primary" role="status"
+                    style="width: 3.5rem; height: 3.5rem; stroke-width: 3;">
                     <span class="visually-hidden">Loading...</span>
                 </div>
                 <h5 class="fw-bold text-dark mb-0 fs-6">Memproses...</h5>
@@ -219,17 +347,21 @@ if (strcasecmp($currentRoleName, 'admin') === 0 || strcasecmp($currentRoleName, 
     </div>
 </div>
 
-<div class="modal fade" id="modalSuksesEdit" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="modalSuksesEdit" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
         <div class="modal-content border-0 rounded-4 shadow p-4 bg-white text-dark">
             <div class="modal-body text-center p-0">
                 <div class="mb-4">
-                    <img src="<?= $this->baseUrl('assets/img/img-create.svg'); ?>" alt="Sukses Perubahan" style="width: 220px; height: auto;">
+                    <img src="<?= $this->baseUrl('assets/img/img-create.svg'); ?>" alt="Sukses Perubahan"
+                        style="width: 220px; height: auto;">
                 </div>
                 <h4 class="fw-bold text-dark mb-2" style="font-size: 20px;">Berhasil Diperbarui</h4>
                 <p class="text-secondary mb-4 px-2" style="font-size: 14px;">Data bank telah berhasil diperbarui</p>
 
-                <button type="button" id="btnSelesaiEdit" class="btn w-100 py-2.5 fw-bold text-white rounded-3 shadow-sm" style="background-color: #3b82f6; border: none; font-size: 14px; height: 44px;">
+                <button type="button" id="btnSelesaiEdit"
+                    class="btn w-100 py-2.5 fw-bold text-white rounded-3 shadow-sm"
+                    style="background-color: #3b82f6; border: none; font-size: 14px; height: 44px;">
                     Oke
                 </button>
             </div>
@@ -238,11 +370,43 @@ if (strcasecmp($currentRoleName, 'admin') === 0 || strcasecmp($currentRoleName, 
 </div>
 
 <script type="text/javascript">
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
+        // Level yang mewajibkan pilihan IT Provider
+        const ITP_LEVEL_ID = '2';
+
+        const ctxItp = document.getElementById('ctx-itp');
+        const inputItp = document.getElementById('input-itp');
+        const labelItp = document.getElementById('label-itp');
+        const itpError = document.getElementById('itp-error');
+        const btnItp = document.getElementById('btn-itp');
+
+        function toggleItp(levelValue) {
+            if (levelValue === ITP_LEVEL_ID) {
+                ctxItp.classList.remove('d-none');
+            } else {
+                // sembunyikan + reset pilihan agar tidak terkirim nilai lama
+                ctxItp.classList.add('d-none');
+                inputItp.value = '';
+                labelItp.textContent = 'Pilih IT provider';
+                labelItp.style.setProperty('color', '#B8B9BB', 'important');
+                hideItpError();
+            }
+        }
+
+        function showItpError() {
+            itpError.classList.remove('d-none');
+            btnItp.classList.add('border-danger');
+        }
+
+        function hideItpError() {
+            itpError.classList.add('d-none');
+            btnItp.classList.remove('border-danger');
+        }
+
         const dropdownItems = document.querySelectorAll(".dropdown-menu a");
 
         dropdownItems.forEach(item => {
-            item.addEventListener("click", function(e) {
+            item.addEventListener("click", function (e) {
                 e.preventDefault();
 
                 const value = this.getAttribute("data-value");
@@ -257,8 +421,13 @@ if (strcasecmp($currentRoleName, 'admin') === 0 || strcasecmp($currentRoleName, 
                     document.getElementById("input-status").value = value;
                 } else if (dropdownContainer.id === "ctx-level") {
                     document.getElementById("input-level").value = value;
+                    toggleItp(value);
                 } else if (dropdownContainer.id === "ctx-role") {
                     document.getElementById("input-role").value = value;
+                } else if (dropdownContainer.id === "ctx-itp") {
+                    inputItp.value = value;
+                    labelItp.style.setProperty('color', '#12161C', 'important');
+                    hideItpError();
                 }
             });
         });
@@ -267,7 +436,7 @@ if (strcasecmp($currentRoleName, 'admin') === 0 || strcasecmp($currentRoleName, 
         var modalLoading = new bootstrap.Modal(document.getElementById('modalLoadingEdit'));
         var modalSukses = new bootstrap.Modal(document.getElementById('modalSuksesEdit'));
 
-        document.getElementById('formEditUser').addEventListener('submit', function(event) {
+        document.getElementById('formEditUser').addEventListener('submit', function (event) {
             event.preventDefault();
 
             const levelVal = document.getElementById('input-level').value;
@@ -278,10 +447,17 @@ if (strcasecmp($currentRoleName, 'admin') === 0 || strcasecmp($currentRoleName, 
                 return false;
             }
 
+            // IT Provider wajib dipilih jika level-nya IT Provider
+            if (levelVal === ITP_LEVEL_ID && inputItp.value === '') {
+                showItpError();
+                ctxItp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return false;
+            }
+
             modalKonfirmasi.show();
         });
 
-        document.getElementById('btnProsesUpdate').addEventListener('click', function() {
+        document.getElementById('btnProsesUpdate').addEventListener('click', function () {
             modalKonfirmasi.hide();
             modalLoading.show();
 
@@ -289,9 +465,9 @@ if (strcasecmp($currentRoleName, 'admin') === 0 || strcasecmp($currentRoleName, 
             const formData = new FormData(form);
 
             fetch(form.action, {
-                    method: 'POST',
-                    body: formData
-                })
+                method: 'POST',
+                body: formData
+            })
                 .then(response => {
                     // Jika response HTTP bermasalah (bukan 200), lempar teks error mentahnya
                     if (!response.ok) {
@@ -317,7 +493,7 @@ if (strcasecmp($currentRoleName, 'admin') === 0 || strcasecmp($currentRoleName, 
                 });
         });
 
-        document.getElementById('btnSelesaiEdit').addEventListener('click', function() {
+        document.getElementById('btnSelesaiEdit').addEventListener('click', function () {
             modalSukses.hide();
             window.location.href = "<?= $this->baseUrl('user'); ?>";
         });

@@ -33,6 +33,64 @@ class User_IndexController extends App_Controller_Base
         }
     }
 
+    protected function fetchItpList(App_Service_Api $api)
+    {
+        $response = $api->request('POST', '/service/proxy/service/alias/get-all-itp');
+
+        if (
+            !isset($response['code']) || $response['code'] != 200
+            || empty($response['msg']) || !is_array($response['msg'])
+            || isset($response['msg'][0]['ERROR'])
+        ) {
+            return [];
+        }
+
+        $list = [];
+        foreach ($response['msg'] as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+
+            $code = $row['technical_provider_code']
+                ?? $row['tp_code']
+                ?? $row['itp_code']
+                ?? $row['code']
+                ?? null;
+            $name = $row['nama_technical_provider']
+                ?? $row['tp_name']
+                ?? $row['itp_name']
+                ?? $row['name']
+                ?? null;
+
+            if ($code === null || $code === '') {
+                continue;
+            }
+
+            $list[] = [
+                'code' => (string) $code,
+                'name' => ($name !== null && $name !== '') ? (string) $name : (string) $code,
+            ];
+        }
+
+        return $list;
+    }
+
+    /**
+     * tp_code from the user detail's additional_info JSON, or null.
+     */
+    protected function extractTpCode($userDetail)
+    {
+        if (empty($userDetail['additional_info'])) {
+            return null;
+        }
+
+        $additional = json_decode($userDetail['additional_info'], true);
+
+        return (is_array($additional) && isset($additional['tp_code']) && $additional['tp_code'] !== '')
+            ? (string) $additional['tp_code']
+            : null;
+    }
+
     public function detailAction()
     {
         $api = new App_Service_Api();
@@ -86,6 +144,8 @@ class User_IndexController extends App_Controller_Base
         }
 
         $this->view->userDetail = $userDetail;
+        $this->view->listItp = $this->fetchItpList($api);
+        $this->view->tpCode = $this->extractTpCode($userDetail);
     }
 
     public function createAction()
@@ -99,12 +159,12 @@ class User_IndexController extends App_Controller_Base
 
         $responseRoles = $api->request('POST', '/service/proxy/service/alias/get-roles', $payload);
         $responseLevel = $api->request('POST', '/service/proxy/service/alias/get-levels', $payload);
-        $listItp = $api->request('POST', '/service/proxy/service/alias/get-all-itp', $payload);
 
-        // Zend_Debug::dump($responseLevel);
-        // Zend_Debug::dump($listItp);
+        if (isset($responseRoles['msg'][0]['ERROR']) && $responseRoles['msg'][0]['ERROR'] == 'Invalid or expired session') {
+            return $this->_redirect('/auth/logout');
+        }
 
-        if ($responseRoles['msg'][0]['ERROR'] == 'Invalid or expired session') {
+        if (isset($responseLevel['msg'][0]['ERROR']) && $responseLevel['msg'][0]['ERROR'] == 'Invalid or expired session') {
             return $this->_redirect('/auth/logout');
         }
 
@@ -114,8 +174,8 @@ class User_IndexController extends App_Controller_Base
         }
 
         $this->view->listRoles = $rolesData;
-        $this->view->listLevel = $responseLevel['msg'];
-        $this->view->listItp = $listItp['msg'];
+        $this->view->listLevel = isset($responseLevel['msg']) && is_array($responseLevel['msg']) ? $responseLevel['msg'] : [];
+        $this->view->listItp = $this->fetchItpList($api);
     }
 
     public function saveAction()
@@ -131,8 +191,7 @@ class User_IndexController extends App_Controller_Base
             $email = trim((string) $this->_getParam('email', ''));
             $levelUser = (int) $this->_getParam('level_user', 1);
             $roleValue = (int) $this->_getParam('role', 1);
-            $itpValue = trim((string) $this->_getParam('itp_id', ''));
-            $itpId = $itpValue !== '' ? (int) $itpValue : null;
+            $itpCode = trim((string) $this->_getParam('itp_code', ''));
 
             if (empty($email) || empty($fullName)) {
                 return $this->_helper->json([
@@ -161,7 +220,7 @@ class User_IndexController extends App_Controller_Base
                 $userAgent,
                 $this->currentUser()['session_token'],
                 $roleValue,
-                $itpId,
+                $itpCode,
                 "@p_user_id",
                 "@p_reset_token"
             ];
@@ -283,14 +342,14 @@ class User_IndexController extends App_Controller_Base
         $userSession = new Zend_Session_Namespace('UserDetailCache');
         $userDetail = null;
 
+        $api = new App_Service_Api();
+        $api->authorization(); // Sinkronisasi signature header AJAX / Direct Click
+
         // 2. Jika diakses dari jalur Detail -> Edit, ambil langsung dari session
         if (isset($userSession->data)) {
             $userDetail = $userSession->data;
         } else {
-            // 3. 🔥 JALUR LANGSUNG (Klik Edit dari Halaman Utama): Berikan otentikasi global agar lolos 401
-            $api = new App_Service_Api();
-            $api->authorization(); // Sinkronisasi signature header AJAX / Direct Click
-
+            // 3. 🔥 JALUR LANGSUNG (Klik Edit dari Halaman Utama)
             // Ambil session token andalan Anda
             $sessionToken = $this->currentUser()['session_token'];
             $idUser = (int) $this->_getParam('id', 0);
@@ -306,13 +365,39 @@ class User_IndexController extends App_Controller_Base
             }
         }
 
+        $sessionToken = $this->currentUser()['session_token'];
+        $payload = [$sessionToken];
+
+        $responseRoles = $api->request('POST', '/service/proxy/service/alias/get-roles', $payload);
+        $responseLevel = $api->request('POST', '/service/proxy/service/alias/get-levels', $payload);
+
+        if (isset($responseRoles['msg'][0]['ERROR']) && $responseRoles['msg'][0]['ERROR'] == 'Invalid or expired session') {
+            return $this->_redirect('/auth/logout');
+        }
+
+        if (isset($responseLevel['msg'][0]['ERROR']) && $responseLevel['msg'][0]['ERROR'] == 'Invalid or expired session') {
+            return $this->_redirect('/auth/logout');
+        }
+
+        $rolesData = [];
+        if (isset($responseRoles['code']) && $responseRoles['code'] == 200 && isset($responseRoles['msg'])) {
+            $rolesData = $responseRoles['msg'];
+        }
+
         // 4. Lempar data aman ke view edit.phtml
         $this->view->userDetail = $userDetail;
+        $this->view->listRoles = $rolesData;
+        $this->view->listLevel = isset($responseLevel['msg']) && is_array($responseLevel['msg']) ? $responseLevel['msg'] : [];
+        $this->view->listItp = $this->fetchItpList($api);
+        $this->view->tpCode = $this->extractTpCode($userDetail);
         $this->_helper->viewRenderer('edit');
     }
 
     public function updateAction()
     {
+        $this->_helper->viewRenderer->setNoRender(true);
+        $this->getResponse()->setHeader('Content-Type', 'application/json');
+
         if ($this->_request->isPost()) {
             $api = new App_Service_Api();
 
@@ -323,6 +408,7 @@ class User_IndexController extends App_Controller_Base
             $email = (string) $this->_getParam('email', '');
             $levelUser = (int) $this->_getParam('level_user', 1);
             $roleValue = (int) $this->_getParam('role', 1);
+            $itpCode = trim((string) $this->_getParam('itp_code', ''));
             $statusRaw = $this->_getParam('status', '1');
 
             $isActive = ($statusRaw === '1') ? 1 : 0;
@@ -343,7 +429,8 @@ class User_IndexController extends App_Controller_Base
                 (int) $this->currentUserId(),
                 $this->currentUser()['session_token'],
                 $ipAddress,
-                $userAgent
+                $userAgent,
+                $itpCode
             ];
 
             $response = $api->request('POST', '/service/proxy/service/alias/update-user', $payload);
