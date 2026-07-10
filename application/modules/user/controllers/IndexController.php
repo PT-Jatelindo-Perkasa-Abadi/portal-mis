@@ -9,16 +9,21 @@ class User_IndexController extends App_Controller_Base
 
         $limit = (int) $this->_getParam('limit', 10);
         $page = (int) $this->_getParam('page', 1);
-
-        $response = $api->request('POST', '/service/proxy/service/alias/get-all-user');
+        $level = (int) $this->_getParam('level');
+        $role = (int) $this->_getParam('role');
+        $status = $this->_getParam('status');
+        $search = $this->_getParam('search');
 
         $sessionToken = $this->currentUser()['session_token'];
 
-        $levels = $api->request('POST', '/service/proxy/service/alias/get-levels', [$sessionToken]);
-        $roles = $api->request('POST', '/service/proxy/service/alias/get-roles', [$sessionToken]);
+        $payload = [
+            $sessionToken,
+            $level ?: null,
+            $role ?: null,
+            $status ?: null
+        ];
 
-        Zend_Debug::dump($levels);
-        Zend_Debug::dump($roles);
+        $response = $api->request('POST', '/service/proxy/service/alias/get-all-user-filtered', $payload);
 
         if (isset($response['code']) && $response['code'] == 200 && isset($response['msg']) && is_array($response['msg'])) {
 
@@ -31,6 +36,31 @@ class User_IndexController extends App_Controller_Base
         } else {
             $this->view->users = [];
         }
+
+
+        $payload = [$sessionToken];
+        $responseRoles = $api->request('POST', '/service/proxy/service/alias/get-roles', $payload);
+        $responseLevel = $api->request('POST', '/service/proxy/service/alias/get-levels', $payload);
+
+        if (isset($responseRoles['msg'][0]['ERROR']) && $responseRoles['msg'][0]['ERROR'] == 'Invalid or expired session') {
+            return $this->_redirect('/auth/logout');
+        }
+
+        if (isset($responseLevel['msg'][0]['ERROR']) && $responseLevel['msg'][0]['ERROR'] == 'Invalid or expired session') {
+            return $this->_redirect('/auth/logout');
+        }
+
+        $rolesData = [];
+        if (isset($responseRoles['code']) && $responseRoles['code'] == 200 && isset($responseRoles['msg'])) {
+            $rolesData = $responseRoles['msg'];
+        }
+
+
+        Zend_Debug::dump($rolesData);
+
+        $this->view->rolesData = $rolesData;
+        $this->view->listLevel = isset($responseLevel['msg']) && is_array($responseLevel['msg']) ? $responseLevel['msg'] : [];
+        $this->view->listItp = $this->fetchItpList($api);
     }
 
     protected function fetchItpList(App_Service_Api $api)
