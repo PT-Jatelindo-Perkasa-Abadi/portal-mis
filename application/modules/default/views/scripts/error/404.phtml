@@ -1,5 +1,12 @@
-<h1>404 - Page Not Found</h1>
-<p>Halaman tidak ditemukan.</p>
+<div class="image-container">
+    <img src="<?= $this->baseUrl('assets/img/img_error_message_401.svg'); ?>" alt="Error Illustration"
+        class="error-svg" />
+</div>
+
+<h1>Page not found</h1>
+<p>An error has occurred with a page not found</p>
+
+<a href="#" class="btn-go-back" onclick="history.go(-1)">Go Back</a>
 
 <?php if (APPLICATION_ENV === 'development'): ?>
 <pre><?php echo $this->exception->getMessage(); ?></pre>

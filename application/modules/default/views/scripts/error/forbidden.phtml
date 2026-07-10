@@ -1,2 +1,9 @@
-<h1>403 - Forbidden</h1>
-<p>Kamu tidak punya akses ke halaman ini.</p>
+<div class="image-container">
+    <img src="<?= $this->baseUrl('assets/img/img_error_message_401.svg'); ?>" alt="Error Illustration"
+        class="error-svg">
+</div>
+
+<h1>Forbidden</h1>
+<p>Sorry, you don't have permission to access this page.</p>
+
+<a href="#" class="btn-go-back" onclick="history.go(-1)">Go Back</a>
