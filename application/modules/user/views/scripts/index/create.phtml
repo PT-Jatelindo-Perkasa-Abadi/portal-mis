@@ -133,10 +133,12 @@
                         </button>
                         <ul class="dropdown-menu w-100 shadow-sm border-light-subtle rounded-3">
                             <?php foreach ($this->listLevel as $level): ?>
-                                <li><a class="dropdown-item py-2 text-dark fw-medium" href="#"
+                                <li>
+                                    <a class="dropdown-item py-2 text-dark fw-medium" href="#"
                                         data-value="<?= $level['id']; ?>">
                                         <?= $level['level_name']; ?>
-                                    </a></li>
+                                    </a>
+                                </li>
                             <?php endforeach; ?>
                         </ul>
                     </div>
@@ -157,17 +159,14 @@
                             </svg>
                         </button>
                         <ul class="dropdown-menu w-100 shadow-sm border-light-subtle rounded-3">
-                            <?php if (!empty($this->listItp) && is_array($this->listItp)): ?>
-                                <?php foreach ($this->listItp as $itp): ?>
-                                    <li><a class="dropdown-item py-2 text-dark fw-medium" href="#"
-                                            data-value="<?= $itp['technical_provider_code']; ?>">
-                                            <?= $this->escape($itp['nama_technical_provider']); ?>
-                                        </a></li>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <li><span class="dropdown-item py-2 text-secondary fw-medium">Tidak ada IT provider</span>
+                            <?php foreach ($this->listItp as $itp): ?>
+                                <li>
+                                    <a class="dropdown-item py-2 text-dark fw-medium" href="#"
+                                        data-value="<?= $itp['code']; ?>">
+                                        <?= $itp['name']; ?>
+                                    </a>
                                 </li>
-                            <?php endif; ?>
+                            <?php endforeach; ?>
                         </ul>
                     </div>
                     <div id="itp-error" class="text-danger d-none mt-1" style="font-size: 13px;">
@@ -270,15 +269,15 @@
 </div>
 
 
-<!-- <script type="text/javascript">
-    document.addEventListener("DOMContentLoaded", function() {
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function () {
         const modalKonfirmasi = new bootstrap.Modal(document.getElementById('modalKonfirmasi'));
         const modalLoading = new bootstrap.Modal(document.getElementById('modalLoading'));
         const modalSukses = new bootstrap.Modal(document.getElementById('modalSukses'));
 
         const dropdownItems = document.querySelectorAll(".dropdown-menu a");
         dropdownItems.forEach(item => {
-            item.addEventListener("click", function(e) {
+            item.addEventListener("click", function (e) {
                 e.preventDefault();
                 const value = this.getAttribute("data-value");
                 const text = this.textContent;
@@ -298,12 +297,12 @@
             });
         });
 
-        document.getElementById('formTambahUser').addEventListener('submit', function(event) {
+        document.getElementById('formTambahUser').addEventListener('submit', function (event) {
             event.preventDefault();
             modalKonfirmasi.show();
         });
 
-        document.getElementById('btnProsesSubmit').addEventListener('click', function() {
+        document.getElementById('btnProsesSubmit').addEventListener('click', function () {
             modalKonfirmasi.hide();
             modalLoading.show();
 
@@ -315,12 +314,12 @@
             formData.append('fullName', document.getElementById('fullName').value);
 
             fetch('<?= $this->baseUrl("user/index/save"); ?>', {
-                    method: 'POST',
-                    body: formData
-                })
+                method: 'POST',
+                body: formData
+            })
                 .then(response => response.json())
                 .then(data => {
-                
+
                     if (data.success || data.code == 200) {
                         modalSukses.show();
                     } else {
@@ -334,12 +333,12 @@
                 });
         });
 
-        document.getElementById('btnSuksesOke').addEventListener('click', function() {
+        document.getElementById('btnSuksesOke').addEventListener('click', function () {
             modalSukses.hide();
             window.location.href = '<?= $this->baseUrl("user/index/index"); ?>';
         });
     });
-</script> -->
+</script>
 
 <script type="text/javascript">
     document.addEventListener("DOMContentLoaded", function () {
