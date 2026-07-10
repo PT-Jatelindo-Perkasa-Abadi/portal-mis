@@ -365,8 +365,29 @@ class User_IndexController extends App_Controller_Base
             }
         }
 
+        $sessionToken = $this->currentUser()['session_token'];
+        $payload = [$sessionToken];
+
+        $responseRoles = $api->request('POST', '/service/proxy/service/alias/get-roles', $payload);
+        $responseLevel = $api->request('POST', '/service/proxy/service/alias/get-levels', $payload);
+
+        if (isset($responseRoles['msg'][0]['ERROR']) && $responseRoles['msg'][0]['ERROR'] == 'Invalid or expired session') {
+            return $this->_redirect('/auth/logout');
+        }
+
+        if (isset($responseLevel['msg'][0]['ERROR']) && $responseLevel['msg'][0]['ERROR'] == 'Invalid or expired session') {
+            return $this->_redirect('/auth/logout');
+        }
+
+        $rolesData = [];
+        if (isset($responseRoles['code']) && $responseRoles['code'] == 200 && isset($responseRoles['msg'])) {
+            $rolesData = $responseRoles['msg'];
+        }
+
         // 4. Lempar data aman ke view edit.phtml
         $this->view->userDetail = $userDetail;
+        $this->view->listRoles = $rolesData;
+        $this->view->listLevel = isset($responseLevel['msg']) && is_array($responseLevel['msg']) ? $responseLevel['msg'] : [];
         $this->view->listItp = $this->fetchItpList($api);
         $this->view->tpCode = $this->extractTpCode($userDetail);
         $this->_helper->viewRenderer('edit');
@@ -374,6 +395,9 @@ class User_IndexController extends App_Controller_Base
 
     public function updateAction()
     {
+        $this->_helper->viewRenderer->setNoRender(true);
+        $this->getResponse()->setHeader('Content-Type', 'application/json');
+
         if ($this->_request->isPost()) {
             $api = new App_Service_Api();
 

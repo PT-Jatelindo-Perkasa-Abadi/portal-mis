@@ -162,12 +162,14 @@ if ($itpVisible && $tpCode !== null) {
                             </svg>
                         </button>
                         <ul class="dropdown-menu w-100 shadow-sm border-light-subtle rounded-3">
-                            <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#" data-value="1">Admin
-                                    MIS</a></li>
-                            <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#" data-value="2">IT
-                                    Provider</a></li>
-                            <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#" data-value="8">Guest
-                                    MIS</a></li>
+                            <?php foreach ($this->listLevel as $level): ?>
+                                <li>
+                                    <a class="dropdown-item py-2 text-dark fw-medium" href="#"
+                                        data-value="<?= $level['id']; ?>">
+                                        <?= $level['level_name']; ?>
+                                    </a>
+                                </li>
+                            <?php endforeach; ?>
                         </ul>
                     </div>
                 </div>
@@ -188,10 +190,20 @@ if ($itpVisible && $tpCode !== null) {
                             </svg>
                         </button>
                         <ul class="dropdown-menu w-100 shadow-sm border-light-subtle rounded-3">
-                            <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#"
-                                    data-value="2">Administrator</a></li>
-                            <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#"
-                                    data-value="1">Viewer</a></li>
+                            <?php foreach ($this->listRoles as $role): ?>
+                                <?php
+
+                                $originalName = strtolower($role['role_name']);
+                                $displayName = ucwords($originalName);
+
+                                ?>
+                                <li>
+                                    <a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#"
+                                        data-value="<?= $role['id']; ?>">
+                                        <?= $displayName; ?>
+                                    </a>
+                                </li>
+                            <?php endforeach; ?>
                         </ul>
                     </div>
                 </div>
