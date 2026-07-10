@@ -19096,6 +19096,10 @@ p {
   font-size: 0.875rem;
 }
 
+.fs-8 {
+  font-size: 0.75rem;
+}
+
 .min-w-auto {
   min-width: auto !important;
 }
@@ -24944,4 +24948,88 @@ table.table.dataTable.table-hover>tbody>tr.selected:hover>* {
   100% {
     background-position: -100% 0;
   }
+}
+
+.card.card-item-log {
+  display: flex;
+  flex-direction: row;
+  gap: .5rem;
+  padding: 1.5rem;
+  border-radius: var(--bs-border-radius-lg) !important;
+}
+.card.card-item-log .d-flex {
+  background-image: url("../img/bg-side-log.svg");
+  background-position: top right;
+  background-size: 46px;
+  background-repeat: no-repeat;
+}
+.card.card-item-log .log-item-title {
+  color: var(--bs-neutral-50);
+  font-size: 1rem;
+  font-weight: normal;
+  margin-bottom: 0;
+}
+.card.card-item-log .log-item-value {
+  display: none;
+  color: var(--bs-neutral-100);
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0;
+}
+.card.card-item-log .log-item-value span {
+  font-size: .75rem;
+  font-weight: normal;
+}
+.card.card-item-log .skeleton-cell {
+  display: none;
+}
+.card.card.card-item-log.loading .log-item-title,
+.card.card.card-item-log.success .log-item-title {
+  font-size: .85rem;
+}
+.card.card-item-log.loading .skeleton-cell {
+  display: block;
+}
+.card.card-item-log.success .skeleton-cell {
+  display: none;
+}
+.card.card-item-log.success .log-item-value {
+  display: block;
+}
+
+.card.card-progress-log {
+  flex-direction: row;
+  align-items: center;
+  border: 0;
+}
+.card.card-progress-log .progress-point {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .75rem;
+}
+.card.card-progress-log .progress-point span {
+  color: var(--bs-neutral-70);
+  font-size: .875rem;
+}
+.card.card-progress-log .progress-bar {
+  flex: 1 1 0;
+  --progress: 0%;
+
+    width: 100%;
+    height: 8px;
+    margin-top: -1.8rem;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: --progress .3s ease;
+
+    background:
+        linear-gradient(
+            to right,
+            var(--bs-blue) 0,
+            var(--bs-blue) var(--progress),
+            var(--bs-blue-light-90) var(--progress),
+            var(--bs-blue-light-90) 100%
+        );
 }
