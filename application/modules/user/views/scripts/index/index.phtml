@@ -78,7 +78,22 @@
                             style="font-size: 14px; height: 40px; background-color: #fff;">
                             <span id="label-level"
                                 style="color: <?= $hasLevel ? '#12161C' : '#B8B9BB'; ?>; font-weight: <?= $hasLevel ? '600' : '500'; ?>;">
-                                <?= $hasLevel ? $this->escape($_GET['level']) : 'Pilih Level User'; ?>
+                                <?php
+                                if ($hasLevel) {
+                                    $levelLabel = $_GET['level'];
+                                    if (!empty($this->listLevel)) {
+                                        foreach ($this->listLevel as $lvl) {
+                                            if (isset($lvl['id']) && $lvl['id'] == $_GET['level']) {
+                                                $levelLabel = $lvl['level_name'];
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    echo $this->escape($levelLabel);
+                                } else {
+                                    echo 'Pilih Level User';
+                                }
+                                ?>
                             </span>
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none"
                                 viewBox="0 0 24 24" stroke="#4A5568" stroke-width="2.5" style="margin-top: 1px;">
@@ -109,7 +124,16 @@
                                 style="color: <?= $hasRole ? '#12161C' : '#B8B9BB'; ?>; font-weight: <?= $hasRole ? '600' : '500'; ?>;">
                                 <?php
                                 if ($hasRole) {
-                                    echo ucwords($_GET['role']);
+                                    $roleLabel = $_GET['role'];
+                                    if (!empty($this->rolesData) && is_array($this->rolesData)) {
+                                        foreach ($this->rolesData as $r) {
+                                            if (isset($r['id']) && $r['id'] == $_GET['role']) {
+                                                $roleLabel = $r['role_name'];
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    echo $this->escape(ucwords($roleLabel));
                                 } else {
                                     echo 'Pilih Role';
                                 }
@@ -149,7 +173,19 @@
                             style="font-size: 14px; height: 40px; background-color: #fff;">
                             <span id="label-status"
                                 style="color: <?= $hasStatus ? '#12161C' : '#B8B9BB'; ?>; font-weight: <?= $hasStatus ? '600' : '500'; ?>;">
-                                <?= $hasStatus ? $this->escape($_GET['status']) : 'Pilih Status'; ?>
+                                <?php
+                                if ($hasStatus) {
+                                    $statusMap = array(
+                                        'active' => 'Aktif',
+                                        'nonactive' => 'Non-Aktif',
+                                        'blocked' => 'Blokir',
+                                    );
+                                    $statusVal = $_GET['status'];
+                                    echo $this->escape(isset($statusMap[$statusVal]) ? $statusMap[$statusVal] : $statusVal);
+                                } else {
+                                    echo 'Pilih Status';
+                                }
+                                ?>
                             </span>
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none"
                                 viewBox="0 0 24 24" stroke="#4A5568" stroke-width="2.5" style="margin-top: 1px;">
