@@ -18,8 +18,15 @@ class Default_IndexController extends App_Controller_Base
         $this->view->headScript()->appendFile($this->view->baseUrl('/assets/js/format-currency-compact.js'));
         $this->view->headScript()->appendFile($this->view->baseUrl('/assets/js/format-number.js'));
 
-        $filterDate = $this->_dashboardSession->filterDate ?? '1';
+        $filterDate = isset($this->_dashboardSession->filterDate)
+            ? (int) $this->_dashboardSession->filterDate
+            : 1;
+        $currentDate = ($filterDate === 1)
+            ? date('Y-m-d')
+            : date('Y-m-d', strtotime('-1 day'));
         $this->view->filterDate = $filterDate;
+        $this->view->currentDate = App_Helper_Date::indonesia($currentDate);
+        $this->view->currentHour = date('H').':00';
     }
 
     public function filterDateAction()
@@ -28,7 +35,7 @@ class Default_IndexController extends App_Controller_Base
         $this->_helper->viewRenderer->setNoRender(true);
 
         $filterDate = $this->_getParam('filterDate');
-        $this->_dashboardSession->filterDate = $filterDate == 1 ? '1' : '0';
+        $this->_dashboardSession->filterDate = $filterDate ?? '1';
 
         return $this->jsonSuccess();
 
@@ -37,9 +44,11 @@ class Default_IndexController extends App_Controller_Base
     public function totalSummaryAction()
     {
         $service = $this->api();
-        $filterDate = $this->_dashboardSession->filterDate ?? '1';
+        $filterDate = isset($this->_dashboardSession->filterDate)
+            ? (int) $this->_dashboardSession->filterDate
+            : 1;
 
-        $currentFilter = $filterDate == '1' ? 'now' : 'yesterday';
+        $currentFilter = $filterDate > 0 ? 'now' : 'yesterday';
 
         $response = $service->request(
             'POST',
@@ -53,9 +62,11 @@ class Default_IndexController extends App_Controller_Base
     public function summaryTransactionAverageAction()
     {
         $service = $this->api();
-        $filterDate = $this->_dashboardSession->filterDate ?? '1';
+        $filterDate = isset($this->_dashboardSession->filterDate)
+            ? (int) $this->_dashboardSession->filterDate
+            : 1;
 
-        $currentFilter = $filterDate == '1' ? 'now' : 'yesterday';
+        $currentFilter = $filterDate > 0 ? 'now' : 'yesterday';
 
         $response = $service->request(
             'POST',
@@ -69,9 +80,11 @@ class Default_IndexController extends App_Controller_Base
     public function transactionChartAction()
     {
         $service = $this->api();
-        $filterDate = $this->_dashboardSession->filterDate ?? '1';
+        $filterDate = isset($this->_dashboardSession->filterDate)
+            ? (int) $this->_dashboardSession->filterDate
+            : 1;
 
-        $currentFilter = $filterDate == '1' ? 'now' : 'yesterday';
+        $currentFilter = $filterDate > 0 ? 'now' : 'yesterday';
         $response = [];
 
         $response = $service->request(
