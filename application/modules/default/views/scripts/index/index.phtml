@@ -33,7 +33,7 @@
     <div class="d-flex flex-wrap align-items-start align-items-md-center gap-4">
         <div class="d-flex flex-column flex-fill">
             <h1 class="header-title">Dashboard</h1>
-            <p class="header-sub fs-7">Data Transaksi - <span class="text-primary">Senin, 01 Juni 2026</span></p>
+            <p class="header-sub fs-7">Data Transaksi - <span class="text-primary"><?= $this->currentDate; ?></span></p>
         </div>
 
         <div class="d-flex align-items-center">
@@ -45,7 +45,7 @@
         <div class="d-flex align-items-center bg-blue-light-90 rounded">
             <div class="d-flex px-3 py-2 gap-2">
                 <span class="fs-7 text-neutral-70">Terakhir diperbarui</span>
-                <span class="fs-7 fw-bold text-primary">14:00</span>
+                <span class="fs-7 fw-bold text-primary"><?= $this->currentHour; ?></span>
             </div>
             <span class="divider bg-primary"></span>
             <button type="button" class="btn btn-link p-2" onclick="window.location.reload()">
