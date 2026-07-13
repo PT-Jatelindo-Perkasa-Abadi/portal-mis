@@ -104,6 +104,9 @@ class Default_IndexController extends App_Controller_Base
         $this->_helper->viewRenderer->setNoRender(true);
 
         $service = $this->api();
+        $end = new DateTime();
+        $start = clone $end;
+        $start->modify('-1 minute');
         $response = $service->request(
             'POST',
             "/service/proxy/service/third-api",
@@ -111,8 +114,8 @@ class Default_IndexController extends App_Controller_Base
                 "conf_key" => "monitoring_chart_mis",
                 "path" => "events",
                 "payload" => [
-                    "start" => "2026-07-12 20:00:00",
-                    "end" => "2026-07-12 21:00:00"
+                    "start" => $start->format('Y-m-d H:i:s'),
+                    "end" => $end->format('Y-m-d H:i:s')
                 ]
             ]
         );

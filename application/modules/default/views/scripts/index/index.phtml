@@ -868,7 +868,7 @@ $(function() {
             } else if (random == 1) {
                 latencyChart.showEmpty();
             } else {
-                latencyChart.showError();
+                latencyChart.showEmpty();
             }
         }, 1500);
     }
@@ -903,13 +903,23 @@ $(function() {
     function successState(data) {
         stopProgressAnimation();
 
-        if (!data.msg) {
+        if (!data.data.msg) {
             errorState();
             return;
         }
 
+        const {
+            msg
+        } = data.data;
+
         $('.card-item-log').removeClass('loading');
         $('.card-item-log').addClass('success');
+        $('#ping-value').html(msg.latency + ' <span>ms</span>');
+        $('#status-value')
+            .text('Connected')
+            .removeClass('text-danger')
+            .addClass('text-success')
+            .removeClass('d-none');
 
         $('#progressBar').css('--progress', '100%');
 
