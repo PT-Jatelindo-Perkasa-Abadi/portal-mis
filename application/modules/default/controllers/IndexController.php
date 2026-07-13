@@ -1,9 +1,12 @@
 <?php
 class Default_IndexController extends App_Controller_Base
 {
+    protected $_dashboardSession;
+
     public function init()
     {
         Zend_Session::start();
+        $this->_dashboardSession = new Zend_Session_Namespace('dashboard_filter');
     }
     public function indexAction()
     {
@@ -12,54 +15,97 @@ class Default_IndexController extends App_Controller_Base
         $this->view->headScript()->appendFile($this->view->baseUrl('/assets/js/dashboard-chart.js'));
         $this->view->headScript()->appendFile($this->view->baseUrl('/assets/js/format-currency-compact.js'));
         $this->view->headScript()->appendFile($this->view->baseUrl('/assets/js/format-number.js'));
+
+        $filterDate = $this->_dashboardSession->filterDate ?? '1';
+        $this->view->filterDate = $filterDate;
     }
 
-    public function totalSummaryAction() {
+    public function filterDateAction()
+    {
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+
+        $filterDate = $this->_getParam('filterDate');
+        $this->_dashboardSession->filterDate = $filterDate == 1 ? '1' : '0';
+
+        return $this->jsonSuccess();
+
+    }
+
+    public function totalSummaryAction()
+    {
         $service = $this->api();
+        $filterDate = $this->_dashboardSession->filterDate ?? '1';
+
+        $currentFilter = $filterDate == '1' ? 'now' : 'yesterday';
+
         $response = $service->request(
             'POST',
-            '/service/proxy/service/alias/row1-all-tp-now',
+            "/service/proxy/service/alias/row1-all-tp-{$currentFilter}",
             ["conf" => "ch_12_dev"]
         );
 
         return $this->jsonSuccess($response['msg'][0]);
     }
 
-    public function summaryTransactionAverageAction() {
+    public function summaryTransactionAverageAction()
+    {
         $service = $this->api();
+        $filterDate = $this->_dashboardSession->filterDate ?? '1';
+
+        $currentFilter = $filterDate == '1' ? 'now' : 'yesterday';
+
         $response = $service->request(
             'POST',
-            '/service/proxy/service/alias/row2-all-tp-yesterday',
+            "/service/proxy/service/alias/row2-all-tp-{$currentFilter}",
             ["conf" => "mis_ch_rekon"]
         );
 
         return $this->jsonSuccess($response['msg'][0]);
     }
 
-    public function transactionChartAction() {
-        $isDay = $this->_getParam('currentDate');
+    public function transactionChartAction()
+    {
         $service = $this->api();
+        $filterDate = $this->_dashboardSession->filterDate ?? '1';
+
+        $currentFilter = $filterDate == '1' ? 'now' : 'yesterday';
         $response = [];
 
-        if ($isDay == '1') {
-            $response = $service->request(
-                'POST',
-                '/service/proxy/service/alias/row3-all-tp-now',
-                ["conf" => "ch_12_dev"]
-            );
-        }
+        $response = $service->request(
+            'POST',
+            "/service/proxy/service/alias/row3-all-tp-{$currentFilter}",
+            ["conf" => "ch_12_dev"]
+        );
 
-        if ($isDay == '0') {
-            $response = $service->request(
-                'POST',
-                '/service/proxy/service/alias/row3-all-tp-yesterday',
-                ["conf" => "ch_12_dev"]
-            );
-        }
+        $result = Default_Model_DashboardChart::transform($response['msg']);
 
-        Zend_Debug::dump($response);
-        exit;
+        return $this->jsonSuccess($result);
+    }
 
-        return $this->jsonSuccess($response['msg'][0]);
+    public function apiLogAction()
+    {
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+
+        $service = $this->api();
+        $response = $service->request(
+            'POST',
+            "/service/proxy/service/third-api",
+            [
+                "conf_key" => "monitoring_chart_mis",
+                "path" => "events",
+                "payload" => [
+                    "start" => "2026-07-12 20:00:00",
+                    "end" => "2026-07-12 21:00:00"
+                ]
+            ]
+        );
+
+        return $this->jsonSuccess($response);
+    }
+
+    protected function getDashboardSession() {
+        return new Zend_Session_Namespace('dashboard_filter');
     }
 }

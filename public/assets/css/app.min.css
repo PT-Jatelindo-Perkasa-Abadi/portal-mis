@@ -25033,3 +25033,30 @@ table.table.dataTable.table-hover>tbody>tr.selected:hover>* {
             var(--bs-blue-light-90) 100%
         );
 }
+
+.card.card-progress-log .progress-bar::before {
+    width:var(--progress);
+    transition:width .25s linear;
+}
+
+.card-progress-log .progress-bar {
+    --progress:0%;
+    width:100%;
+    height:8px;
+    background:#edf2ff;
+    border-radius:20px;
+    overflow:hidden;
+    position:relative;
+
+}
+
+.card-progress-log .progress-bar::before {
+    content:"";
+    position:absolute;
+    left:0;
+    top:0;
+    height:100%;
+    width:var(--progress);
+    background:#2F6FED;
+    transition:width .1s linear;
+}
