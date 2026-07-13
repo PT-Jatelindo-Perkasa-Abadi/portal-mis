@@ -18,18 +18,7 @@ class Default_IndexController extends App_Controller_Base
         $this->view->headScript()->appendFile($this->view->baseUrl('/assets/js/format-currency-compact.js'));
         $this->view->headScript()->appendFile($this->view->baseUrl('/assets/js/format-number.js'));
 
-        $formatter = new IntlDateFormatter(
-            'id_ID', 
-            IntlDateFormatter::FULL, 
-            IntlDateFormatter::NONE,
-            'Asia/Jakarta',
-            IntlDateFormatter::GREGORIAN,
-            'EEEE, dd MMMM yyyy'
-        );
         $filterDate = $this->_dashboardSession->filterDate ?? '1';
-
-        $this->view->currentDate = $formatter->format(time());
-        $this->view->currentHour = date('H') . ':00';
         $this->view->filterDate = $filterDate;
     }
 
