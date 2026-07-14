@@ -43,100 +43,56 @@ class Default_IndexController extends App_Controller_Base
 
     public function totalSummaryAction()
     {
-        // $service = $this->api();
-        // $filterDate = isset($this->_dashboardSession->filterDate)
-        //     ? (int) $this->_dashboardSession->filterDate
-        //     : 1;
+        $service = $this->api();
+        $filterDate = isset($this->_dashboardSession->filterDate)
+            ? (int) $this->_dashboardSession->filterDate
+            : 1;
 
-        // $currentFilter = $filterDate > 0 ? 'now' : 'yesterday';
+        $currentFilter = $filterDate > 0 ? 'now' : 'yesterday';
 
-        // $response = $service->request(
-        //     'POST',
-        //     "/service/proxy/service/alias/row1-all-tp-{$currentFilter}",
-        //     ["conf" => "ch_12_dev"]
-        // );
-
-        $response['msg'][0] = [
-            "SUM_LEMBAR" => 0,
-            "SUM_NOMINAL_TRANSAKSI" => 0,
-            "TP" => "All TP"
-        ];
+        $response = $service->request(
+            'POST',
+            "/service/proxy/service/alias/row1-all-tp-{$currentFilter}",
+            ["conf" => "ch_12_dev"]
+        );
 
         return $this->jsonSuccess($response['msg'][0]);
     }
 
     public function summaryTransactionAverageAction()
     {
-        // $service = $this->api();
-        // $filterDate = isset($this->_dashboardSession->filterDate)
-        //     ? (int) $this->_dashboardSession->filterDate
-        //     : 1;
+        $service = $this->api();
+        $filterDate = isset($this->_dashboardSession->filterDate)
+            ? (int) $this->_dashboardSession->filterDate
+            : 1;
 
-        // $currentFilter = $filterDate > 0 ? 'now' : 'yesterday';
+        $currentFilter = $filterDate > 0 ? 'now' : 'yesterday';
 
-        // $response = $service->request(
-        //     'POST',
-        //     "/service/proxy/service/alias/row2-all-tp-{$currentFilter}",
-        //     ["conf" => "mis_ch_rekon"]
-        // );
-
-        $response['msg'][0] = [
-            "PERCENTAGE_BATAL" => 0,
-            "PERCENTAGE_LUNAS" => 0,
-            "PERCENTAGE_SUSPECT" => 0,
-            "SUM_TPS" => 0,
-            "TOTAL" => 0,
-            "TP" => "All TP"
-        ];
+        $response = $service->request(
+            'POST',
+            "/service/proxy/service/alias/row2-all-tp-{$currentFilter}",
+            ["conf" => "mis_ch_rekon"]
+        );
 
         return $this->jsonSuccess($response['msg'][0]);
     }
 
     public function transactionChartAction()
     {
-        // $service = $this->api();
-        // $filterDate = isset($this->_dashboardSession->filterDate)
-        //     ? (int) $this->_dashboardSession->filterDate
-        //     : 1;
+        $service = $this->api();
+        $filterDate = isset($this->_dashboardSession->filterDate)
+            ? (int) $this->_dashboardSession->filterDate
+            : 1;
 
-        // $currentFilter = $filterDate > 0 ? 'now' : 'yesterday';
-        // $response = [];
+        $currentFilter = $filterDate > 0 ? 'now' : 'yesterday';
 
-        // $response = $service->request(
-        //     'POST',
-        //     "/service/proxy/service/alias/row3-all-tp-{$currentFilter}",
-        //     ["conf" => "ch_12_dev"]
-        // );
+        $response = $service->request(
+            'POST',
+            "/service/proxy/service/alias/row3-all-tp-{$currentFilter}",
+            ["conf" => "ch_12_dev"]
+        );
 
-        $response['msg'][0] = [
-            [
-                "JAM" => "2026-07-12 00",
-                "LAYANAN" => "NONTAGLIS",
-                "SUM_LEMBAR" => 0,
-                "SUM_NOMINAL_TRANSAKSI" => 0,
-                "TP" => "All TP"
-            ],
-            [
-                "JAM" => "2026-07-12 00",
-                "LAYANAN" => "PREPAID",
-                "SUM_LEMBAR" => 0,
-                "SUM_NOMINAL_TRANSAKSI" => 0,
-                "TP" => "All TP"
-            ],
-            [
-                "JAM" => "2026-07-12 00",
-                "LAYANAN" => "POSTPAID",
-                "SUM_LEMBAR" => 0,
-                "SUM_NOMINAL_TRANSAKSI" => 0,
-                "TP" => "All TP"
-            ],
-        ];
-
-        // if (!$response['msg'][0]) {
-        //     return $this->jsonError("Terjadi Kesalahan", 400);
-        // }
-
-        $result = Default_Model_DashboardChart::transform($response['msg'][0]);
+        $result = Default_Model_DashboardChart::transform($response['msg']);
 
         return $this->jsonSuccess($result);
     }
