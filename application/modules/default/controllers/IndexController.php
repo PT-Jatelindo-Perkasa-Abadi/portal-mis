@@ -55,11 +55,6 @@ class Default_IndexController extends App_Controller_Base
             "/service/proxy/service/alias/row1-all-tp-{$currentFilter}",
             ["conf" => "ch_12_dev"]
         );
-        $response['msg'][0] = [
-            "SUM_LEMBAR" => 0,
-            "SUM_NOMINAL_TRANSAKSI" => 0,
-            "TP" => "All TP"
-        ];
 
         return $this->jsonSuccess($response['msg'][0]);
     }
@@ -78,14 +73,6 @@ class Default_IndexController extends App_Controller_Base
             "/service/proxy/service/alias/row2-all-tp-{$currentFilter}",
             ["conf" => "mis_ch_rekon"]
         );
-        $response['msg'][0] = [
-            "PERCENTAGE_BATAL" => 0,
-            "PERCENTAGE_LUNAS" => 0,
-            "PERCENTAGE_SUSPECT" => 0,
-            "SUM_TPS" => 0,
-            "TOTAL" => 0,
-            "TP" => "All TP"
-        ];
 
         return $this->jsonSuccess($response['msg'][0]);
     }
@@ -105,29 +92,6 @@ class Default_IndexController extends App_Controller_Base
             "/service/proxy/service/alias/row3-all-tp-{$currentFilter}",
             ["conf" => "ch_12_dev"]
         );
-        $response['msg'] = [
-            [
-                "JAM" => "2026-07-12 00",
-                "LAYANAN" => "NONTAGLIS",
-                "SUM_LEMBAR" => 0,
-                "SUM_NOMINAL_TRANSAKSI" => 0,
-                "TP" => "All TP"
-            ],
-            [
-                "JAM" => "2026-07-12 00",
-                "LAYANAN" => "PREPAID",
-                "SUM_LEMBAR" => 0,
-                "SUM_NOMINAL_TRANSAKSI" => 0,
-                "TP" => "All TP"
-            ],
-            [
-                "JAM" => "2026-07-12 00",
-                "LAYANAN" => "POSTPAID",
-                "SUM_LEMBAR" => 0,
-                "SUM_NOMINAL_TRANSAKSI" => 0,
-                "TP" => "All TP"
-            ],
-        ];
 
         $result = Default_Model_DashboardChart::transform($response['msg']);
 
