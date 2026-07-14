@@ -1,7 +1,14 @@
-<h1>500 - Internal Server Error</h1>
-<p>Terjadi kesalahan pada sistem.</p>
+<div class="image-container">
+    <img src="<?= $this->baseUrl('assets/img/img_error_message_500.svg'); ?>" alt="Error Illustration"
+        class="error-svg" />
+</div>
 
-<textarea class="form-control w-100" rows="20">
+<h1>Unexpected error</h1>
+<p>An unexpected error has occurred</p>
+
+<a href="#" class="btn-go-back" onclick="history.go(-1)">Go Back</a>
+
+<pre class="w-100">
 <?php echo $this->exception->getMessage(); ?>
 <?php echo $this->exception->getTraceAsString(); ?>
-</textarea>
+</pre>

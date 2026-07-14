@@ -1,151 +1,277 @@
+<style>
+.chart-card canvas {
+    height: 260px !important;
+}
+
+.chart-card {
+    position: relative;
+    height: 260px;
+}
+
+.chart-card canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.chart-overlay {
+    background: var(--bs-neutral-10);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: .25rem;
+    inset: 0;
+    position: absolute;
+    z-index: 20;
+    /* margin: 0 0 1.8rem 2.25rem; */
+}
+
+.chart-overlay.d-none {
+    display: none !important;
+}
+</style>
 <div class="content-header">
-    <div class="d-flex">
+    <div class="d-flex flex-wrap align-items-start align-items-md-center gap-4">
         <div class="d-flex flex-column flex-fill">
             <h1 class="header-title">Dashboard</h1>
-            <p class="header-sub fs-7">Data Transaksi - <span class="text-primary">Senin, 01 Juni 2026</span></p>
+            <p class="header-sub fs-7">Data Transaksi - <span class="text-primary"><?= $this->currentDate; ?></span></p>
         </div>
-        <div class="d-flex align-items-center gap-3">
-            <div class="d-flex align-items-center">
-                <select name="" id="" class="form-select">
-                    <option value="">Hari ini</option>
-                    <option value="">Kemarin</option>
-                </select>
+
+        <div class="d-flex align-items-center">
+            <select name="" id="" class="form-select" data-toggle="filterDate">
+                <option value="1" <?= $this->filterDate == '1' ? 'selected' : '' ?>>Hari ini</option>
+                <option value="0" <?= $this->filterDate == '0' ? 'selected' : '' ?>>Kemarin</option>
+            </select>
+        </div>
+        <div class="d-flex align-items-center bg-blue-light-90 rounded">
+            <div class="d-flex px-3 py-2 gap-2">
+                <span class="fs-7 text-neutral-70">Terakhir diperbarui</span>
+                <span class="fs-7 fw-bold text-primary"><?= $this->currentHour; ?></span>
             </div>
-            <div class="d-flex align-items-center bg-blue-light-90 rounded">
-                <div class="d-flex px-3 py-2 gap-2">
-                    <span class="fs-7 text-neutral-70">Terakhir diperbarui</span>
-                    <span class="fs-7 fw-bold text-primary">14:00</span>
-                </div>
-                <span class="divider bg-primary"></span>
-                <button type="button" class="btn btn-link p-2">
-                    <span class="icon-menu ic-refresh mx-1"></span>
-                </button>
-            </div>
+            <span class="divider bg-primary"></span>
+            <button type="button" class="btn btn-link p-2" onclick="window.location.reload()">
+                <span class="icon-menu ic-refresh mx-1"></span>
+            </button>
         </div>
     </div>
 </div>
 <div class="content-body">
-    <div class="container">
-        <div class="row bg-blue-light-90 gap-4 mb-4 p-4 rounded">
-            <div class="col d-flex bg-white gap-4 p-4 rounded-3">
-                <img src="<?= $this->baseUrl('/assets/img/img-total-amount.svg'); ?>" alt="image total transaction" />
-                <div class="d-flex flex-column align-item-center justify-content-between flex-fill">
-                    <h5 class="fs-7 text-neutral-70 mb-0">Total Nominal Transaksi</h5>
-                    <h2 class="fs-5 fw-bold text-neutral-100 mb-0" data-field="total_transaction">
-                        <div class="skeleton-cell w-100 float-end"></div>
-                    </h2>
-                </div>
-            </div>
-            <div class="col d-flex bg-white gap-4 p-4 rounded-3">
-                <img src="<?= $this->baseUrl('/assets/img/img-fee-transaction.svg'); ?>" alt="image total income" />
-                <div class="d-flex flex-column align-item-center justify-content-between flex-fill">
-                    <h5 class="fs-7 text-neutral-70 mb-0">Total Pendapatan</h5>
-                    <h2 class="fs-5 fw-bold text-neutral-100 mb-0" data-field="total_income">
-                        <div class="skeleton-cell w-100 float-end"></div>
-                    </h2>
-                </div>
-            </div>
-            <div class="col d-flex bg-white gap-4 p-4 rounded-3">
-                <img src="<?= $this->baseUrl('/assets/img/img-total-disbursement.svg'); ?>" alt="image total file" />
-                <div class="d-flex flex-column align-item-center justify-content-between flex-fill">
-                    <h5 class="fs-7 text-neutral-70 mb-0">Total Lembar</h5>
-                    <h2 class="fs-5 fw-bold text-neutral-100 mb-0" data-field="total_sheet">
-                        <div class="skeleton-cell w-100 float-end"></div>
-                    </h2>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="container">
-        <div class="row gap-4 mb-4 p-4 border border-neutral-10 rounded-3">
-            <div class="col d-flex flex-column gap-2 bg-white px-4 py-3 rounded-3">
-                <h5 class="fs-7 text-neutral-70 mb-0">Rata-Rata Transaksi perDetik</h5>
-                <h2 class="fs-5 fw-bold text-neutral-100 mb-0">340</h2>
-            </div>
-            <div class="col d-flex flex-column gap-2 bg-success-subtle px-4 py-3 rounded-3">
-                <h5 class="fs-7 text-neutral-70 mb-0">Persentase Transaksi Sukses</h5>
-                <h2 class="fs-5 fw-bold text-neutral-100 mb-0">98%</h2>
-            </div>
-            <div class="col d-flex flex-column gap-2 bg-warning-subtle px-4 py-3 rounded-3">
-                <h5 class="fs-7 text-neutral-70 mb-0">Persentase Transaksi Pending</h5>
-                <h2 class="fs-5 fw-bold text-neutral-100 mb-0">1%</h2>
-            </div>
-            <div class="col d-flex flex-column gap-2 bg-danger-subtle px-4 py-3 rounded-3">
-                <h5 class="fs-7 text-neutral-70 mb-0">Persentase Transaksi Gagal</h5>
-                <h2 class="fs-5 fw-bold text-neutral-100 mb-0">1%</h2>
-            </div>
-        </div>
-    </div>
-    <div class="container">
-        <div class="row gap-4 mb-4">
-            <div class="col p-4 border border-neutral-10 rounded-3">
-                <div class="d-flex flex-column gap-4">
-                    <h2 class="fs-6 text-neutral-100 fw-bold mb-0">Grafik Pendapatan</h2>
-                    <div class="container">
-                        <div class="row gap-4">
-                            <div class="col d-flex flex-column gap-2 p-3 border border-neutral-10 rounded-3">
-                                <div class="d-flex flex-column gap-2">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span class="square bg-primary"></span>
-                                        <span class="fs-7 text-neutral-70">IT Provider</span>
-                                    </div>
-                                    <h5 class="fs-7 fw-semibold text-neutral-100 mb-0">Rp620Jt</h5>
-                                </div>
-                            </div>
-                            <div class="col d-flex flex-column gap-2 p-3 border border-neutral-10 rounded-3">
-                                <div class="d-flex flex-column gap-2">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span class="square bg-purple"></span>
-                                        <span class="fs-7 text-neutral-70">Mitra</span>
-                                    </div>
-                                    <h5 class="fs-7 fw-semibold text-neutral-100 mb-0">Rp420Jt</h5>
-                                </div>
-                            </div>
-                        </div>
+    <div class="row g-4 mb-4">
+        <div class="col">
+            <div class="d-flex flex-column flex-md-row bg-blue-light-90 gap-4 p-4 rounded">
+                <div class="col d-flex bg-white gap-4 p-4 rounded-3">
+                    <img src="<?= $this->baseUrl('/assets/img/img-total-amount.svg'); ?>"
+                        alt="image total transaction" />
+                    <div class="d-flex flex-column align-item-center justify-content-between flex-fill">
+                        <h5 class="fs-7 text-neutral-70 mb-0">Total Nominal Transaksi</h5>
+                        <h2 class="fs-5 fw-bold text-neutral-100 mb-0" data-field="total_transaction">
+                            <div class="skeleton-cell w-100 float-end"></div>
+                        </h2>
                     </div>
                 </div>
-            </div>
-            <div class="col p-4 border border-neutral-10 rounded-3">
-                <div class="d-flex flex-column gap-4">
-                    <h2 class="fs-6 text-neutral-100 fw-bold mb-0">Grafik Layanan</h2>
-                    <div class="container">
-                        <div class="row gap-4">
-                            <div class="col d-flex flex-column gap-2 p-3 border border-neutral-10 rounded-3">
-                                <div class="d-flex flex-column gap-2">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span class="square bg-yellow-dark-30"></span>
-                                        <span class="fs-7 text-neutral-70">Prepaid</span>
-                                    </div>
-                                    <h5 class="fs-7 fw-semibold text-neutral-100 mb-0">2.340</h5>
-                                </div>
-                            </div>
-                            <div class="col d-flex flex-column gap-2 p-3 border border-neutral-10 rounded-3">
-                                <div class="d-flex flex-column gap-2">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span class="square bg-warning"></span>
-                                        <span class="fs-7 text-neutral-70">Postpaid</span>
-                                    </div>
-                                    <h5 class="fs-7 fw-semibold text-neutral-100 mb-0">1.890</h5>
-                                </div>
-                            </div>
-                            <div class="col d-flex flex-column gap-2 p-3 border border-neutral-10 rounded-3">
-                                <div class="d-flex flex-column gap-2">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span class="square bg-yellow-light-70"></span>
-                                        <span class="fs-7 text-neutral-70">Non-Taglist</span>
-                                    </div>
-                                    <h5 class="fs-7 fw-semibold text-neutral-100 mb-0">1.020</h5>
-                                </div>
-                            </div>
-                        </div>
+                <div class="col d-flex bg-white gap-4 p-4 rounded-3">
+                    <img src="<?= $this->baseUrl('/assets/img/img-total-disbursement.svg'); ?>"
+                        alt="image total file" />
+                    <div class="d-flex flex-column align-item-center justify-content-between flex-fill">
+                        <h5 class="fs-7 text-neutral-70 mb-0">Total Lembar Transaksi</h5>
+                        <h2 class="fs-5 fw-bold text-neutral-100 mb-0" data-field="total_sheet">
+                            <div class="skeleton-cell w-100 float-end"></div>
+                        </h2>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="container">
-        <div class="row gap-4 mb-4">
-            <div class="col p-4 border border-neutral-10 rounded-3">
+    <div class="row g-4 mb-4">
+        <div class="col">
+            <div class="d-flex flex-column flex-md-row gap-4 p-4 border border-neutral-10 rounded-3">
+                <div class="d-flex flex-column flex-fill justify-content-between gap-2 bg-white px-4 py-3 rounded-3">
+                    <h5 class="fs-7 text-neutral-70 mb-0">Rata-Rata Transaksi perDetik</h5>
+                    <h2 class="fs-5 fw-bold text-neutral-100 mb-0" data-field="average-transaction">
+                        <div class="skeleton-cell w-100 float-end"></div>
+                        <!-- 340
+                        <span class="text-sm fw-normal">/ 1500(TPS)</span> -->
+                    </h2>
+                </div>
+                <div class="d-flex flex-column flex-fill gap-2 bg-success-subtle px-4 py-3 rounded-3">
+                    <h5 class="fs-7 text-neutral-70 mb-0">Persentase Transaksi Sukses</h5>
+                    <h2 class="fs-5 fw-bold text-neutral-100 mb-0" data-field="success-transaction">
+                        <div class="skeleton-cell w-100 float-end"></div>
+                    </h2>
+                </div>
+                <div class="d-flex flex-column flex-fill gap-2 bg-warning-subtle px-4 py-3 rounded-3">
+                    <h5 class="fs-7 text-neutral-70 mb-0">Persentase Transaksi Pending</h5>
+                    <h2 class="fs-5 fw-bold text-neutral-100 mb-0" data-field="pending-transaction">
+                        <div class="skeleton-cell w-100 float-end"></div>
+                    </h2>
+                </div>
+                <div class="d-flex flex-column flex-fill gap-2 bg-danger-subtle px-4 py-3 rounded-3">
+                    <h5 class="fs-7 text-neutral-70 mb-0">Persentase Transaksi Gagal</h5>
+                    <h2 class="fs-5 fw-bold text-neutral-100 mb-0" data-field="failed-transaction">
+                        <div class="skeleton-cell w-100 float-end"></div>
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="p-4 border border-neutral-10 rounded-3">
+                <h2 class="fs-6 text-neutral-100 fw-bold mb-4">Grafik Nominal Transaksi</h2>
+                <div class="row g-3 mb-4">
+                    <div class="col">
+                        <div class="d-flex flex-column gap-2 p-3 border border-neutral-10 rounded-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="square bg-yellow-dark-30"></span>
+                                <span class="fs-7 text-neutral-70">Prepaid</span>
+                            </div>
+                            <h5 class="fs-7 fw-semibold text-neutral-100 mb-0" data-field="nominal-prepaid">
+                                <div class="skeleton-cell w-100 float-end"></div>
+                            </h5>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="d-flex flex-column gap-2 p-3 border border-neutral-10 rounded-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="square bg-warning"></span>
+                                <span class="fs-7 text-neutral-70">Postpaid</span>
+                            </div>
+                            <h5 class="fs-7 fw-semibold text-neutral-100 mb-0" data-field="nominal-postpaid">
+                                <div class="skeleton-cell w-100 float-end"></div>
+                            </h5>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="d-flex flex-column gap-2 p-3 border border-neutral-10 rounded-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="square bg-yellow-light-70"></span>
+                                <span class="fs-7 text-neutral-70">Non-Taglist</span>
+                            </div>
+                            <h5 class="fs-7 fw-semibold text-neutral-100 mb-0" data-field="nominal-nontaglist">
+                                <div class="skeleton-cell w-100 float-end"></div>
+                            </h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <canvas id="transactionChart"></canvas>
+
+                    <!-- Loading -->
+                    <div class="chart-overlay chart-loading d-none">
+                        <div class="text-center">
+                            <div class="spinner-border text-primary mb-3"></div>
+                            <div class="fs-6 fw-semibold mb-2">Memuat data...</div>
+                        </div>
+                    </div>
+
+                    <!-- Empty -->
+                    <div class="chart-overlay chart-empty d-none">
+                        <div class="text-center">
+                            <h5 class="fs-6 fw-semibold mb-2">Tidak ada data</h5>
+                            <p class="fs-8 fw-normal text-neutral-70">
+                                Belum ada data yang dapat ditampilkan.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Error -->
+                    <div class="chart-overlay chart-error d-none">
+                        <div class="text-center">
+                            <h5 class="fs-6 fw-semibold mb-2">
+                                Gagal menampilkan data
+                            </h5>
+                            <p class="fs-8 fw-normal text-neutral-70 mb-4">
+                                Klik muat ulang untuk memproses ulang data
+                            </p>
+                            <button class="btn btn-outline-primary btnReload">
+                                Muat Ulang
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="p-4 border border-neutral-10 rounded-3">
+                <h2 class="fs-6 text-neutral-100 fw-bold mb-4">Grafik Layanan</h2>
+                <div class="row g-3 mb-4">
+                    <div class="col">
+                        <div class="d-flex flex-column gap-2 p-3 border border-neutral-10 rounded-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="square bg-yellow-dark-30"></span>
+                                <span class="fs-7 text-neutral-70">Prepaid</span>
+                            </div>
+                            <h5 class="fs-7 fw-semibold text-neutral-100 mb-0" data-field="service-prepaid">
+                                <div class="skeleton-cell w-100 float-end"></div>
+                            </h5>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="d-flex flex-column gap-2 p-3 border border-neutral-10 rounded-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="square bg-warning"></span>
+                                <span class="fs-7 text-neutral-70">Postpaid</span>
+                            </div>
+                            <h5 class="fs-7 fw-semibold text-neutral-100 mb-0" data-field="service-postpaid">
+                                <div class="skeleton-cell w-100 float-end"></div>
+                            </h5>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="d-flex flex-column gap-2 p-3 border border-neutral-10 rounded-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="square bg-yellow-light-70"></span>
+                                <span class="fs-7 text-neutral-70">Non-Taglist</span>
+                            </div>
+                            <h5 class="fs-7 fw-semibold text-neutral-100 mb-0" data-field="service-nontaglist">
+                                <div class="skeleton-cell w-100 float-end"></div>
+                            </h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <canvas id="serviceChart"></canvas>
+
+                    <!-- Loading -->
+                    <div class="chart-overlay chart-loading d-none">
+                        <div class="text-center">
+                            <div class="spinner-border text-primary mb-3"></div>
+                            <div class="fs-6 fw-semibold mb-2">Memuat data...</div>
+                        </div>
+                    </div>
+
+                    <!-- Empty -->
+                    <div class="chart-overlay chart-empty d-none">
+                        <div class="text-center">
+                            <h5 class="fs-6 fw-semibold mb-2">Tidak ada data</h5>
+                            <p class="fs-8 fw-normal text-neutral-70">
+                                Belum ada data yang dapat ditampilkan.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Error -->
+                    <div class="chart-overlay chart-error d-none">
+                        <div class="text-center">
+                            <h5 class="fs-6 fw-semibold mb-2">
+                                Gagal menampilkan data
+                            </h5>
+                            <p class="fs-8 fw-normal text-neutral-70 mb-4">
+                                Klik muat ulang untuk memproses ulang data
+                            </p>
+                            <button class="btn btn-outline-primary btnReload">
+                                Muat Ulang
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="p-4 border border-neutral-10 rounded-3">
                 <div class="d-flex flex-column gap-4">
                     <h2 class="fs-6 text-neutral-100 fw-bold mb-0">Grafik Latency</h2>
                     <div class="container">
@@ -156,7 +282,9 @@
                                         <span class="square bg-primary"></span>
                                         <span class="fs-7 text-neutral-70">Latency (msec)</span>
                                     </div>
-                                    <h5 class="fs-7 fw-semibold text-neutral-100 mb-0">32 ms</h5>
+                                    <h5 class="fs-7 fw-semibold text-neutral-100 mb-0" data-field="request-latency">
+                                        <div class="skeleton-cell w-100 float-end"></div>
+                                    </h5>
                                 </div>
                             </div>
                             <div class="col d-flex flex-column gap-2 p-3 border border-neutral-10 rounded-3">
@@ -165,7 +293,9 @@
                                         <span class="square bg-cyan"></span>
                                         <span class="fs-7 text-neutral-70">Rata-Rata Request</span>
                                     </div>
-                                    <h5 class="fs-7 fw-semibold text-neutral-100 mb-0">48 ms</h5>
+                                    <h5 class="fs-7 fw-semibold text-neutral-100 mb-0" data-field="request-average">
+                                        <div class="skeleton-cell w-100 float-end"></div>
+                                    </h5>
                                 </div>
                             </div>
                             <div class="col d-flex flex-column gap-2 p-3 border border-neutral-10 rounded-3">
@@ -174,24 +304,686 @@
                                         <span class="square bg-cyan-blue"></span>
                                         <span class="fs-7 text-neutral-70">Rata-Rata Response</span>
                                     </div>
-                                    <h5 class="fs-7 fw-semibold text-neutral-100 mb-0">32 ms</h5>
+                                    <h5 class="fs-7 fw-semibold text-neutral-100 mb-0" data-field="response-average">
+                                        <div class="skeleton-cell w-100 float-end"></div>
+                                    </h5>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <canvas id="latencyChart"></canvas>
+
+                        <!-- Loading -->
+                        <div class="chart-overlay chart-loading d-none" style="margin-left: 1.25rem">
+                            <div class="text-center">
+                                <div class="spinner-border text-primary mb-3"></div>
+                                <div class="fs-6 fw-semibold mb-2">Memuat data...</div>
+                            </div>
+                        </div>
+
+                        <!-- Empty -->
+                        <div class="chart-overlay chart-empty d-none" style="margin-left: 1.25rem">
+                            <div class="text-center">
+                                <h5 class="fs-6 fw-semibold mb-2">Tidak ada data</h5>
+                                <p class="fs-8 fw-normal text-neutral-70">
+                                    Belum ada data yang dapat ditampilkan.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Error -->
+                        <div class="chart-overlay chart-error d-none" style="margin-left: 1.25rem">
+                            <div class="text-center">
+                                <h5 class="fs-6 fw-semibold mb-2">
+                                    Gagal menampilkan data
+                                </h5>
+                                <p class="fs-8 fw-normal text-neutral-70 mb-4">
+                                    Klik muat ulang untuk memproses ulang data
+                                </p>
+                                <button class="btn btn-outline-primary btnReload">
+                                    Muat Ulang
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col p-4 border border-neutral-10 rounded-3"></div>
+        </div>
+        <div class="col-lg-6">
+            <div class="p-4 border border-neutral-10 rounded-3">
+                <div class="d-flex flex-column gap-4">
+                    <h2 class="fs-6 text-neutral-100 fw-bold mb-0">API Log</h2>
+                    <div class="d-flex flex-column gap-3 mb-3">
+                        <div class="card card-item-log">
+                            <img src="<?= $this->baseUrl('/assets/img/ic-log-connection.svg'); ?>" alt="icon ping" />
+                            <div class="d-flex flex-column justify-content-center flex-fill gap-2">
+                                <h5 class="log-item-title">Ping</h5>
+                                <div id="ping-loading" class="skeleton-cell w-75"></div>
+                                <h5 id="ping-value" class="log-item-value">
+                                    81,0 <span>ms</span>
+                                </h5>
+                            </div>
+                        </div>
+                        <div class="card card-item-log">
+                            <img src="<?= $this->baseUrl('/assets/img/ic-log-status.svg'); ?>" alt="icon status" />
+                            <div class="d-flex flex-column justify-content-center flex-fill gap-2">
+                                <h5 class="log-item-title">Status</h5>
+                                <div id="status-loading" class="skeleton-cell w-75"></div>
+                                <h5 id="status-value" class="log-item-value text-success">Connected</h5>
+                            </div>
+                        </div>
+                        <div class="card card-progress-log">
+                            <div class="progress-point">
+                                <img src="<?= $this->baseUrl('/assets/img/img-log-point.svg'); ?>" alt="point" />
+                                <span>170.10.172.100</span>
+                            </div>
+                            <div id="progressBar" class="progress-bar" style="--progress: 0%"></div>
+                            <div class="progress-point">
+                                <img src="<?= $this->baseUrl('/assets/img/img-log-point.svg'); ?>" alt="point" />
+                                <span>Server MIS</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-center">
+                        <button id="btnCheckConnection" class="btn btn-primary">Cek Koneksi</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <script type="text/javascript">
 $(function() {
-    setTimeout(() => {
-        $('[data-field="total_transaction"]').text('Rp1.790M');
-        $('[data-field="total_income"]').text('Rp470Jt');
-        $('[data-field="total_sheet"]').text('5.250');
-    }, 1500);
+    $('[data-toggle=filterDate]').on('change', function() {
+        $.ajax({
+            url: '/index/filter-date',
+            type: 'POST',
+            data: {
+                filterDate: $(this).val()
+            },
+            success: function(result) {
+                if (result.status == 'success') {
+                    location.reload();
+                }
+            },
+            error: function() {}
+        });
+    });
+
+    function loadTotalSummary() {
+        const fieldTransaction = $('[data-field="total_transaction"]');
+        const fieldSheet = $('[data-field="total_sheet"]');
+
+        $.ajax({
+            url: "<?= $this->baseUrl('/index/total-summary') ?>",
+            type: 'POST',
+            dataType: 'json',
+            success: function(response) {
+                if (!response.data) {
+                    fieldTransaction.text('-');
+                    fieldSheet.text('-');
+
+                    return;
+                }
+
+                if (!Array.isArray(response.data) && typeof response.data !== "object") {
+                    fieldTransaction.text('-');
+                    fieldSheet.text('-');
+
+                    return;
+                }
+
+                const {
+                    SUM_NOMINAL_TRANSAKSI,
+                    SUM_LEMBAR
+                } = response.data;
+                fieldTransaction.text(formatCurrencyCompact(SUM_NOMINAL_TRANSAKSI));
+                fieldSheet.text('' + formatNumber(SUM_LEMBAR));
+            },
+            error: function(error) {}
+        });
+    }
+    loadTotalSummary();
+
+    function loadAverageTransaction() {
+        const fieldAverage = $('[data-field="average-transaction"]');
+        const fieldSuccess = $('[data-field="success-transaction"]');
+        const fieldPending = $('[data-field="pending-transaction"]');
+        const fieldFailed = $('[data-field="failed-transaction"]');
+
+        $.ajax({
+            url: "<?= $this->baseUrl('/index/summary-transaction-average') ?>",
+            type: 'POST',
+            dataType: 'json',
+            success: function(response) {
+                if (!response.data) {
+                    fieldAverage.text('-');
+                    fieldSuccess.text('-');
+                    fieldPending.text('-');
+                    fieldFailed.text('-');
+                    return;
+                }
+
+                if (!Array.isArray(response.data) && typeof response.data !== "object") {
+                    fieldAverage.text('-');
+                    fieldSuccess.text('-');
+                    fieldPending.text('-');
+                    fieldFailed.text('-');
+                    return;
+                }
+
+                const {
+                    SUM_TPS,
+                    PERCENTAGE_LUNAS,
+                    PERCENTAGE_SUSPECT,
+                    PERCENTAGE_BATAL
+                } = response.data;
+
+                const valueSuccess = PERCENTAGE_LUNAS != null ? PERCENTAGE_LUNAS + '%' : '-';
+                const valuePending = PERCENTAGE_SUSPECT != null ? PERCENTAGE_SUSPECT + '%' : '-';
+                const valueFailed = PERCENTAGE_BATAL != null ? PERCENTAGE_BATAL + '%' : '-';
+
+                fieldAverage.html(SUM_TPS +
+                    "<span class='fs-7 fw-normal text-neutral-100'> / 1500 (TPS)</span>" ?? "-");
+                fieldSuccess.text(valueSuccess);
+                fieldPending.text(valuePending);
+                fieldFailed.text(valueFailed);
+            },
+            error: function(error) {
+                fieldAverage.text('-');
+                fieldSuccess.text('-');
+                fieldPending.text('-');
+                fieldFailed.text('-');
+            }
+        });
+    }
+    loadAverageTransaction();
+
+    /** Transaction Chart */
+    const transactionChart = new DashboardChart({
+        canvas: '#transactionChart',
+        type: 'line',
+        autoScaleY: true,
+        data: {
+            labels: [],
+            datasets: []
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    callbacks: {
+                        label(context) {
+                            return context.dataset.label +
+                                ' : ' +
+                                formatCurrencyCompact(
+                                    context.parsed.y * 1000000
+                                );
+                        }
+                    }
+                }
+            },
+            interaction: {
+                mode: 'nearest',
+                intersect: false
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    border: {
+                        display: false
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: '#E8E8E8',
+                        borderDash: [5, 5]
+                    },
+                    border: {
+                        display: false
+                    },
+                    ticks: {
+                        callback(value) {
+                            return formatCurrencyCompact(value * 1000000);
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    /** Service Chart */
+    const serviceChart = new DashboardChart({
+        canvas: '#serviceChart',
+        type: 'bar',
+        data: {
+            labels: [],
+            datasets: []
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.parsed.y;
+                            return context.dataset.label + ': ' + formatNumber(value);
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    border: {
+                        display: false
+                    },
+                    ticks: {
+                        color: '#666',
+                        font: {
+                            size: 13
+                        }
+                    }
+                },
+                y: {
+                    min: 0,
+                    max: 3000,
+                    ticks: {
+                        stepSize: 500,
+                        color: '#666',
+                        callback: function(value) {
+                            if (value === 0) {
+                                return '0';
+                            }
+                            if (value === 500) {
+                                return '500';
+                            }
+                            if (value % 1000 === 0) {
+                                return (value / 1000) + 'rb';
+                            }
+
+                            return (value / 1000).toFixed(1).replace('.0', '') + 'rb';
+                        }
+                    },
+                    grid: {
+                        color: '#ECECEC',
+                        borderDash: [5, 5],
+                        drawBorder: false
+                    },
+                    border: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+
+    function loadTransactionDashboard() {
+        transactionChart.showLoading();
+        serviceChart.showLoading();
+
+        $.ajax({
+                url: "<?= $this->baseUrl('/index/transaction-chart') ?>",
+                type: 'POST',
+                dataType: 'json'
+            })
+            .done(function(response) {
+                if (response.status !== 'success') {
+                    transactionChart.showError();
+                    serviceChart.showError();
+                    updateNominalSummary();
+                    updateServiceSummary();
+
+                    return;
+                }
+
+                renderNominalChart(response.data.nominal);
+                renderServiceChart(response.data.service);
+            })
+            .fail(function() {
+                transactionChart.showError();
+                serviceChart.showError();
+                updateNominalSummary();
+                updateServiceSummary()
+            });
+    }
+
+    function renderNominalChart(data) {
+        if (!data || !data.chart || !data.chart.datasets.length) {
+            transactionChart.showEmpty();
+            return;
+        }
+
+        updateNominalSummary(data.summary);
+
+        transactionChart.setData(data.chart);
+        transactionChart.showChart();
+    }
+
+    function renderServiceChart(data) {
+        if (!data || !data.chart || !data.chart.datasets.length) {
+            serviceChart.showEmpty();
+            return;
+        }
+
+        updateServiceSummary(data.summary);
+
+        serviceChart.setData(data.chart);
+        serviceChart.showChart();
+    }
+
+    function updateNominalSummary(summary) {
+        const cards = {};
+
+        if (summary) {
+            summary.forEach(function(item) {
+                cards[item.service] = item;
+            });
+
+            $('[data-field=nominal-prepaid]')
+                .text(formatCurrencyCompact(cards.PREPAID.value));
+
+            $('[data-field=nominal-postpaid]')
+                .text(formatCurrencyCompact(cards.POSTPAID.value));
+
+            $('[data-field=nominal-nontaglist]')
+                .text(formatCurrencyCompact(cards.NONTAGLIS.value));
+
+            return;
+        }
+
+        $('[data-field=nominal-prepaid]').text('-');
+        $('[data-field=nominal-postpaid]').text('-');
+        $('[data-field=nominal-nontaglist]').text('-');
+    }
+
+    function updateServiceSummary(summary) {
+        const cards = {};
+
+        if (summary) {
+            summary.forEach(function(item) {
+                cards[item.service] = item;
+            });
+
+            $('[data-field=service-prepaid]')
+                .text(formatNumber(cards.PREPAID.value));
+
+            $('[data-field=service-postpaid]')
+                .text(formatNumber(cards.POSTPAID.value));
+
+            $('[data-field=service-nontaglist]')
+                .text(formatNumber(cards.NONTAGLIS.value));
+
+            return
+        }
+
+        $('[data-field=service-prepaid]').text('-');
+        $('[data-field=service-postpaid]').text('-');
+        $('[data-field=service-nontaglist]').text('-');
+    }
+
+    transactionChart.onReload(loadTransactionDashboard);
+    serviceChart.onReload(loadTransactionDashboard);
+
+    loadTransactionDashboard();
+
+    /** Latency Chart */
+    const latencyChart = new DashboardChart({
+        canvas: '#latencyChart',
+        type: 'line',
+        data: {
+            labels: [0],
+            datasets: [{
+                    label: 'Latency (msec)',
+                    data: [0],
+                    borderColor: '#3B6FF5',
+                    backgroundColor: '#3B6FF5',
+                    borderWidth: 3,
+                    pointRadius: 0
+                },
+                {
+                    label: 'Rata-Rata Request',
+                    data: [0],
+                    borderColor: '#36D8C5',
+                    backgroundColor: '#36D8C5',
+                    borderWidth: 3,
+                    pointRadius: 0
+                },
+                {
+                    label: 'Rata-Rata Response',
+                    data: [0],
+                    borderColor: '#19C2F2',
+                    backgroundColor: '#19C2F2',
+                    borderWidth: 3,
+                    pointRadius: 0
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ' : ' + context.parsed.y + ' ms';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    border: {
+                        display: false
+                    },
+                    ticks: {
+                        color: '#666',
+                        font: {
+                            size: 13
+                        }
+                    }
+                },
+                y: {
+                    min: 0,
+                    max: 50,
+                    ticks: {
+                        stepSize: 10,
+                        color: '#666'
+                    },
+                    grid: {
+                        color: '#E9E9E9',
+                        borderDash: [5, 5],
+                        drawBorder: false
+                    },
+                    border: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+
+    function loadLatencyChart() {
+        latencyChart.showLoading();
+
+        setTimeout(function() {
+            latencyChart.showChart();
+            $('[data-field=request-latency]').text("0");
+            $('[data-field=request-average]').text("0");
+            $('[data-field=response-average]').text("0");
+        }, 1500);
+    }
+    latencyChart.onReload(loadLatencyChart);
+    loadLatencyChart();
+
+    let progressInterval = null;
+    let currentRequest = null;
+
+    $('#btnCheckConnection').on('click', function() {
+        if ($(this).data('loading')) {
+            stopRequest();
+            return;
+        }
+
+        checkConnection();
+    });
+
+    function startLoadingState() {
+        $('#btnCheckConnection')
+            .data('loading', true)
+            .removeClass('btn-primary')
+            .addClass('btn-outline-danger')
+            .text('Stop');
+
+        $('.card-item-log').removeClass('success');
+        $('.card-item-log').addClass('loading');
+
+        startProgressAnimation();
+    }
+
+    function successState(data) {
+        stopProgressAnimation();
+
+        if (!data.data.msg) {
+            errorState();
+            return;
+        }
+
+        const {
+            msg
+        } = data.data;
+
+        $('.card-item-log').removeClass('loading');
+        $('.card-item-log').addClass('success');
+        $('#ping-value').html(msg.latency + ' <span>ms</span>');
+        $('#status-value')
+            .text('Connected')
+            .removeClass('text-danger')
+            .addClass('text-success')
+            .removeClass('d-none');
+
+        $('#progressBar').css('--progress', '100%');
+
+        resetButton();
+    }
+
+    function errorState() {
+        stopProgressAnimation();
+
+        $('.card-item-log').removeClass('loading');
+        $('.card-item-log').addClass('success');
+
+        $('#ping-value')
+            .html('-')
+            .removeClass('d-none');
+
+        $('#status-value')
+            .text('Disconnected')
+            .removeClass('text-success')
+            .addClass('text-danger')
+            .removeClass('d-none');
+
+        resetButton();
+    }
+
+    function resetButton() {
+        $('#btnCheckConnection')
+            .data('loading', false)
+            .removeClass('btn-outline-danger')
+            .addClass('btn-primary')
+            .text('Cek Koneksi');
+    }
+
+    function startProgressAnimation() {
+        let progress = 0;
+
+        $('#progressBar')
+            .css('--progress', '0%');
+
+        progressInterval = setInterval(function() {
+            if (progress < 70) {
+                progress += 5;
+            } else if (progress < 90) {
+                progress += 2;
+            } else if (progress < 98) {
+                progress += 0.3;
+            }
+
+            $('#progressBar')
+                .css('--progress', progress + '%');
+        }, 120);
+    }
+
+    function stopProgressAnimation() {
+        clearInterval(progressInterval);
+
+        $('#progressBar').css('--progress', '100%');
+    }
+
+    function checkConnection() {
+        startLoadingState();
+
+        currentRequest = $.ajax({
+            url: '<?= $this->baseUrl('/index/api-log'); ?>',
+            method: 'POST',
+            dataType: 'json'
+        });
+
+        currentRequest.done(function(response) {
+            successState(response);
+        });
+
+        currentRequest.fail(function() {
+            errorState();
+        });
+    }
+
+    function stopRequest() {
+        if (currentRequest) {
+            currentRequest.abort();
+        }
+
+        stopProgressAnimation();
+
+        $('#ping-loading').addClass('d-none');
+        $('#status-loading').addClass('d-none');
+
+        $('#ping-value')
+            .html('-')
+            .removeClass('d-none');
+
+        $('#status-value')
+            .text('-')
+            .removeClass('d-none');
+
+        resetButton();
+    }
 });
 </script>

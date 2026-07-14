@@ -9,6 +9,7 @@ class App_Service_Api
     protected $userPassword;
     protected $logger;
     protected $activityId;
+    protected $uriWhitelist;
 
     public function __construct()
     {
@@ -20,6 +21,16 @@ class App_Service_Api
         $this->userPassword = rtrim($config->api->userPassword);
         $this->logger = Zend_Registry::get('logger');
         $this->activityId = Zend_Registry::get('activity_id');
+        $this->uriWhitelist = [
+            '/service/email',
+            '/service/proxy/service/alias/row1-all-tp-now',
+            '/service/proxy/service/alias/row1-all-tp-yesterday',
+            '/service/proxy/service/alias/row2-all-tp-now',
+            '/service/proxy/service/alias/row2-all-tp-yesterday',
+            '/service/proxy/service/alias/row3-all-tp-now',
+            '/service/proxy/service/alias/row3-all-tp-yesterday',
+            '/service/proxy/service/third-api'
+        ];
     }
 
     private function getBasicAuthHeader()
@@ -34,7 +45,7 @@ class App_Service_Api
 
     public function request($method, $uri, $payload = [], $isLoggedIn = true)
     {
-        $payload = $uri == '/service/email' ? $payload : ['params' => $payload];
+        $payload = in_array($uri, $this->uriWhitelist) ? $payload : ['params' => $payload];
         $url = rtrim($this->baseUrl, '/') . '/' . ltrim($uri, '/');
         $client = new Zend_Http_Client($url);
         $signature = $this->accessToken . $this->clientSecret . json_encode($payload);

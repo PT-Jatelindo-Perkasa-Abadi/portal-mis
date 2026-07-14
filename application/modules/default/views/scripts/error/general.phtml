@@ -1,1 +1,13 @@
-<p>General Error</p>
+<div class="image-container">
+    <img src="<?= $this->baseUrl('assets/img/img_error_message_general.svg'); ?>" alt="Error Illustration"
+        class="error-svg">
+</div>
+
+<h1>Error while processing</h1>
+<p>Sorry, an error occurred while processing the data, please try again</p>
+
+<a href="#" class="btn-go-back" onclick="history.go(-1)">Go Back</a>
+
+<?php if (APPLICATION_ENV === 'development'): ?>
+<pre><?php echo $this->exception->getMessage(); ?></pre>
+<?php endif; ?>
