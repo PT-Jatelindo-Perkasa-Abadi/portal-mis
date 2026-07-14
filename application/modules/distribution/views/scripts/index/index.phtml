@@ -1,0 +1,480 @@
+<?php
+// 🎯 LOGIKA PHP UNTUK MENAMPILKAN TEKS HARI/BULAN SECARA REALTIME INDONESIA
+date_default_timezone_set('Asia/Jakarta');
+$hariArray = array("Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu");
+$bulanArray = array(
+    1 => "Januari", "Februari", "Maret", "April", "Mei", "Juni", 
+    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+);
+
+// 🎯 AMANKAN FORMAT TANGGAL: Konversi format YYYY-MM-DD dari Controller ke format UI Indonesia
+$activeDate = $this->filters['date'];
+$inputDateValue = $activeDate; 
+
+if (strpos($activeDate, '/') !== false) {
+    $parts = explode('/', $activeDate);
+    if (count($parts) == 3) { $inputDateValue = $parts[2] . '-' . $parts[1] . '-' . $parts[0]; }
+} else {
+    $activeDate = date('d/m/Y', strtotime($inputDateValue));
+}
+
+$hariAngka = date('w', strtotime($inputDateValue));
+$bulanAngka = date('n', strtotime($inputDateValue));
+$tanggalTeksRealtime = $hariArray[$hariAngka] . ", " . date('d', strtotime($inputDateValue)) . " " . $bulanArray[$bulanAngka] . " " . date('Y', strtotime($inputDateValue));
+
+$badgeDateLabel = $activeDate;
+?>
+
+<style>
+    /* Custom style dropdown menu filter agar sesuai spesifikasi figma */
+    .custom-dropdown-menu {
+        border-radius: 12px !important;
+        padding: 8px !important;
+        border: 1px solid #E7E8E8 !important;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05) !important;
+        min-width: 200px;
+    }
+    .custom-dropdown-item {
+        border-radius: 8px !important;
+        padding: 10px 14px !important;
+        color: #12161C !important;
+        font-size: 14px;
+        font-weight: 500;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-decoration: none;
+    }
+    .custom-dropdown-item.active {
+        background-color: #EBF2FE !important;
+        color: #3A7BF6 !important;
+        font-weight: 600;
+    }
+    .custom-dropdown-item:hover:not(.active) {
+        background-color: #F8F9FA !important;
+    }
+
+    /* 🎯 FIX STYLE CONTAINER INPUT KALENDER */
+    .calendar-input-container {
+        position: relative; /* Wajib ada agar posisi absolute elemen di dalamnya mengunci di sini */
+        height: 48px;
+        outline: 1px #E7E8E8 solid;
+        outline-offset: -1px;
+        background: #ffffff;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    /* 🎯 MERAPIKAN INPUT DATE + SUNTIK ICON ic_calender.svg LOKAL */
+    .custom-date-input-with-icon {
+        outline: none;
+        cursor: pointer;
+        color: #12161C;
+        font-size: 14px;
+        font-weight: 600;
+        background: transparent;
+        border: 0;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        
+        /* Memanggil gambar ikon kalender lokal sebagai latar background */
+        background-image: url('<?= $this->baseUrl("assets/img/ic_calender.svg"); ?>');
+        background-repeat: no-repeat;
+        background-position: right center;
+        background-size: 16px 16px;
+    }
+
+    /* 🎯 FIX DETEKSI KLIK: Sembunyikan panah bawaan browser dan bentangkan area klik di atas kotak */
+    .custom-date-input-with-icon::-webkit-calendar-picker-indicator {
+        background: transparent !important;
+        color: transparent !important;
+        cursor: pointer;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        z-index: 5; /* Memastikan dia berada di lapisan atas untuk menangkap klik */
+    }
+</style>
+
+<div class="container-fluid px-2 pb-4 pt-3 bg-light min-vh-100 text-dark" style="font-family: 'Sora', sans-serif;">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1" style="color: #12161C; font-size: 24px;">Rangkuman Distribusi</h2>
+            <div class="fs-7" style="color: #595C60;">
+                Data Transaksi - <span style="color: #3A7BF6;"><?= $tanggalTeksRealtime; ?></span>
+            </div>
+        </div>
+        <!-- Info Terakhir Diperbarui -->
+        <div class="overflow-hidden rounded-3" style="height: 48px;">
+            <div class="px-3 py-2 d-flex align-items-center gap-2 h-100" style="background: #EBF2FE;">
+                <span style="color: #595C60; font-size: 14px;">Terakhir diperbarui</span>
+                <span class="fw-bold" style="color: #3A7BF6; font-size: 14px;">14:00</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="w-100 mb-4" style="border-bottom: 1px #E7E8E8 solid;">
+        <div class="d-flex align-items-center gap-4">
+            <!-- Tab IT Provider -->
+            <div class="d-flex flex-column align-items-center gap-2" style="height: 48px;">
+                <a href="<?= $this->baseUrl('distribution/index/index/type/it-provider'); ?>"
+                    class="text-decoration-none px-1 pt-2 fw-semibold"
+                    style="font-size: 16px; color: <?= ($this->activeTab === 'it-provider') ? '#3A7BF6' : '#595C60'; ?>;">
+                    IT Provider
+                </a>
+                <?php if ($this->activeTab === 'it-provider'): ?>
+                    <div class="w-100" style="height: 4px; background: #3A7BF6; border-top-left-radius: 10px; border-top-right-radius: 10px;"></div>
+                <?php endif; ?>
+            </div>
+
+            <!-- Tab Mitra -->
+            <div class="d-flex flex-column align-items-center gap-2" style="height: 48px;">
+                <a href="<?= $this->baseUrl('distribution/index/index/type/mitra'); ?>"
+                    class="text-decoration-none px-1 pt-2 fw-semibold"
+                    style="font-size: 16px; color: <?= ($this->activeTab === 'mitra') ? '#3A7BF6' : '#595C60'; ?>;">
+                    Mitra
+                </a>
+                <?php if ($this->activeTab === 'mitra'): ?>
+                    <div class="w-100" style="height: 4px; background: #3A7BF6; border-top-left-radius: 10px; border-top-right-radius: 10px;"></div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         3. WRAPPER CARD UTAMA 
+         ========================================== -->
+    <div class="card bg-white border-0 shadow-sm mb-4" style="border-radius: 12px; outline: 1px #E7E8E8 solid; outline-offset: -1px;">
+        <div class="card-body p-4 d-flex flex-column gap-4">
+
+            <!-- 🔹 SECTION 3A: FORM FILTERS & BUTTON SEARCH -->
+            <form method="GET" action="" class="d-flex align-items-center gap-3 w-100 m-0">
+                <input type="hidden" name="type" value="<?= $this->escape($this->activeTab); ?>">
+
+                <!-- Input Cari -->
+                <div class="flex-grow-1 bg-white rounded-3 d-flex align-items-center px-3 gap-2" style="height: 48px; outline: 1px #E7E8E8 solid; outline-offset: -1px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#B8B9BB" class="bi bi-search" viewBox="0 0 16 16">
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                    </svg>
+                    <input type="text" name="search" value="<?= $this->escape($this->filters['search'] ?? ''); ?>" class="form-control border-0 bg-transparent p-0 text-dark placeholder-muted" placeholder="Cari" style="font-size: 14px; box-shadow: none;">
+                </div>
+
+                <!-- 🎯 FIX WRAPPER KALENDER: Memakai class calendar-input-container baru yang presisi -->
+                <div class="position-relative" style="width: 200px;">
+                    <div class="calendar-input-container">
+                        <input type="date" name="date" value="<?= $this->escape($inputDateValue); ?>" class="custom-date-input-with-icon" required>
+                    </div>
+                </div>
+
+                <!-- Sort Dropdown Filter -->
+                <div class="dropdown" style="width: 200px;">
+                    <?php 
+                        $currentSort = $this->filters['sort_by'] ?? 'total'; 
+                        $sortLabel = 'Total (Rp)';
+                        if ($currentSort === 'lembar') $sortLabel = 'Lembar';
+                        elseif ($currentSort === 'tagihan') $sortLabel = 'Tagihan (Rp)';
+                        elseif ($currentSort === 'admin') $sortLabel = 'Admin (Rp)';
+                    ?>
+                    <input type="hidden" name="sort_by" id="value-sort-by" value="<?= $this->escape($currentSort); ?>">
+                    <button class="btn bg-white w-100 rounded-3 d-flex align-items-center justify-content-between px-3 border-0 text-start text-dark" type="button" data-bs-toggle="dropdown" style="height: 48px; outline: 1px #E7E8E8 solid; outline-offset: -1px; font-size: 14px; font-weight: 600;">
+                        <span id="label-sort-by"><?= $sortLabel; ?></span>
+                        <img src="<?= $this->baseUrl('assets/img/ic_arrow_down.svg'); ?>" style="width: 12px; height: 12px; object-fit: contain;" alt="arrow">
+                    </button>
+                    <ul class="dropdown-menu custom-dropdown-menu">
+                        <li>
+                            <a class="dropdown-item custom-dropdown-item <?= ($currentSort === 'total') ? 'active' : ''; ?>" href="#" onclick="selectSort('total', 'Total (Rp)', this)">
+                                <span>Total (Rp)</span>
+                                <?php if($currentSort === 'total'): ?><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#198754" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg><?php endif; ?>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item custom-dropdown-item <?= ($currentSort === 'lembar') ? 'active' : ''; ?>" href="#" onclick="selectSort('lembar', 'Lembar', this)">
+                                <span>Lembar</span>
+                                <?php if($currentSort === 'lembar'): ?><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#198754" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg><?php endif; ?>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item custom-dropdown-item <?= ($currentSort === 'tagihan') ? 'active' : ''; ?>" href="#" onclick="selectSort('tagihan', 'Tagihan (Rp)', this)">
+                                <span>Tagihan (Rp)</span>
+                                <?php if($currentSort === 'tagihan'): ?><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#198754" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg><?php endif; ?>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item custom-dropdown-item <?= ($currentSort === 'admin') ? 'active' : ''; ?>" href="#" onclick="selectSort('admin', 'Admin (Rp)', this)">
+                                <span>Admin (Rp)</span>
+                                <?php if($currentSort === 'admin'): ?><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#198754" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg><?php endif; ?>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Service Dropdown Filter -->
+                <div class="dropdown" style="width: 200px;">
+                    <?php $sVal = strtolower($this->filters['service'] ?? ''); ?>
+                    <input type="hidden" name="service" id="value-service" value="<?= $this->escape($this->filters['service'] ?? ''); ?>">
+                    <button class="btn bg-white w-100 rounded-3 d-flex align-items-center justify-content-between px-3 border-0 text-start text-dark" type="button" data-bs-toggle="dropdown" style="height: 48px; outline: 1px #E7E8E8 solid; outline-offset: -1px; font-size: 14px; font-weight: 600;">
+                        <span id="label-service">
+                            <?php 
+                                if($sVal === 'prepaid') echo 'Prepaid';
+                                elseif($sVal === 'postpaid') echo 'Postpaid';
+                                elseif($sVal === 'non-taglist') echo 'Non-Taglist';
+                                else echo 'Semua Layanan';
+                            ?>
+                        </span>
+                        <img src="<?= $this->baseUrl('assets/img/ic_arrow_down.svg'); ?>" style="width: 12px; height: 12px; object-fit: contain;" alt="arrow">
+                    </button>
+                    <ul class="dropdown-menu custom-dropdown-menu">
+                        <li>
+                            <a class="dropdown-item custom-dropdown-item <?= empty($sVal) ? 'active' : ''; ?>" href="#" onclick="selectService('', 'Semua Layanan', this)">
+                                <span>Semua Layanan</span>
+                                <?php if(empty($sVal)): ?><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#198754" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg><?php endif; ?>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item custom-dropdown-item <?= ($sVal === 'prepaid') ? 'active' : ''; ?>" href="#" onclick="selectService('prepaid', 'Prepaid', this)">
+                                <span>Prepaid</span>
+                                <?php if($sVal === 'prepaid'): ?><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#198754" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg><?php endif; ?>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item custom-dropdown-item <?= ($sVal === 'postpaid') ? 'active' : ''; ?>" href="#" onclick="selectService('postpaid', 'Postpaid', this)">
+                                <span>Postpaid</span>
+                                <?php if($sVal === 'postpaid'): ?><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#198754" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg><?php endif; ?>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item custom-dropdown-item <?= ($sVal === 'non-taglist') ? 'active' : ''; ?>" href="#" onclick="selectService('non-taglist', 'Non-Taglist', this)">
+                                <span>Non-Taglist</span>
+                                <?php if($sVal === 'non-taglist'): ?><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#198754" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg><?php endif; ?>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Button Search -->
+                <button type="submit" class="btn bg-white rounded-3 fw-bold d-flex align-items-center justify-content-center" style="height: 48px; padding: 10px 16px; color: #3A7BF6; outline: 1px #3A7BF6 solid; outline-offset: -1px; font-size: 14px; transition: all 0.2s;">
+                    Search
+                </button>
+            </form>
+
+            <!-- 🔹 SECTION 3B: TOKEN BADGES STATUS FILTERS -->
+            <div class="d-flex align-items-center gap-3">
+                <!-- Download Button Data Token -->
+                <div class="bg-white rounded-3 d-flex align-items-center px-2 py-1 gap-1" style="outline: 1px #E7E8E8 solid; outline-offset: -1px; cursor: pointer; height: 36px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="#3A7BF6" viewBox="0 0 16 16" style="margin-left: 4px; margin-right: 2px;">
+                        <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v2.5a.5.5 0 0 1 .5-.5"/><path d="M7.646 11.854a5 5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
+                    </svg>
+                    <span class="fw-semibold" style="color: #12161C; font-size: 14px;">Download Data</span>
+                </div>
+                <!-- Pill Status Active Filters -->
+                <div class="rounded-3 d-flex align-items-center justify-content-center px-3" style="height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600;">
+                    Tanggal <?= $this->escape($badgeDateLabel); ?>
+                </div>
+                <div class="rounded-3 d-flex align-items-center justify-content-center px-3" style="height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600;">
+                    Berdasarkan <?= (isset($this->filters['sort_by']) && $this->filters['sort_by'] === 'lembar') ? 'Lembar' : 'Total (Rp)'; ?>
+                </div>
+                <div class="rounded-3 d-flex align-items-center justify-content-center px-3" style="height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600;">
+                    <?= !empty($sVal) ? ucfirst($sVal) : 'Semua Layanan'; ?>
+                </div>
+                <!-- Reset Text -->
+                <a href="<?= $this->baseUrl('distribution/index/index/type/' . $this->activeTab); ?>" class="text-decoration-none fw-semibold" style="color: #595C60; font-size: 14px;">Reset Data</a>
+            </div>
+
+            <!-- 🔹 SECTION 3C: GRAFIK TRANSAKSI BOX WITH SUMMARY INTERNAL CARDS -->
+            <div class="w-100 p-4 rounded-3 bg-white" style="outline: 1px #E7E8E8 solid; outline-offset: -1px; border-radius: 12px;">
+                <h6 class="fw-bold mb-4" style="color: #12161C; font-size: 16px;">Grafik Transaksi Top 10 <?= ($this->activeTab === 'mitra') ? 'Mitra' : 'IT Provider'; ?></h6>
+
+                <!-- 3 Mini Kategori Summary Cards -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <div class="bg-white p-3 rounded-3 flex-column d-flex gap-2" style="outline: 1px #E7E8E8 solid; outline-offset: -1px; border-radius: 12px;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width: 12px; height: 12px; background: #B38705; border-radius: 2px;"></div>
+                                <span style="color: #595C60; font-size: 14px;">Prepaid</span>
+                            </div>
+                            <div class="fw-bold" style="color: #12161C; font-size: 14px; font-weight: 600;"><?= number_format($this->summary['prepaid'], 0, ',', '.'); ?></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="bg-white p-3 rounded-3 flex-column d-flex gap-2" style="outline: 1px #E7E8E8 solid; outline-offset: -1px; border-radius: 12px;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width: 12px; height: 12px; background: #FFC107; border-radius: 2px;"></div>
+                                <span style="color: #595C60; font-size: 14px;">Postpaid</span>
+                            </div>
+                            <div class="fw-bold" style="color: #12161C; font-size: 14px; font-weight: 600;"><?= number_format($this->summary['postpaid'], 0, ',', '.'); ?></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="bg-white p-3 rounded-3 flex-column d-flex gap-2" style="outline: 1px #E7E8E8 solid; outline-offset: -1px; border-radius: 12px;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width: 12px; height: 12px; background: #FFECB5; border-radius: 2px;"></div>
+                                <span style="color: #595C60; font-size: 14px;">Non-Taglist</span>
+                            </div>
+                            <div class="fw-bold" style="color: #12161C; font-size: 14px; font-weight: 600;"><?= number_format($this->summary['non_taglist'], 0, ',', '.'); ?></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Canvas Chart Area -->
+                <div style="position: relative; height: 241px; width: 100%;">
+                    <canvas id="distributionBarChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 🔹 SECTION 3D: DATA TABLE LIST TRANSAKSI -->
+            <div class="table-responsive w-100" style="overflow-x: auto;">
+                <table class="table align-middle table-hover mb-0 w-100" style="border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: white; border-top: 1px #E7E8E8 solid; border-bottom: 1px #E7E8E8 solid; height: 56px;">
+                            <th class="ps-3 fw-bold" style="color: #595C60; font-size: 14px; width: 58px;">No</th>
+                            <th class="fw-bold" style="color: #595C60; font-size: 14px; width: 160px;">Kode <?= ($this->activeTab === 'mitra') ? 'Mitra' : 'IT Provider'; ?></th>
+                            <th class="fw-bold" style="color: #595C60; font-size: 14px;">Nama <?= ($this->activeTab === 'mitra') ? 'Mitra' : 'IT Provider'; ?></th>
+                            <th class="fw-bold text-center" style="color: #595C60; font-size: 14px; width: 140px;">Layanan</th>
+                            <th class="fw-bold text-center" style="color: #595C60; font-size: 14px; width: 120px;">Lembar</th>
+                            <th class="fw-bold text-end" style="color: #595C60; font-size: 14px; width: 160px;">Tagihan (Rp)</th>
+                            <th class="fw-bold text-end" style="color: #595C60; font-size: 14px; width: 160px;">Admin ITP (Rp)</th>
+                            <th class="fw-bold text-end pe-3" style="color: #595C60; font-size: 14px; width: 160px;">Total (Rp)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (!empty($this->listData)): $no = 1;
+                            foreach ($this->listData as $row): ?>
+                                <tr style="height: 64px; background: white; border-bottom: 1px #E7E8E8 solid;">
+                                    <td class="ps-3 text-center" style="color: #12161C; font-size: 14px; font-weight: 400;"><?= $no++; ?></td>
+                                    <td style="color: #12161C; font-size: 14px; font-weight: 400;"><?= isset($row['kode']) ? $row['kode'] : ''; ?></td>
+                                    <td style="color: #12161C; font-size: 14px; font-weight: 400;"><?= isset($row['nama']) ? $row['nama'] : ''; ?></td>
+                                    <td class="text-center">
+                                        <?php
+                                        $layananNama = isset($row['layanan']) ? $row['layanan'] : '';
+                                        $badgeTextColor = '#595C60';
+                                        ?>
+                                        <div class="mx-auto d-flex align-items-center justify-content-center rounded-3"
+                                            style="width: 102px; height: 28px; background: white; outline: 1px #E7E8E8 solid; outline-offset: -1px;">
+                                            <span class="fw-semibold" style="color: <?= $badgeTextColor; ?>; font-size: 14px;"><?= $layananNama; ?></span>
+                                        </div>
+                                    </td>
+                                    <td class="text-center" style="color: #12161C; font-size: 14px; font-weight: 400;"><?= isset($row['lembar']) ? $row['lembar'] : (isset($row['jumlah']) ? $row['jumlah'] : 0); ?></td>
+                                    <td class="text-end" style="color: #12161C; font-size: 14px; font-weight: 400;"><?= isset($row['tagihan']) ? $row['tagihan'] : '0'; ?></td>
+                                    <td class="text-center" style="color: #12161C; font-size: 14px; font-weight: 400;"><?= isset($row['admin']) ? $row['admin'] : '0'; ?></td>
+                                    <td class="text-end" style="color: #12161C; font-size: 14px; font-weight: 400;"><?= isset($row['admin']) ? $row['total'] : '0'; ?></td>
+                                </tr>
+                            <?php endforeach;
+                        else: ?>
+                            <tr style="height: 64px;">
+                                <td colspan="8" class="text-center py-4 text-secondary">Data Kosong.</td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ==========================================
+     📦 LOAD CHART ENGINE
+     ========================================== -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+
+        // 1. Fungsi Pembantu Interaksi Dropdown Ganti Data & Centang Hijau SVG
+        window.selectSort = function(val, text, element) {
+            document.getElementById('value-sort-by').value = val;
+            document.getElementById('label-sort-by').innerText = text;
+            
+            element.closest('.dropdown-menu').querySelectorAll('.custom-dropdown-item').forEach(el => {
+                el.classList.remove('active');
+                const icon = el.querySelector('svg');
+                if(icon) icon.remove();
+            });
+            element.classList.add('active');
+            element.insertAdjacentHTML('beforeend', '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#198754" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>');
+        };
+
+        window.selectService = function(val, text, element) {
+            document.getElementById('value-service').value = val;
+            document.getElementById('label-service').innerText = text;
+            
+            element.closest('.dropdown-menu').querySelectorAll('.custom-dropdown-item').forEach(el => {
+                el.classList.remove('active');
+                const icon = el.querySelector('svg');
+                if(icon) icon.remove();
+            });
+            element.classList.add('active');
+            element.insertAdjacentHTML('beforeend', '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#198754" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>');
+        };
+
+        // 2. Render Engine Grafik Batang Chart.js
+        const chartRawData = <?= $this->chartJson; ?>;
+        const ctx = document.getElementById('distributionBarChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: chartRawData.labels,
+                datasets: [{
+                        label: 'Prepaid',
+                        data: chartRawData.prepaid,
+                        backgroundColor: '#B38705', 
+                        borderRadius: 2,
+                        barThickness: 24, 
+                    },
+                    {
+                        label: 'Postpaid',
+                        data: chartRawData.postpaid,
+                        backgroundColor: '#FFC107', 
+                        borderRadius: 2,
+                        barThickness: 24,
+                    },
+                    {
+                        label: 'Non-Taglist',
+                        data: chartRawData.non_taglist,
+                        backgroundColor: '#FFECB5', 
+                        borderRadius: 2,
+                        barThickness: 24,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false } 
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#595C60',
+                            font: { family: 'Sora', size: 12 }
+                        },
+                        grid: { color: '#E7E8E8', drawBorder: false },
+                        afterFit: function(scaleInstance) {
+                            scaleInstance.width = 40;
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#595C60',
+                            font: { family: 'Sora', size: 12, weight: '700' }
+                        },
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+    });
+</script>
