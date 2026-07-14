@@ -282,7 +282,9 @@
                                         <span class="square bg-primary"></span>
                                         <span class="fs-7 text-neutral-70">Latency (msec)</span>
                                     </div>
-                                    <h5 class="fs-7 fw-semibold text-neutral-100 mb-0">32 ms</h5>
+                                    <h5 class="fs-7 fw-semibold text-neutral-100 mb-0" data-field="request-latency">
+                                        <div class="skeleton-cell w-100 float-end"></div>
+                                    </h5>
                                 </div>
                             </div>
                             <div class="col d-flex flex-column gap-2 p-3 border border-neutral-10 rounded-3">
@@ -291,7 +293,9 @@
                                         <span class="square bg-cyan"></span>
                                         <span class="fs-7 text-neutral-70">Rata-Rata Request</span>
                                     </div>
-                                    <h5 class="fs-7 fw-semibold text-neutral-100 mb-0">48 ms</h5>
+                                    <h5 class="fs-7 fw-semibold text-neutral-100 mb-0" data-field="request-average">
+                                        <div class="skeleton-cell w-100 float-end"></div>
+                                    </h5>
                                 </div>
                             </div>
                             <div class="col d-flex flex-column gap-2 p-3 border border-neutral-10 rounded-3">
@@ -300,7 +304,9 @@
                                         <span class="square bg-cyan-blue"></span>
                                         <span class="fs-7 text-neutral-70">Rata-Rata Response</span>
                                     </div>
-                                    <h5 class="fs-7 fw-semibold text-neutral-100 mb-0">32 ms</h5>
+                                    <h5 class="fs-7 fw-semibold text-neutral-100 mb-0" data-field="response-average">
+                                        <div class="skeleton-cell w-100 float-end"></div>
+                                    </h5>
                                 </div>
                             </div>
                         </div>
@@ -743,18 +749,10 @@ $(function() {
         canvas: '#latencyChart',
         type: 'line',
         data: {
-            labels: [
-                '09:00',
-                '10:00',
-                '11:00',
-                '12:00',
-                '13:00',
-                '14:00',
-                '15:00'
-            ],
+            labels: [0],
             datasets: [{
                     label: 'Latency (msec)',
-                    data: [15, 17, 29, 29, 32, 35, 35],
+                    data: [0],
                     borderColor: '#3B6FF5',
                     backgroundColor: '#3B6FF5',
                     borderWidth: 3,
@@ -762,7 +760,7 @@ $(function() {
                 },
                 {
                     label: 'Rata-Rata Request',
-                    data: [9, 11, 24, 24, 29, 30, 45],
+                    data: [0],
                     borderColor: '#36D8C5',
                     backgroundColor: '#36D8C5',
                     borderWidth: 3,
@@ -770,7 +768,7 @@ $(function() {
                 },
                 {
                     label: 'Rata-Rata Response',
-                    data: [7, 9, 17, 19, 25, 31, 35],
+                    data: [0],
                     borderColor: '#19C2F2',
                     backgroundColor: '#19C2F2',
                     borderWidth: 3,
@@ -836,40 +834,10 @@ $(function() {
         latencyChart.showLoading();
 
         setTimeout(function() {
-            const random = Math.floor(Math.random() * 3);
-            if (random == 0) {
-                latencyChart.update([{
-                        label: 'Latency (msec)',
-                        data: [15, 17, 29, 29, 32, 35, 35],
-                        borderColor: '#3B6FF5',
-                        backgroundColor: '#3B6FF5',
-                        borderWidth: 3,
-                        pointRadius: 0
-                    },
-                    {
-                        label: 'Rata-Rata Request',
-                        data: [9, 11, 24, 24, 29, 30, 45],
-                        borderColor: '#36D8C5',
-                        backgroundColor: '#36D8C5',
-                        borderWidth: 3,
-                        pointRadius: 0
-                    },
-                    {
-                        label: 'Rata-Rata Response',
-                        data: [7, 9, 17, 19, 25, 31, 35],
-                        borderColor: '#19C2F2',
-                        backgroundColor: '#19C2F2',
-                        borderWidth: 3,
-                        pointRadius: 0
-                    }
-                ]);
-
-                latencyChart.showChart();
-            } else if (random == 1) {
-                latencyChart.showEmpty();
-            } else {
-                latencyChart.showEmpty();
-            }
+            latencyChart.showChart();
+            $('[data-field=request-latency]').text("0");
+            $('[data-field=request-average]').text("0");
+            $('[data-field=response-average]').text("0");
         }, 1500);
     }
     latencyChart.onReload(loadLatencyChart());
