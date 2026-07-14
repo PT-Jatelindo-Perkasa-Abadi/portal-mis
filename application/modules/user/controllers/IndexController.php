@@ -142,7 +142,7 @@ class User_IndexController extends App_Controller_Base
             $sessionToken = $sessionData['msg']['access_token'];
         }
 
-        $idUser = (int) $this->_getParam('id', 0);
+        $idUser = (int) $this->_getParam('id_user', 0);
 
         $payload = [
             $idUser,
@@ -195,6 +195,14 @@ class User_IndexController extends App_Controller_Base
         }
 
         if (isset($responseLevel['msg'][0]['ERROR']) && $responseLevel['msg'][0]['ERROR'] == 'Invalid or expired session') {
+            return $this->_redirect('/auth/logout');
+        }
+
+         if ($responseLevel['msg'][0]['ERROR'] == 'Invalid or expired session') {
+            return $this->_redirect('/auth/logout');
+        }
+
+         if ($listItp['msg'][0]['ERROR'] == 'Invalid or expired session') {
             return $this->_redirect('/auth/logout');
         }
 
@@ -382,7 +390,7 @@ class User_IndexController extends App_Controller_Base
             // 3. 🔥 JALUR LANGSUNG (Klik Edit dari Halaman Utama)
             // Ambil session token andalan Anda
             $sessionToken = $this->currentUser()['session_token'];
-            $idUser = (int) $this->_getParam('id', 0);
+            $idUser = (int) $this->_getParam('id_user', 0);
 
             // Susun payload flat ke API detail
             $payload = [$idUser, $sessionToken];
