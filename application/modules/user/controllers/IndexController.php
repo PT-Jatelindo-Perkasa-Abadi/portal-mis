@@ -142,7 +142,7 @@ class User_IndexController extends App_Controller_Base
             $sessionToken = $sessionData['msg']['access_token'];
         }
 
-        $idUser = (int) $this->_getParam('id_user', 0);
+        $idUser = (int) $this->_getParam('id', 0);
 
         $payload = [
             $idUser,
@@ -198,11 +198,11 @@ class User_IndexController extends App_Controller_Base
             return $this->_redirect('/auth/logout');
         }
 
-         if ($responseLevel['msg'][0]['ERROR'] == 'Invalid or expired session') {
+        if ($responseLevel['msg'][0]['ERROR'] == 'Invalid or expired session') {
             return $this->_redirect('/auth/logout');
         }
 
-         if ($listItp['msg'][0]['ERROR'] == 'Invalid or expired session') {
+        if ($listItp['msg'][0]['ERROR'] == 'Invalid or expired session') {
             return $this->_redirect('/auth/logout');
         }
 
@@ -376,38 +376,36 @@ class User_IndexController extends App_Controller_Base
 
     public function editAction()
     {
-        // 1. Inisialisasi session cache internal
         $userSession = new Zend_Session_Namespace('UserDetailCache');
         $userDetail = null;
 
         $api = new App_Service_Api();
-        $api->authorization(); // Sinkronisasi signature header AJAX / Direct Click
+        $api->authorization();
 
-        // 2. Jika diakses dari jalur Detail -> Edit, ambil langsung dari session
-        if (isset($userSession->data)) {
+        $idUser = (int) $this->_getParam('id', 0);
+
+        $cacheId = isset($userSession->data['id']) ? (int)$userSession->data['id'] : (isset($userSession->data['id_user']) ? (int)$userSession->data['id_user'] : 0);
+
+        if (isset($userSession->data) && $cacheId === $idUser && $idUser !== 0) {
             $userDetail = $userSession->data;
         } else {
-            // 3. 🔥 JALUR LANGSUNG (Klik Edit dari Halaman Utama)
-            // Ambil session token andalan Anda
             $sessionToken = $this->currentUser()['session_token'];
-            $idUser = (int) $this->_getParam('id_user', 0);
 
-            // Susun payload flat ke API detail
             $payload = [$idUser, $sessionToken];
 
-            // Hit ke API Detail User Spesifik
             $response = $api->request('POST', '/service/proxy/service/alias/get-user-detail', $payload);
 
             if (isset($response['code']) && $response['code'] == 200 && isset($response['msg'][0])) {
                 $userDetail = $response['msg'][0];
+                $userSession->data = $userDetail;
             }
         }
 
         $sessionToken = $this->currentUser()['session_token'];
-        $payload = [$sessionToken];
+        $payloadData = [$sessionToken];
 
-        $responseRoles = $api->request('POST', '/service/proxy/service/alias/get-roles', $payload);
-        $responseLevel = $api->request('POST', '/service/proxy/service/alias/get-levels', $payload);
+        $responseRoles = $api->request('POST', '/service/proxy/service/alias/get-roles', $payloadData);
+        $responseLevel = $api->request('POST', '/service/proxy/service/alias/get-levels', $payloadData);
 
         if (isset($responseRoles['msg'][0]['ERROR']) && $responseRoles['msg'][0]['ERROR'] == 'Invalid or expired session') {
             return $this->_redirect('/auth/logout');
@@ -422,12 +420,12 @@ class User_IndexController extends App_Controller_Base
             $rolesData = $responseRoles['msg'];
         }
 
-        // 4. Lempar data aman ke view edit.phtml
         $this->view->userDetail = $userDetail;
         $this->view->listRoles = $rolesData;
         $this->view->listLevel = isset($responseLevel['msg']) && is_array($responseLevel['msg']) ? $responseLevel['msg'] : [];
         $this->view->listItp = $this->fetchItpList($api);
         $this->view->tpCode = $this->extractTpCode($userDetail);
+
         $this->_helper->viewRenderer('edit');
     }
 
@@ -591,7 +589,7 @@ class User_IndexController extends App_Controller_Base
             $api = new App_Service_Api();
             $sessionData = $api->authorization();
 
-            $idUser = (int) $this->_getParam('id_user', 0);
+            $idUser = (int) $this->_getParam('id', 0);
             $fullName = (string) $this->_getParam('fullName', '');
             $email = trim((string) $this->_getParam('email', ''));
             $roleValue = (int) $this->_getParam('role', 1);
@@ -660,7 +658,6 @@ class User_IndexController extends App_Controller_Base
                     ];
 
                     $api->request('POST', '/service/email', $emailPayload);
-
                 } catch (Exception $e) {
                     error_log("Gagal memproses notifikasi email reset password: " . $e->getMessage());
                 }
