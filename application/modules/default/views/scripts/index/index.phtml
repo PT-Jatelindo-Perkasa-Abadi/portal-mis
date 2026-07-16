@@ -269,6 +269,7 @@
         </div>
     </div>
 
+    <?php if ($this->isAllowed('user:index', 'create')) : ?>
     <div class="row g-4 mb-4">
         <div class="col-lg-6">
             <div class="p-4 border border-neutral-10 rounded-3">
@@ -392,6 +393,7 @@
             </div>
         </div>
     </div>
+    <?php endif; ?>
 </div>
 
 <script type="text/javascript">
@@ -744,6 +746,7 @@ $(function() {
 
     loadTransactionDashboard();
 
+    <?php if ($this->isAllowed('user:index', 'create')) : ?>
     /** Latency Chart */
     const latencyChart = new DashboardChart({
         canvas: '#latencyChart',
@@ -985,5 +988,6 @@ $(function() {
 
         resetButton();
     }
+    <?php endif; ?>
 });
 </script>
