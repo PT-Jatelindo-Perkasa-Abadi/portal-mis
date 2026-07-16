@@ -89,6 +89,7 @@ class Distribution_IndexController extends Zend_Controller_Action
             $this->_helper->layout->disableLayout();
             $this->_helper->viewRenderer->setNoRender(true);
 
+            set_include_path(get_include_path() . PATH_SEPARATOR . APPLICATION_PATH . '/../library');
             require_once '../library/Spreadsheet/Excel/Writer.php';
 
             $filename = "Rangkuman_Distribusi_" . ($activeTab === 'mitra' ? 'Mitra' : 'ITP') . "_" . date('Ymd_His') . ".xls";
