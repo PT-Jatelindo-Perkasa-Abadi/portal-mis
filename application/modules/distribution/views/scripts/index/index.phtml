@@ -221,32 +221,32 @@ if (strtolower($activeService) === 'prepaid') {
     </div>
 
     <!-- TAB MENU -->
-    <div class="w-100 mb-4" style="border-bottom: 1px #E7E8E8 solid;">
-        <div class="d-flex align-items-center gap-4">
+    <div class="w-100 mb-4 border-bottom" style="border-color: #E7E8E8 !important; height: 48px;">
+        <div class="d-flex align-items-end gap-4" style="height: 100%;">
 
-            <!-- Tab IT Provider -->
-            <?php if ($this->isAllowed('user:index', 'create') || $this->isAllowed('distribution:index', 'it-provider')): ?>
-                <div class="d-flex flex-column align-items-center gap-2" style="height: 48px;">
+            <?php if ($this->isAllowed('distribution:index', 'itp-tab') || $this->isAllowed('distribution:index', 'it-provider')): ?>
+                <div class="d-flex flex-column align-items-center justify-content-end" style="height: 100%; position: relative;">
                     <a href="<?= $this->baseUrl('distribution/index/index/type/it-provider'); ?>"
-                        class="text-decoration-none px-1 pt-2 fw-semibold"
-                        style="font-size: 16px; color: <?= ($this->activeTab === 'it-provider') ? '#3A7BF6' : '#595C60'; ?>;">
+                        class="text-decoration-none pb-2 px-1 fw-semibold"
+                        style="font-size: 16px; color: <?= ($this->activeTab === 'it-provider') ? '#3A7BF6' : '#595C60'; ?>; text-align: center;">
                         IT Provider
                     </a>
                     <?php if ($this->activeTab === 'it-provider'): ?>
-                        <div class="w-100" style="height: 4px; background: #3A7BF6; border-top-left-radius: 10px; border-top-right-radius: 10px;"></div>
+                        <div style="width: 100%; height: 4px; background: #3A7BF6; border-top-left-radius: 4px; border-top-right-radius: 4px; border-bottom-left-radius: 0px; border-bottom-right-radius: 0px; margin-bottom: -1px;"></div>
                     <?php endif; ?>
                 </div>
             <?php endif; ?>
 
             <!-- Tab Mitra -->
-            <div class="d-flex flex-column align-items-center gap-2" style="height: 48px;">
+            <div class="d-flex flex-column align-items-center justify-content-end" style="height: 100%; position: relative;">
                 <a href="<?= $this->baseUrl('distribution/index/index/type/mitra'); ?>"
-                    class="text-decoration-none px-1 pt-2 fw-semibold"
-                    style="font-size: 16px; color: <?= ($this->activeTab === 'mitra') ? '#3A7BF6' : '#595C60'; ?>;">
+                    class="text-decoration-none pb-2 px-1 fw-semibold"
+                    style="font-size: 16px; color: <?= ($this->activeTab === 'mitra') ? '#3A7BF6' : '#595C60'; ?>; text-align: center;">
                     Mitra
                 </a>
+                <!-- Tanda Biru Aktif Rata Bawah -->
                 <?php if ($this->activeTab === 'mitra'): ?>
-                    <div class="w-100" style="height: 4px; background: #3A7BF6; border-top-left-radius: 10px; border-top-right-radius: 10px;"></div>
+                    <div style="width: 100%; height: 4px; background: #3A7BF6; border-top-left-radius: 4px; border-top-right-radius: 4px; border-bottom-left-radius: 0px; border-bottom-right-radius: 0px; margin-bottom: -1px;"></div>
                 <?php endif; ?>
             </div>
 
@@ -347,7 +347,7 @@ if (strtolower($activeService) === 'prepaid') {
                 </button>
             </form>
 
-            <!-- 🔹 SECTION 3B: TOKEN BADGES STATUS FILTERS -->
+            <!-- 🔹 SECTION 3B: TOKEN BADGES STATUS FILTERS (ANTI-BENTROK & PROTEKSI DUPLIKASI) -->
             <div class="d-flex align-items-center gap-3">
                 <!-- Download Button Data Token -->
                 <a href="<?= $this->baseUrl('distribution/index/index/type/' . $this->activeTab . '?' . $_SERVER['QUERY_STRING'] . '&download=true'); ?>"
@@ -357,22 +357,55 @@ if (strtolower($activeService) === 'prepaid') {
                     <span class="fw-semibold" style="color: #12161C; font-size: 14px;">Download Data</span>
                 </a>
 
-                <!-- Tanggal -->
-                <?php if (!empty($inputDateValue) && (!isset($_GET['date']) || $_GET['date'] !== '')): ?>
+                <?php
+                $isFilterActive = false;
+                $searchText = isset($this->filters['search']) ? strtolower(trim($this->filters['search'])) : '';
+
+                if ($searchText !== '') {
+                    $isFilterActive = true;
+                ?>
+                    <div class="rounded-3 d-flex align-items-center justify-content-center px-3" style="height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600;">
+                        "<?= $this->escape($this->filters['search']); ?>"
+                    </div>
+                <?php
+                }
+
+                $isDateFilterActive = (!empty($inputDateValue) && (!isset($_GET['date']) || $_GET['date'] !== ''));
+                if ($isDateFilterActive) {
+                    $isFilterActive = true;
+                ?>
                     <div id="badge-date" class="rounded-3 d-flex align-items-center justify-content-center px-3" style="height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600;">
                         Tanggal <?= $this->escape($badgeDateLabel); ?>
                     </div>
-                <?php endif; ?>
+                    <?php
+                }
 
-                <!-- Badge Service -->
-                <?php if (!empty($badgeServiceLabel)): ?>
-                    <div id="badge-service" class="rounded-3 d-flex align-items-center justify-content-center px-3" style="height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600;">
-                        <?= $badgeServiceLabel; ?>
-                    </div>
-                <?php endif; ?>
+                if (!empty($badgeServiceLabel)) {
+                    $serviceLower = strtolower($badgeServiceLabel);
 
-                <!-- Reset Text -->
-                <a href="<?= $this->baseUrl('distribution/index/index/type/' . $this->activeTab); ?>" class="text-decoration-none fw-semibold" style="color: #595C60; font-size: 14px;">Reset Data</a>
+                    $isRedundant = (
+                        strpos($searchText, 'prepaid') !== false ||
+                        strpos($searchText, 'postpaid') !== false ||
+                        strpos($searchText, 'non') !== false ||
+                        ($serviceLower === 'semua layanan' && $searchText !== '')
+                    );
+
+                    if (!$isRedundant) {
+                        $isFilterActive = true;
+                    ?>
+                        <div id="badge-service" class="rounded-3 d-flex align-items-center justify-content-center px-3" style="height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600;">
+                            <?= $badgeServiceLabel; ?>
+                        </div>
+                    <?php
+                    } else {
+                        $isFilterActive = true;
+                    }
+                }
+
+                if ($isFilterActive):
+                    ?>
+                    <a href="<?= $this->baseUrl('distribution/index/index/type/' . $this->activeTab); ?>" class="text-decoration-none fw-semibold" style="color: #595C60; font-size: 14px;">Reset Data</a>
+                <?php endif; ?>
             </div>
 
             <!-- 🔹 SECTION 3C: GRAFIK TRANSAKSI BOX WITH SUMMARY INTERNAL CARDS -->
@@ -510,17 +543,13 @@ if (strtolower($activeService) === 'prepaid') {
         window.selectService = function(val, text, element) {
             document.getElementById('value-service').value = val;
 
-            // Ambil elemen span label
             const labelService = document.getElementById('label-service');
             labelService.innerText = text;
 
-            // 🎯 FIX UTAMA: Paksa warna hitam tebal secara realtime ketika user mengklik pilihan
             if (val === '') {
-                // Jika memilih kembali ke 'Pilih Layanan' (kondisi kosong)
                 labelService.style.color = '#9A9C9E';
                 labelService.style.fontWeight = '400';
             } else {
-                // Jika memilih Prepaid, Postpaid, atau Non-Taglist, langsung ubah jadi hitam tebal kustom Figma
                 labelService.style.color = '#12161C';
                 labelService.style.fontWeight = '600';
             }
@@ -539,13 +568,10 @@ if (strtolower($activeService) === 'prepaid') {
             const labelService = document.getElementById('label-service');
             labelService.innerText = text;
 
-            // 🎯 FIX REALTIME JS: Jika memilih 'Semua Layanan' (val murni kosong ""), warnanya TETAP dibuat hitam tebal!
-            // Warna abu-abu tipis HANYA boleh dipakai untuk tulisan "Pilih Layanan" saat pertama kali load aplikasi.
             if (text === 'Pilih Layanan') {
                 labelService.style.color = '#9A9C9E';
                 labelService.style.fontWeight = '400';
             } else {
-                // Pilihan 'Semua Layanan', 'Prepaid', 'Postpaid', 'Non-Taglist' otomatis hitam bold kustom Figma
                 labelService.style.color = '#12161C';
                 labelService.style.fontWeight = '600';
             }
@@ -600,17 +626,16 @@ if (strtolower($activeService) === 'prepaid') {
                 scales: {
                     y: {
                         beginAtZero: true,
-                        // 🎯 FIX PERFECT FIGMA: Mengatur garis grid horizontal agar rapi
                         grid: {
                             color: '#E7E8E8',
-                            drawTicks: false, // Menghilangkan garis kecil menonjol dekat angka
+                            drawTicks: false,
                         },
                         border: {
-                            display: false // Menghilangkan garis vertikal utama paling kiri y-axis
+                            display: false
                         },
                         ticks: {
                             color: '#595C60',
-                            padding: 12, // Memberi jarak (gap) aman antara teks angka dan garis
+                            padding: 12,
                             font: {
                                 family: 'Sora',
                                 size: 12
@@ -621,7 +646,6 @@ if (strtolower($activeService) === 'prepaid') {
                         }
                     },
                     x: {
-                        // 🎯 TAMBAHKAN INI: Biar garis border bawah x-axis tidak ikut hilang/aneh
                         border: {
                             display: false
                         },
@@ -651,11 +675,9 @@ if (strtolower($activeService) === 'prepaid') {
         if (dateInput) {
             dateInput.addEventListener('input', function() {
                 if (!this.value) {
-                    // Sembunyikan langsung secara visual
                     if (badgeDate) {
                         badgeDate.style.display = 'none';
                     }
-                    // Submit form agar halaman refresh membawa parameter kosong (?date=)
                     if (this.form) {
                         this.form.submit();
                     }
