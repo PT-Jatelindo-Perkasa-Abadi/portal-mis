@@ -99,24 +99,70 @@ class Distribution_IndexController extends Zend_Controller_Action
 
             $worksheet = &$workbook->addWorksheet('Rangkuman');
 
+            // --- 🎨 DEFINISI STYLE FORMATTING STANDAR FINANCE (BORDER + ALIGNMENT + SEPARATOR) ---
             $format_bold = &$workbook->addFormat();
             $format_bold->setBold();
 
-            $format_right = &$workbook->addFormat();
-            $format_right->setAlign('right');
+            // Style isi data text (No, Kode, Nama, Layanan) -> Center + Border
+            $format_center_data = &$workbook->addFormat();
+            $format_center_data->setAlign('center');
+            $format_center_data->setBorder(1);
 
+            // Style isi data volume (Lembar) -> Right + Border (Angka biasa tanpa desimal)
+            $format_lembar_data = &$workbook->addFormat();
+            $format_lembar_data->setAlign('right');
+            $format_lembar_data->setBorder(1);
+
+            // 🌟 STANDAR FINANCE: Style nominal uang -> Right + Border + Ribuan Separator
+            $format_uang = &$workbook->addFormat();
+            $format_uang->setAlign('right');
+            $format_uang->setBorder(1);
+            $format_uang->setNumFormat('#,##0'); // Memunculkan pembatas ribuan otomatis (e.g., 47.800.000)
+
+            // Style untuk Header Tabel -> Bold + Center + Border
             $format_header = &$workbook->addFormat();
             $format_header->setBold();
             $format_header->setAlign('center');
             $format_header->setBorder(1);
 
+            // Style untuk Baris TOTAL nominal uang di bawah -> Bold + Right + Border + Separator
+            $format_total_uang = &$workbook->addFormat();
+            $format_total_uang->setBold();
+            $format_total_uang->setAlign('right');
+            $format_total_uang->setBorder(1);
+            $format_total_uang->setNumFormat('#,##0');
+
+            // Style untuk Baris TOTAL data lembar -> Bold + Right + Border
+            $format_total_lembar = &$workbook->addFormat();
+            $format_total_lembar->setBold();
+            $format_total_lembar->setAlign('right');
+            $format_total_lembar->setBorder(1);
+
+            // Style khusus teks tulisan 'TOTAL' -> Bold + Center + Border
+            $format_total_text = &$workbook->addFormat();
+            $format_total_text->setBold();
+            $format_total_text->setAlign('center');
+            $format_total_text->setBorder(1);
+
+            // --- 🛠️ PENGATURAN LEBAR KOLOM (ANTI TEKS TERPOTONG) ---
+            $worksheet->setColumn(0, 0, 8);   // Kolom A (No)
+            $worksheet->setColumn(1, 1, 18);  // Kolom B (Kode Mitra / ITP)
+            $worksheet->setColumn(2, 2, 32);  // Kolom C (Nama Mitra / ITP) -> Lebar untuk nama perusahaan panjang
+            $worksheet->setColumn(3, 3, 16);  // Kolom D (Layanan)
+            $worksheet->setColumn(4, 4, 14);  // Kolom E (Lembar)
+            $worksheet->setColumn(5, 5, 20);  // Kolom F (Tagihan Rp)
+            $worksheet->setColumn(6, 6, 20);  // Kolom G (Admin ITP Rp)
+            $worksheet->setColumn(7, 7, 20);  // Kolom H (Total Rp)
+
             $colCode = ($activeTab === 'mitra') ? 'Kode Mitra' : 'Kode IT Provider';
             $colName = ($activeTab === 'mitra') ? 'Nama Mitra' : 'Nama IT Provider';
 
+            // Menulis Informasi Judul dan Filter di atas tabel
             $worksheet->write(0, 0, "REKAP RANGKUMAN DISTRIBUSI", $format_bold);
             $worksheet->write(1, 0, "PERIODE FILTER TANGGAL : " . $filterDate, $format_bold);
             $worksheet->write(2, 0, "KATEGORI DISTRIBUSI   : " . strtoupper($activeTab), $format_bold);
 
+            // Menulis Header Tabel (Baris ke-5 / Indeks 4)
             $worksheet->write(4, 0, 'No', $format_header);
             $worksheet->write(4, 1, $colCode, $format_header);
             $worksheet->write(4, 2, $colName, $format_header);
@@ -138,71 +184,48 @@ class Distribution_IndexController extends Zend_Controller_Action
                     $nama    = isset($lap['nama']) ? $lap['nama'] : (isset($lap['NAMA']) ? $lap['NAMA'] : '');
                     $layanan = isset($lap['layanan']) ? $lap['layanan'] : (isset($lap['LAYANAN']) ? $lap['LAYANAN'] : '');
 
-                    if (isset($lap['lembar'])) {
-                        $nilaiLembar = $lap['lembar'];
-                    } elseif (isset($lap['LEMBAR'])) {
-                        $nilaiLembar = $lap['LEMBAR'];
-                    } elseif (isset($lap['jumlah'])) {
-                        $nilaiLembar = $lap['jumlah'];
-                    } elseif (isset($lap['JUMLAH'])) {
-                        $nilaiLembar = $lap['JUMLAH'];
-                    } else {
-                        $nilaiLembar = 0;
-                    }
+                    // Parsing data Lembar
+                    if (isset($lap['lembar'])) { $nilaiLembar = $lap['lembar']; }
+                    elseif (isset($lap['LEMBAR'])) { $nilaiLembar = $lap['LEMBAR']; }
+                    elseif (isset($lap['jumlah'])) { $nilaiLembar = $lap['jumlah']; }
+                    elseif (isset($lap['JUMLAH'])) { $nilaiLembar = $lap['JUMLAH']; }
+                    else { $nilaiLembar = 0; }
 
-                    if (isset($lap['total_amount'])) {
-                        $nilaiTagihan = $lap['total_amount'];
-                    } elseif (isset($lap['TOTAL_AMOUNT'])) {
-                        $nilaiTagihan = $lap['TOTAL_AMOUNT'];
-                    } elseif (isset($lap['tagihan'])) {
-                        $nilaiTagihan = $lap['tagihan'];
-                    } elseif (isset($lap['TAGIHAN'])) {
-                        $nilaiTagihan = $lap['TAGIHAN'];
-                    } elseif (isset($lap['rp_pelimpahan'])) {
-                        $nilaiTagihan = $lap['rp_pelimpahan'];
-                    } elseif (isset($lap['RP_PELIMPAHAN'])) {
-                        $nilaiTagihan = $lap['RP_PELIMPAHAN'];
-                    } else {
-                        $nilaiTagihan = 0;
-                    }
+                    // Parsing data Tagihan
+                    if (isset($lap['total_amount'])) { $nilaiTagihan = $lap['total_amount']; }
+                    elseif (isset($lap['TOTAL_AMOUNT'])) { $nilaiTagihan = $lap['TOTAL_AMOUNT']; }
+                    elseif (isset($lap['tagihan'])) { $nilaiTagihan = $lap['tagihan']; }
+                    elseif (isset($lap['TAGIHAN'])) { $nilaiTagihan = $lap['TAGIHAN']; }
+                    elseif (isset($lap['rp_pelimpahan'])) { $nilaiTagihan = $lap['rp_pelimpahan']; }
+                    elseif (isset($lap['RP_PELIMPAHAN'])) { $nilaiTagihan = $lap['RP_PELIMPAHAN']; }
+                    else { $nilaiTagihan = 0; }
 
-                    if (isset($lap['total_fee'])) {
-                        $nilaiAdmin = $lap['total_fee'];
-                    } elseif (isset($lap['TOTAL_FEE'])) {
-                        $nilaiAdmin = $lap['TOTAL_FEE'];
-                    } elseif (isset($lap['admin'])) {
-                        $nilaiAdmin = $lap['admin'];
-                    } elseif (isset($lap['ADMIN'])) {
-                        $nilaiAdmin = $lap['ADMIN'];
-                    } elseif (isset($lap['rp_admin'])) {
-                        $nilaiAdmin = $lap['rp_admin'];
-                    } elseif (isset($lap['RP_ADMIN'])) {
-                        $nilaiAdmin = $lap['RP_ADMIN'];
-                    } else {
-                        $nilaiAdmin = 0;
-                    }
+                    // Parsing data Admin
+                    if (isset($lap['total_fee'])) { $nilaiAdmin = $lap['total_fee']; }
+                    elseif (isset($lap['TOTAL_FEE'])) { $nilaiAdmin = $lap['TOTAL_FEE']; }
+                    elseif (isset($lap['admin'])) { $nilaiAdmin = $lap['admin']; }
+                    elseif (isset($lap['ADMIN'])) { $nilaiAdmin = $lap['ADMIN']; }
+                    elseif (isset($lap['rp_admin'])) { $nilaiAdmin = $lap['rp_admin']; }
+                    elseif (isset($lap['RP_ADMIN'])) { $nilaiAdmin = $lap['RP_ADMIN']; }
+                    else { $nilaiAdmin = 0; }
 
-                    if (isset($lap['total_bill'])) {
-                        $nilaiTotal = $lap['total_bill'];
-                    } elseif (isset($lap['TOTAL_BILL'])) {
-                        $nilaiTotal = $lap['TOTAL_BILL'];
-                    } elseif (isset($lap['total'])) {
-                        $nilaiTotal = $lap['total'];
-                    } elseif (isset($lap['TOTAL'])) {
-                        $nilaiTotal = $lap['TOTAL'];
-                    } else {
-                        $nilaiTotal = 0;
-                    }
+                    // Parsing data Total Bill
+                    if (isset($lap['total_bill'])) { $nilaiTotal = $lap['total_bill']; }
+                    elseif (isset($lap['TOTAL_BILL'])) { $nilaiTotal = $lap['TOTAL_BILL']; }
+                    elseif (isset($lap['total'])) { $nilaiTotal = $lap['total']; }
+                    elseif (isset($lap['TOTAL'])) { $nilaiTotal = $lap['TOTAL']; }
+                    else { $nilaiTotal = 0; }
 
-                    $worksheet->write($i + 4, 0, $i);
-                    $worksheet->write($i + 4, 1, $kode);
-                    $worksheet->write($i + 4, 2, $nama);
-                    $worksheet->write($i + 4, 3, $layanan);
+                    // Menulis isi tabel (Menggunakan format rata tengah untuk text & rata kanan dengan separator untuk nominal)
+                    $worksheet->write($i + 4, 0, $i, $format_center_data);
+                    $worksheet->write($i + 4, 1, $kode, $format_center_data);
+                    $worksheet->write($i + 4, 2, $nama, $format_center_data);
+                    $worksheet->write($i + 4, 3, $layanan, $format_center_data);
 
-                    $worksheet->writeNumber($i + 4, 4, intval($nilaiLembar), $format_right);
-                    $worksheet->writeNumber($i + 4, 5, floatval($nilaiTagihan), $format_right);
-                    $worksheet->writeNumber($i + 4, 6, floatval($nilaiAdmin), $format_right);
-                    $worksheet->writeNumber($i + 4, 7, floatval($nilaiTotal), $format_right);
+                    $worksheet->writeNumber($i + 4, 4, intval($nilaiLembar), $format_lembar_data);
+                    $worksheet->writeNumber($i + 4, 5, floatval($nilaiTagihan), $format_uang);
+                    $worksheet->writeNumber($i + 4, 6, floatval($nilaiAdmin), $format_uang);
+                    $worksheet->writeNumber($i + 4, 7, floatval($nilaiTotal), $format_uang);
 
                     $total_lembar  = $total_lembar + intval($nilaiLembar);
                     $total_amount  = $total_amount + floatval($nilaiTagihan);
@@ -213,12 +236,20 @@ class Distribution_IndexController extends Zend_Controller_Action
                 }
             }
 
+            // Menentukan posisi baris TOTAL paling bawah
             $row_total = count($listData) + 5;
-            $worksheet->write($row_total, 1, 'TOTAL', $format_bold);
-            $worksheet->writeNumber($row_total, 4, $total_lembar, $format_bold);
-            $worksheet->writeNumber($row_total, 5, $total_amount, $format_bold);
-            $worksheet->writeNumber($row_total, 6, $total_fee, $format_bold);
-            $worksheet->writeNumber($row_total, 7, $total_bill, $format_bold);
+            
+            // Memberikan border kotak kosong agar selaras dengan tabel atasnya
+            $worksheet->write($row_total, 0, '', $format_total_text);
+            $worksheet->write($row_total, 1, 'TOTAL', $format_total_text);
+            $worksheet->write($row_total, 2, '', $format_total_text);
+            $worksheet->write($row_total, 3, '', $format_total_text);
+            
+            // Menulis total akhir dengan format tebal + pemisah ribuan khusus finance
+            $worksheet->writeNumber($row_total, 4, $total_lembar, $format_total_lembar);
+            $worksheet->writeNumber($row_total, 5, $total_amount, $format_total_uang);
+            $worksheet->writeNumber($row_total, 6, $total_fee, $format_total_uang);
+            $worksheet->writeNumber($row_total, 7, $total_bill, $format_total_uang);
 
             $workbook->close();
             exit;
