@@ -696,7 +696,7 @@ $(function() {
 
         if (summary) {
             summary.forEach(function(item) {
-                cards[item.service] = item;
+                cards[item.key] = item;
             });
 
             $('[data-field=nominal-prepaid]')
@@ -721,7 +721,7 @@ $(function() {
 
         if (summary) {
             summary.forEach(function(item) {
-                cards[item.service] = item;
+                cards[item.key] = item;
             });
 
             $('[data-field=service-prepaid]')
@@ -752,32 +752,8 @@ $(function() {
         canvas: '#latencyChart',
         type: 'line',
         data: {
-            labels: [0],
-            datasets: [{
-                    label: 'Latency (msec)',
-                    data: [0],
-                    borderColor: '#3B6FF5',
-                    backgroundColor: '#3B6FF5',
-                    borderWidth: 3,
-                    pointRadius: 0
-                },
-                {
-                    label: 'Rata-Rata Request',
-                    data: [0],
-                    borderColor: '#36D8C5',
-                    backgroundColor: '#36D8C5',
-                    borderWidth: 3,
-                    pointRadius: 0
-                },
-                {
-                    label: 'Rata-Rata Response',
-                    data: [0],
-                    borderColor: '#19C2F2',
-                    backgroundColor: '#19C2F2',
-                    borderWidth: 3,
-                    pointRadius: 0
-                }
-            ]
+            labels: [],
+            datasets: []
         },
         options: {
             responsive: true,
@@ -833,18 +809,69 @@ $(function() {
         }
     });
 
-    function loadLatencyChart() {
+    function loadLatencyDashboard() {
         latencyChart.showLoading();
 
-        setTimeout(function() {
-            latencyChart.showChart();
-            $('[data-field=request-latency]').text("0");
-            $('[data-field=request-average]').text("0");
-            $('[data-field=response-average]').text("0");
-        }, 1500);
+        $.ajax({
+                url: "<?= $this->baseUrl('/index/latency-chart') ?>",
+                type: 'POST',
+                dataType: 'json'
+            })
+            .done(function(response) {
+                if (response.status !== 'success') {
+                    latencyChart.showError();
+                    updateLatencySummary();
+
+                    return;
+                }
+
+                renderLatencyChart(response.data);
+            })
+            .fail(function() {
+                latencyChart.showError();
+                updateLatencySummary();
+            });
     }
-    latencyChart.onReload(loadLatencyChart);
-    loadLatencyChart();
+
+    function renderLatencyChart(data) {
+        if (!data || !data.chart || !data.chart.datasets.length) {
+            latencyChart.showEmpty();
+            return;
+        }
+
+        updateLatencySummary(data.summary);
+
+        latencyChart.setData(data.chart);
+        latencyChart.showChart();
+    }
+
+    function updateLatencySummary(summary) {
+        const cards = {};
+
+        if (summary) {
+            summary.forEach(function(item) {
+                cards[item.key] = item;
+            });
+
+            $('[data-field=request-latency]')
+                .text(`${formatNumber(cards.latency.value)} ms`);
+
+            $('[data-field=request-average]')
+                .text(`${formatNumber(cards.rata_rata_request.value)} ms`);
+
+            $('[data-field=response-average]')
+                .text(`${formatNumber(cards.rata_rata_rt.value)} ms`);
+
+            return
+        }
+
+        $('[data-field=request-latency]').text('-');
+        $('[data-field=request-average]').text('-');
+        $('[data-field=response-average]').text('-');
+    }
+
+    latencyChart.onReload(loadLatencyDashboard);
+    loadLatencyDashboard();
 
     let progressInterval = null;
     let currentRequest = null;
