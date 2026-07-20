@@ -822,11 +822,9 @@ $isApiError = isset($this->isError) && $this->isError === true;
             });
         }
 
-        showLoadingShimmer()
-
-        // TAMPILKAN HASIL / EXECUTE SHIMMER CONTROL
-        // setTimeout(function() {
-        //     hideLoadingShimmer();
-        // }, 300);
+        // TAMPILKAN HASILl
+        setTimeout(function() {
+            hideLoadingShimmer();
+        }, 300);
     });
 </script>

@@ -71,7 +71,7 @@ class Distribution_IndexController extends Zend_Controller_Action
             $listData = [];
         }
 
-        // DOWNLOADING EXCEL 
+        // DOWNLOADING EXCELl 
         $isDownload = $this->_getParam('download', 'false');
         if ($isDownload === 'true') {
             $this->_helper->layout->disableLayout();
