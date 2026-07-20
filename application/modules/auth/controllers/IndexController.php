@@ -92,7 +92,9 @@ class Auth_IndexController extends Zend_Controller_Action
             'fullName' => $user['full_name'],
             'email' => $user['email'],
             'role' => strtolower($user['role_name']),
-            'session_token' => $user['session_token']
+            'session_token' => $user['session_token'],
+            'level' => $user['level_name'],
+            'tp_code' => $user['tp_code'] ?? ""
         ];
 
         App_Service_Session::set('user', $userProfile);
