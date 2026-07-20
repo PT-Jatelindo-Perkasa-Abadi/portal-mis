@@ -1,6 +1,27 @@
 <?php // index.phtml 
 ?>
 
+<!-- STYLE CSS SHIMMER LOADING -->
+<style>
+    .shimmer-placeholder {
+        background: linear-gradient(90deg, #E7E8E8 25%, #F4F5F6 50%, #E7E8E8 75%);
+        background-size: 200% 100%;
+        animation: shimmerAnim 1.5s infinite ease-in-out;
+        border-radius: 6px;
+        display: inline-block;
+    }
+
+    @keyframes shimmerAnim {
+        0% {
+            background-position: -200% 0;
+        }
+
+        100% {
+            background-position: 200% 0;
+        }
+    }
+</style>
+
 <!-- MAIN CONTAINER WARNA LIGHT PRESISI FIGMA -->
 <div class="container-fluid px-2 pt-4 min-vh-100 bg-light text-dark" style="font-family: 'Sora', sans-serif;">
 
@@ -41,14 +62,14 @@
             </div>
         </div>
 
-        <!-- FORM SEARCH & MULTI-DROPDOWN FILTER (FLEXBOX PATTERN FIGMA) -->
+        <!-- FORM SEARCH & MULTI-DROPDOWN FILTER -->
         <div class="px-4 pb-3 bg-white">
-            <form method="GET" action="" class="d-flex flex-wrap align-items-center gap-3 w-100 mx-0 mt-2">
+            <form id="filterUserForm" method="GET" action="" class="d-flex flex-wrap align-items-center gap-3 w-100 mx-0 mt-2">
                 <input type="hidden" name="level" id="input-level" value="<?= (isset($_GET['level']) && $_GET['level'] !== '') ? $this->escape($_GET['level']) : ''; ?>">
                 <input type="hidden" name="role" id="input-role" value="<?= (isset($_GET['role']) && $_GET['role'] !== '') ? $this->escape($_GET['role']) : ''; ?>">
                 <input type="hidden" name="status" id="input-status" value="<?= (isset($_GET['status']) && $_GET['status'] !== '') ? $this->escape($_GET['status']) : ''; ?>">
 
-                <!-- Dropdown Limit Angka Entries (ISOLATED MODE) -->
+                <!-- Dropdown Limit Angka Entries -->
                 <div class="dropdown" id="ctx-limit">
                     <?php $currentLimit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10; ?>
                     <button class="btn btn-white text-dark fw-semibold bg-white rounded-3 d-flex justify-content-between align-items-center px-3" type="button" data-bs-toggle="dropdown"
@@ -107,9 +128,10 @@
                         </svg>
                     </button>
                     <ul class="dropdown-menu w-100 shadow-sm border-light-subtle rounded-3">
-                        <?php foreach ($this->listLevel as $level): ?>
-                            <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#" data-value="<?= $level['id']; ?>"><?= $level['level_name']; ?></a></li>
-                        <?php endforeach; ?>
+                        <?php if (!empty($this->listLevel)): foreach ($this->listLevel as $level): ?>
+                                <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#" data-value="<?= $level['id']; ?>"><?= $level['level_name']; ?></a></li>
+                        <?php endforeach;
+                        endif; ?>
                     </ul>
                 </div>
 
@@ -175,7 +197,7 @@
                     </ul>
                 </div>
 
-                <!-- Tombol Search Outline Blue Spec Figma -->
+                <!-- Tombol Search -->
                 <div>
                     <button type="submit" class="btn fw-bold rounded-3 bg-white px-4 text-center d-flex align-items-center justify-content-center"
                         style="height: 48px; min-width: 90px; color: #3A7BF6; border: 1px solid #3A7BF6; font-size: 14px; transition: all 0.2s;">
@@ -185,11 +207,10 @@
             </form>
         </div>
 
-        <!-- 🎯 FILTER CHIP BADGE & RESET LINK (PROTEKSI TOTAL ANTI-DUPLIKASI & BENTROK VISUAL) -->
+        <!-- FILTER CHIP BADGE & RESET LINK -->
         <div class="d-flex flex-wrap align-items-center gap-3 px-4 pb-4 bg-white border-bottom" style="border-color: #E7E8E8 !important;">
             <?php
             $isFilterActive = false;
-            // Ambil text pencarian dan ubah ke lowercase untuk mempermudah pengecekan teks sensitif
             $searchText = isset($_GET['search']) ? strtolower(trim($_GET['search'])) : '';
 
             // 1. Chip Kata Kunci/Search
@@ -216,7 +237,6 @@
                 }
 
                 $levelLower = strtolower($activeLevelName);
-                // Proteksi: Tampilkan hanya jika input pencarian tidak mengandung teks level ini
                 if ($searchText === '' || strpos($searchText, $levelLower) === false) {
                     $isFilterActive = true;
                 ?>
@@ -226,7 +246,7 @@
                     </div>
                 <?php
                 } else {
-                    $isFilterActive = true; // Tetap aktifkan tombol reset
+                    $isFilterActive = true;
                 }
             }
 
@@ -243,7 +263,6 @@
                 }
 
                 $roleLower = strtolower($activeRoleName);
-                // Proteksi: Tampilkan hanya jika input pencarian tidak mengandung teks role ini
                 if ($searchText === '' || strpos($searchText, $roleLower) === false) {
                     $isFilterActive = true;
                 ?>
@@ -263,13 +282,11 @@
                 $activeStatusName = $statusMap[$_GET['status']] ?? $_GET['status'];
 
                 $statusLower = strtolower($activeStatusName);
-                // Proteksi tambahan untuk variasi kata (misal user mengetik 'non' atau 'aktif')
                 $isMatchStatus = (
                     strpos($searchText, $statusLower) !== false ||
                     ($statusLower === 'non-aktif' && (strpos($searchText, 'non') !== false || strpos($searchText, 'aktif') !== false))
                 );
 
-                // Proteksi: Tampilkan hanya jika input pencarian tidak berkaitan dengan teks status ini
                 if ($searchText === '' || !$isMatchStatus) {
                     $isFilterActive = true;
                 ?>
@@ -286,7 +303,7 @@
             // 5. Link Reset Data
             if ($isFilterActive):
                 ?>
-                <a href="<?= $this->baseUrl('user'); ?>" class="text-decoration-none fw-semibold" style="color: #595C60; font-size: 14px; margin-left: 4px;">Reset Data</a>
+                <a href="<?= $this->baseUrl('user'); ?>" onclick="showLoadingShimmer()" class="text-decoration-none fw-semibold" style="color: #595C60; font-size: 14px; margin-left: 4px;">Reset Data</a>
             <?php endif; ?>
         </div>
 
@@ -296,7 +313,6 @@
                 <thead>
                     <tr class="fw-bold border-bottom" style="border-color: #E7E8E8 !important; font-size: 14px; color: #595C60; background: #fff;">
                         <th class="py-3 ps-4" style="width: 6.5%;">No</th>
-                        <!-- 🎯 FIX: Ditambahkan class text-center pada header ID User -->
                         <th class="py-3 text-center" style="width: 12%;">ID User</th>
                         <th class="py-3" style="width: 17%;">Nama</th>
                         <th class="py-3" style="width: 24%;">Email</th>
@@ -306,7 +322,44 @@
                         <th class="py-3 pe-4" style="width: 17%;">Action</th>
                     </tr>
                 </thead>
-                <tbody>
+
+                <!-- 🎯 SHIMMER TABLE BODY (Tampil Bawaan) -->
+                <tbody id="shimmer-table-body">
+                    <?php for ($i = 0; $i < 6; $i++): ?>
+                        <tr class="border-bottom" style="border-color: #E7E8E8 !important; height: 64px; background: #fff;">
+                            <td class="ps-4">
+                                <div class="shimmer-placeholder" style="width: 20px; height: 16px;"></div>
+                            </td>
+                            <td class="text-center">
+                                <div class="shimmer-placeholder" style="width: 60px; height: 16px;"></div>
+                            </td>
+                            <td>
+                                <div class="shimmer-placeholder" style="width: 110px; height: 16px;"></div>
+                            </td>
+                            <td>
+                                <div class="shimmer-placeholder" style="width: 160px; height: 16px;"></div>
+                            </td>
+                            <td>
+                                <div class="shimmer-placeholder" style="width: 90px; height: 16px;"></div>
+                            </td>
+                            <td>
+                                <div class="shimmer-placeholder" style="width: 80px; height: 16px;"></div>
+                            </td>
+                            <td>
+                                <div class="shimmer-placeholder" style="width: 70px; height: 26px; border-radius: 8px;"></div>
+                            </td>
+                            <td class="pe-4">
+                                <div class="d-flex gap-2">
+                                    <div class="shimmer-placeholder" style="width: 68px; height: 36px; border-radius: 8px;"></div>
+                                    <div class="shimmer-placeholder" style="width: 68px; height: 36px; border-radius: 8px;"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endfor; ?>
+                </tbody>
+
+                <!-- 🎯 REAL DATA TABLE BODY (Disembunyikan Bawaan via d-none) -->
+                <tbody id="real-table-body" class="d-none">
                     <?php if (isset($this->users) && count($this->users) > 0): ?>
                         <?php
                         $no = 1;
@@ -317,7 +370,6 @@
                         foreach ($this->users as $user): ?>
                             <tr class="text-dark border-bottom" style="border-color: #E7E8E8 !important; font-size: 14px; background: #fff;">
                                 <td class="py-3 ps-4" style="color: #12161C; font-weight: 400;"><?= $no++; ?></td>
-                                <!-- 🎯 FIX: Ditambahkan class text-center pada isi ID User -->
                                 <td class="text-center" style="color: #12161C; font-weight: 400;"><?= isset($user['id_user']) ? $user['id_user'] : '-'; ?></td>
                                 <td class="text-truncate pe-2" style="max-width: 160px; color: #12161C; font-weight: 400;"><?= $user['fullName'] ?? '-'; ?></td>
                                 <td class="text-truncate pe-2" style="max-width: 220px; color: #12161C; font-weight: 400;"><?= $user['email'] ?? '-'; ?></td>
@@ -342,13 +394,11 @@
                                 </td>
                                 <td class="pe-4">
                                     <div class="d-flex gap-2">
-                                        <!-- Edit Outline Orange -->
                                         <a href="<?= $this->baseUrl('user/index/edit/id/' . ($user['id_user'] ?? '')); ?>"
                                             class="btn btn-sm d-flex align-items-center justify-content-center gap-1 bg-white fw-bold px-0 text-decoration-none rounded-3"
                                             style="height: 36px; width: 68px; font-size: 12px; color: #FFA700; border: 1px solid #FFA700; transition: all 0.2s;">
                                             <i class="bi bi-pencil" style="-webkit-text-stroke: 0.3px #FFA700;"></i> Edit
                                         </a>
-                                        <!-- Detail Outline Blue -->
                                         <a href="<?= $this->baseUrl('user/index/detail/id/' . ($user['id_user'] ?? '')); ?>"
                                             class="btn btn-sm d-flex align-items-center justify-content-center gap-1 bg-white fw-bold px-0 text-decoration-none rounded-3"
                                             style="height: 36px; width: 68px; font-size: 12px; color: #3A7BF6; border: 1px solid #3A7BF6; transition: all 0.2s;">
@@ -399,16 +449,15 @@
                 ?>
                 <nav>
                     <ul class="pagination pagination-sm mb-0 gap-1 align-items-center">
-                        <!-- Tombol First Page («) -->
                         <li class="page-item <?= (!isset($pages->previous)) ? 'disabled' : ''; ?>">
                             <?php $queryParams['page'] = $pages->first; ?>
-                            <a class="page-link bg-white d-flex align-items-center justify-content-center"
+                            <a onclick="showLoadingShimmer()" class="page-link bg-white d-flex align-items-center justify-content-center"
                                 style="width: 32px; height: 32px; border: 1px solid #E7E8E8; border-radius: 8px !important; color: #B8B9BB; font-weight: bold; font-size: 12px;"
                                 href="<?= $currentUrl . '?' . http_build_query($queryParams); ?>">&laquo;</a>
                         </li>
                         <li class="page-item <?= (!isset($pages->previous)) ? 'disabled' : ''; ?>">
                             <?php $queryParams['page'] = $pages->previous ?? $pages->first; ?>
-                            <a class="page-link bg-white d-flex align-items-center justify-content-center"
+                            <a onclick="showLoadingShimmer()" class="page-link bg-white d-flex align-items-center justify-content-center"
                                 style="width: 32px; height: 32px; border: 1px solid #E7E8E8; border-radius: 8px !important; color: #B8B9BB; font-size: 12px;"
                                 href="<?= $currentUrl . '?' . http_build_query($queryParams); ?>">&lsaquo;</a>
                         </li>
@@ -423,7 +472,7 @@
                                 $queryParams['page'] = $page;
                         ?>
                                 <li class="page-item <?= ($page == $currentPage) ? 'active' : ''; ?>">
-                                    <a class="page-link px-0 fw-bold d-flex align-items-center justify-content-center <?= ($page == $currentPage) ? 'text-white' : 'bg-white text-secondary'; ?>"
+                                    <a onclick="showLoadingShimmer()" class="page-link px-0 fw-bold d-flex align-items-center justify-content-center <?= ($page == $currentPage) ? 'text-white' : 'bg-white text-secondary'; ?>"
                                         style="width: 32px; height: 32px; border-radius: 8px !important; <?= ($page == $currentPage) ? 'background: #3A7BF6 !important; border: 1px solid #3A7BF6;' : 'border: 1px solid #E7E8E8; color: #595C60;'; ?> font-size: 14px;"
                                         href="<?= $currentUrl . '?' . http_build_query($queryParams); ?>">
                                         <?= $page; ?>
@@ -441,17 +490,15 @@
                         endfor;
                         ?>
 
-                        <!-- Tombol Next Page (›) -->
                         <li class="page-item <?= (!isset($pages->next)) ? 'disabled' : ''; ?>">
                             <?php $queryParams['page'] = $pages->next ?? $pages->last; ?>
-                            <a class="page-link bg-white d-flex align-items-center justify-content-center"
+                            <a onclick="showLoadingShimmer()" class="page-link bg-white d-flex align-items-center justify-content-center"
                                 style="width: 32px; height: 32px; border: 1px solid #E7E8E8; border-radius: 8px !important; color: #B8B9BB; font-size: 12px;"
                                 href="<?= $currentUrl . '?' . http_build_query($queryParams); ?>">&rsaquo;</a>
                         </li>
-                        <!-- Tombol Last Page (») -->
                         <li class="page-item <?= (!isset($pages->next)) ? 'disabled' : ''; ?>">
                             <?php $queryParams['page'] = $pages->last; ?>
-                            <a class="page-link bg-white d-flex align-items-center justify-content-center"
+                            <a onclick="showLoadingShimmer()" class="page-link bg-white d-flex align-items-center justify-content-center"
                                 style="width: 32px; height: 32px; border: 1px solid #E7E8E8; border-radius: 8px !important; color: #B8B9BB; font-weight: bold; font-size: 12px;"
                                 href="<?= $currentUrl . '?' . http_build_query($queryParams); ?>">&raquo;</a>
                         </li>
@@ -463,9 +510,29 @@
     </div>
 </div>
 
-<!-- JAVASCRIPT ACTION INTERACTION WITH SEPARATED LOGIC -->
+<!-- JAVASCRIPT ACTION INTERACTION -->
 <script type="text/javascript">
+    // --- FUNGSIONALITAS TOGGLE SHIMMER LOADING ---
+    function showLoadingShimmer() {
+        document.getElementById('real-table-body')?.classList.add('d-none');
+        document.getElementById('shimmer-table-body')?.classList.remove('d-none');
+    }
+
+    function hideLoadingShimmer() {
+        document.getElementById('shimmer-table-body')?.classList.add('d-none');
+        document.getElementById('real-table-body')?.classList.remove('d-none');
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
+
+        // Trigger shimmer ketika form disubmit
+        const form = document.getElementById('filterUserForm');
+        if (form) {
+            form.addEventListener('submit', function() {
+                showLoadingShimmer();
+            });
+        }
+
         const filterItems = document.querySelectorAll(".dropdown-menu a:not(.limit-item)");
 
         filterItems.forEach(item => {
@@ -507,8 +574,14 @@
                 document.getElementById("label-limit").textContent = value;
                 document.getElementById("input-limit").value = value;
 
+                showLoadingShimmer();
                 this.closest("form").submit();
             });
         });
+
+        // FIRST LOAD EXECUTION: Tampilkan shimmer 300ms saat halaman dimuat
+        setTimeout(function() {
+            hideLoadingShimmer();
+        }, 300);
     });
 </script>
