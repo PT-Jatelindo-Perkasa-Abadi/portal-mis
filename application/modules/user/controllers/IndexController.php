@@ -12,7 +12,8 @@ class User_IndexController extends App_Controller_Base
         $level = (int) $this->_getParam('level');
         $role = (int) $this->_getParam('role');
         $status = $this->_getParam('status');
-        $search = $this->_getParam('search');
+
+        $search = trim($this->_getParam('search', ''));
 
         $sessionToken = $this->currentUser()['session_token'];
 
@@ -27,16 +28,46 @@ class User_IndexController extends App_Controller_Base
 
         if (isset($response['code']) && $response['code'] == 200 && isset($response['msg']) && is_array($response['msg'])) {
 
-            $paginator = Zend_Paginator::factory($response['msg']);
+            $userData = $response['msg'];
 
+            if ($search !== '') {
+                $searchLower = strtolower($search);
+
+                $userData = array_filter($userData, function ($user) use ($searchLower) {
+                    $idUser    = isset($user['id_user']) ? strtolower($user['id_user']) : '';
+                    $fullName  = isset($user['fullName']) ? strtolower($user['fullName']) : '';
+                    $email     = isset($user['email']) ? strtolower($user['email']) : '';
+                    $levelUser = isset($user['level_user']) ? strtolower($user['level_user']) : '';
+                    $roleName  = isset($user['role']) ? strtolower($user['role']) : '';
+
+                    $statusText = 'non-aktif';
+                    if (isset($user['is_blocked']) && $user['is_blocked'] == 1) {
+                        $statusText = 'blokir';
+                    } elseif (isset($user['is_active']) && $user['is_active'] == 1) {
+                        $statusText = 'aktif';
+                    }
+
+                    return (
+                        strpos($idUser, $searchLower) !== false ||
+                        strpos($fullName, $searchLower) !== false ||
+                        strpos($email, $searchLower) !== false ||
+                        strpos($levelUser, $searchLower) !== false ||
+                        strpos($roleName, $searchLower) !== false ||
+                        strpos($statusText, $searchLower) !== false
+                    );
+                });
+            }
+
+            $paginator = Zend_Paginator::factory($userData);
             $paginator->setItemCountPerPage($limit);
             $paginator->setCurrentPageNumber($page);
+
+            $paginator->setPageRange(3);
 
             $this->view->users = $paginator;
         } else {
             $this->view->users = [];
         }
-
 
         $payload = [$sessionToken];
         $responseRoles = $api->request('POST', '/service/proxy/service/alias/get-roles', $payload);
@@ -54,9 +85,6 @@ class User_IndexController extends App_Controller_Base
         if (isset($responseRoles['code']) && $responseRoles['code'] == 200 && isset($responseRoles['msg'])) {
             $rolesData = $responseRoles['msg'];
         }
-
-
-        Zend_Debug::dump($rolesData);
 
         $this->view->rolesData = $rolesData;
         $this->view->listLevel = isset($responseLevel['msg']) && is_array($responseLevel['msg']) ? $responseLevel['msg'] : [];
@@ -335,44 +363,6 @@ class User_IndexController extends App_Controller_Base
 
         return $this->_helper->redirector->gotoUrl('user/index/index');
     }
-
-    // public function saveAction()
-    // {
-    //     // Pastikan respons dalam format JSON murni agar AJAX di HTML tidak crash
-    //     $this->_helper->viewRenderer->setNoRender(true);
-    //     $this->getResponse()->setHeader('Content-Type', 'application/json');
-
-    //     if ($this->_request->isPost()) {
-    //         try {
-    //             $fullName  = (string)$this->_getParam('fullName', 'User Test');
-    //             $email     = trim((string)$this->_getParam('email', ''));
-    //             $roleValue = (int)$this->_getParam('role', 1);
-
-    //             if (empty($email)) {
-    //                 return $this->_helper->json(['success' => false, 'msg' => 'Email wajib diisi!']);
-    //                 exit;
-    //             }
-
-    //             // 2. 🚧 BYPASS DATABASE: Kunci utama agar user tidak bertambah terus!
-    //             // Kita langsung alihkan (forward) prosesnya ke fungsi sendMailAction
-    //             // tanpa memanggil API /create-user ke database Go.
-    //             return $this->_forward('send-mail', 'index', 'user', [
-    //                 'id_user'  => 999, // Dummy ID untuk sekadar isi variabel template email
-    //                 'fullName' => $fullName,
-    //                 'email'    => $email,
-    //                 'role'     => $roleValue
-    //             ]);
-    //         } catch (Exception $e) {
-    //             return $this->_helper->json([
-    //                 'success' => false,
-    //                 'msg'     => 'Bypass system error: ' . $e->getMessage()
-    //             ]);
-    //             exit;
-    //         }
-    //     }
-
-    //     return $this->_helper->redirector->gotoUrl('user/index/index');
-    // }
 
     public function editAction()
     {
