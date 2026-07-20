@@ -27,6 +27,7 @@ class Default_IndexController extends App_Controller_Base
         $this->view->filterDate = $filterDate;
         $this->view->currentDate = App_Helper_Date::indonesia($currentDate);
         $this->view->currentHour = date('H').':00';
+        $this->view->currentUser = $this->currentUser();
     }
 
     public function filterDateAction()
@@ -48,12 +49,17 @@ class Default_IndexController extends App_Controller_Base
             ? (int) $this->_dashboardSession->filterDate
             : 1;
 
-        $currentFilter = $filterDate > 0 ? 'now' : 'yesterday';
+        $request = $this->buildDashboardRequest(
+            'row1',
+            $filterDate,
+            'ch_12_dev',
+            [strtoupper($this->currentUser()['tp_code'])]
+        );
 
         $response = $service->request(
             'POST',
-            "/service/proxy/service/alias/row1-all-tp-{$currentFilter}",
-            ["conf" => "ch_12_dev"]
+            $request['endpoint'],
+            $request['payload']
         );
 
         return $this->jsonSuccess($response['msg'][0]);
@@ -66,12 +72,17 @@ class Default_IndexController extends App_Controller_Base
             ? (int) $this->_dashboardSession->filterDate
             : 1;
 
-        $currentFilter = $filterDate > 0 ? 'now' : 'yesterday';
+        $request = $this->buildDashboardRequest(
+            'row2',
+            $filterDate,
+            'mis_ch_rekon',
+            array_fill(0, 4, $this->currentUser()['tp_code'])
+        );
 
         $response = $service->request(
             'POST',
-            "/service/proxy/service/alias/row2-all-tp-{$currentFilter}",
-            ["conf" => "mis_ch_rekon"]
+            $request['endpoint'],
+            $request['payload']
         );
 
         return $this->jsonSuccess($response['msg'][0]);
@@ -84,12 +95,17 @@ class Default_IndexController extends App_Controller_Base
             ? (int) $this->_dashboardSession->filterDate
             : 1;
 
-        $currentFilter = $filterDate > 0 ? 'now' : 'yesterday';
+        $request = $this->buildDashboardRequest(
+            'row3',
+            $filterDate,
+            'ch_12_dev',
+            [$this->currentUser()['tp_code']]
+        );
 
         $response = $service->request(
             'POST',
-            "/service/proxy/service/alias/row3-all-tp-{$currentFilter}",
-            ["conf" => "ch_12_dev"]
+            $request['endpoint'],
+            $request['payload']
         );
 
         $result = Default_Model_TransactionTransformer::transform($response['msg']);
@@ -142,7 +158,24 @@ class Default_IndexController extends App_Controller_Base
         return $this->jsonSuccess($response);
     }
 
-    protected function getDashboardSession() {
-        return new Zend_Session_Namespace('dashboard_filter');
+    private function buildDashboardRequest($alias, $filterDate, $conf, array $params)
+    {
+        $period = ((int) $filterDate === 1) ? 'now' : 'yesterday';
+        $tpCode = strtoupper(trim((string) $this->currentUser()['tp_code']));
+        $scope = 'all';
+
+        if ($tpCode !== '') {
+            $scope = 'in';
+
+            $params = array_fill(0, count($params), $tpCode);
+        }
+
+        return [
+            'endpoint' => "/service/proxy/service/alias/{$alias}-{$scope}-tp-{$period}",
+            'payload' => [
+                'conf' => $conf,
+                'params' => $params,
+            ],
+        ];
     }
 }

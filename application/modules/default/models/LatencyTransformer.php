@@ -8,15 +8,15 @@ class Default_Model_LatencyTransformer
     private const DATASETS = [
         'latency' => [
             'label' => 'Latency',
-            'color' => '#0D6EFD'
+            'color' => '#3A7BF6'
         ],
         'rata_rata_request' => [
             'label' => 'Average Request',
-            'color' => '#20C997'
+            'color' => '#43E0CF'
         ],
         'rata_rata_rt' => [
             'label' => 'Average Response',
-            'color' => '#FFC107'
+            'color' => '#1AD4F3'
         ]
     ];
 

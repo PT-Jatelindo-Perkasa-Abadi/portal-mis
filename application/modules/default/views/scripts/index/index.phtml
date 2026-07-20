@@ -68,6 +68,17 @@
                         </h2>
                     </div>
                 </div>
+                <?php if ($this->currentUser['level'] == 'IT Provider' && $this->currentUser['role'] == 'administrator') : ?>
+                <div class="col d-flex bg-white gap-4 p-4 rounded-3">
+                    <img src="<?= $this->baseUrl('/assets/img/img-total-revenue.svg'); ?>" alt="image total revenue" />
+                    <div class="d-flex flex-column align-item-center justify-content-between flex-fill">
+                        <h5 class="fs-7 text-neutral-70 mb-0">Total Revenue</h5>
+                        <h2 class="fs-5 fw-bold text-neutral-100 mb-0" data-field="total_revenue">
+                            <div class="skeleton-cell w-100 float-end"></div>
+                        </h2>
+                    </div>
+                </div>
+                <?php endif; ?>
                 <div class="col d-flex bg-white gap-4 p-4 rounded-3">
                     <img src="<?= $this->baseUrl('/assets/img/img-total-disbursement.svg'); ?>"
                         alt="image total file" />
@@ -269,7 +280,7 @@
         </div>
     </div>
 
-    <?php if ($this->isAllowed('user:index', 'create')) : ?>
+    <?php if ($this->currentUser['role'] == 'administrator') : ?>
     <div class="row g-4 mb-4">
         <div class="col-lg-6">
             <div class="p-4 border border-neutral-10 rounded-3">
@@ -417,6 +428,7 @@ $(function() {
     function loadTotalSummary() {
         const fieldTransaction = $('[data-field="total_transaction"]');
         const fieldSheet = $('[data-field="total_sheet"]');
+        const fieldRevenue = $('[data-field="total_revenue"]');
 
         $.ajax({
             url: "<?= $this->baseUrl('/index/total-summary') ?>",
@@ -426,6 +438,7 @@ $(function() {
                 if (!response.data) {
                     fieldTransaction.text('-');
                     fieldSheet.text('-');
+                    fieldRevenue.text('-');
 
                     return;
                 }
@@ -433,18 +446,25 @@ $(function() {
                 if (!Array.isArray(response.data) && typeof response.data !== "object") {
                     fieldTransaction.text('-');
                     fieldSheet.text('-');
+                    fieldRevenue.text('-');
 
                     return;
                 }
 
                 const {
                     SUM_NOMINAL_TRANSAKSI,
-                    SUM_LEMBAR
+                    SUM_LEMBAR,
+                    SUM_REVENUE
                 } = response.data;
                 fieldTransaction.text(formatCurrencyCompact(SUM_NOMINAL_TRANSAKSI));
                 fieldSheet.text('' + formatNumber(SUM_LEMBAR));
+                fieldRevenue.text('' + formatNumber(SUM_REVENUE));
             },
-            error: function(error) {}
+            error: function(error) {
+                fieldTransaction.text('-');
+                fieldSheet.text('-');
+                fieldRevenue.text('-');
+            }
         });
     }
     loadTotalSummary();
@@ -746,7 +766,7 @@ $(function() {
 
     loadTransactionDashboard();
 
-    <?php if ($this->isAllowed('user:index', 'create')) : ?>
+    <?php if ($this->currentUser['role'] == 'administrator') : ?>
     /** Latency Chart */
     const latencyChart = new DashboardChart({
         canvas: '#latencyChart',

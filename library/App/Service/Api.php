@@ -24,11 +24,17 @@ class App_Service_Api
         $this->uriWhitelist = [
             '/service/email',
             '/service/proxy/service/alias/row1-all-tp-now',
+            '/service/proxy/service/alias/row1-in-tp-now',
             '/service/proxy/service/alias/row1-all-tp-yesterday',
+            '/service/proxy/service/alias/row1-in-tp-yesterday',
             '/service/proxy/service/alias/row2-all-tp-now',
+            '/service/proxy/service/alias/row2-in-tp-now',
             '/service/proxy/service/alias/row2-all-tp-yesterday',
+            '/service/proxy/service/alias/row2-in-tp-yesterday',
             '/service/proxy/service/alias/row3-all-tp-now',
+            '/service/proxy/service/alias/row3-in-tp-now',
             '/service/proxy/service/alias/row3-all-tp-yesterday',
+            '/service/proxy/service/alias/row3-in-tp-yesterday',
             '/service/proxy/service/alias/row4-latency-today',
             '/service/proxy/service/alias/row4-latency-yesterday',
             '/service/proxy/service/third-api'
