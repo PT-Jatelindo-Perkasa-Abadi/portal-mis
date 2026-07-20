@@ -92,7 +92,27 @@ class Default_IndexController extends App_Controller_Base
             ["conf" => "ch_12_dev"]
         );
 
-        $result = Default_Model_DashboardChart::transform($response['msg']);
+        $result = Default_Model_TransactionTransformer::transform($response['msg']);
+
+        return $this->jsonSuccess($result);
+    }
+
+    public function latencyChartAction()
+    {
+        $service = $this->api();
+        $filterDate = isset($this->_dashboardSession->filterDate)
+            ? (int) $this->_dashboardSession->filterDate
+            : 1;
+
+        $currentFilter = $filterDate > 0 ? 'today' : 'yesterday';
+
+        $response = $service->request(
+            'POST',
+            "/service/proxy/service/alias/row4-latency-{$currentFilter}",
+            ["payload" => []]
+        );
+
+        $result = Default_Model_LatencyTransformer::transform($response['msg']);
 
         return $this->jsonSuccess($result);
     }

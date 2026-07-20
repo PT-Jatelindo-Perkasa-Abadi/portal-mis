@@ -29,6 +29,8 @@ class App_Service_Api
             '/service/proxy/service/alias/row2-all-tp-yesterday',
             '/service/proxy/service/alias/row3-all-tp-now',
             '/service/proxy/service/alias/row3-all-tp-yesterday',
+            '/service/proxy/service/alias/row4-latency-today',
+            '/service/proxy/service/alias/row4-latency-yesterday',
             '/service/proxy/service/third-api'
         ];
     }
