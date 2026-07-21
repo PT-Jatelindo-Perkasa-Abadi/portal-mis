@@ -1007,6 +1007,11 @@ $(function() {
         });
 
         currentRequest.done(function(response) {
+            if (response.data != 200) {
+                errorState();
+                return;
+            }
+
             successState(response);
         });
 
