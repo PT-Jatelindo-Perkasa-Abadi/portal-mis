@@ -15,9 +15,11 @@ class Distribution_IndexController extends Zend_Controller_Action
         date_default_timezone_set('Asia/Jakarta');
         $today = date('Y-m-d');
 
+        // 1. Tangkap Input Tanggal dari Param
         $rawDateInput  = $this->_getParam('date', '');
         $filterDate    = !empty($rawDateInput) ? $rawDateInput : $today;
 
+        // Normalisasi format d/m/Y ke Y-m-d jika dikirim dari input tertentu
         if (strpos($filterDate, '/') !== false) {
             $parts = explode('/', $filterDate);
             if (count($parts) == 3) {
@@ -72,7 +74,43 @@ class Distribution_IndexController extends Zend_Controller_Action
             $listData = [];
         }
 
-        // DOWNLOADING EXCELl 
+        // 🎯 GLOBAL SEARCH ENGINE UNTUK FITUR CARI
+        if (!empty($filterSearch) && is_array($listData) && !empty($listData)) {
+            $searchKeyword = strtolower(trim($filterSearch));
+            $filteredList = [];
+
+            foreach ($listData as $value) {
+                $kodeData   = isset($value["kode"]) ? strtolower($value["kode"]) : '';
+                $namaData   = isset($value["nama"]) ? strtolower($value["nama"]) : '';
+                $layananRaw = isset($value["layanan"]) ? trim($value["layanan"]) : '';
+
+                if (in_array(strtolower($layananRaw), ['nontaglist', 'non-taglist'])) {
+                    $namaLayanan = 'non-taglist';
+                } else {
+                    $namaLayanan = strtolower($layananRaw);
+                }
+
+                $lembar   = isset($value['lembar']) ? (string)$value['lembar'] : (isset($value['jumlah']) ? (string)$value['jumlah'] : '0');
+                $tagihan  = isset($value['tagihan']) ? str_replace('.', '', (string)$value['tagihan']) : '0';
+                $admin    = isset($value['admin']) ? str_replace('.', '', (string)$value['admin']) : '0';
+                $total    = isset($value['total']) ? str_replace('.', '', (string)$value['total']) : '0';
+
+                if (
+                    strpos($kodeData, $searchKeyword) !== false ||
+                    strpos($namaData, $searchKeyword) !== false ||
+                    strpos($namaLayanan, $searchKeyword) !== false ||
+                    strpos($lembar, $searchKeyword) !== false ||
+                    strpos($tagihan, $searchKeyword) !== false ||
+                    strpos($admin, $searchKeyword) !== false ||
+                    strpos($total, $searchKeyword) !== false
+                ) {
+                    $filteredList[] = $value;
+                }
+            }
+            $listData = $filteredList;
+        }
+
+        // DOWNLOADING EXCEL
         $isDownload = $this->_getParam('download', 'false');
         if ($isDownload === 'true') {
             $this->_helper->layout->disableLayout();
@@ -299,8 +337,9 @@ class Distribution_IndexController extends Zend_Controller_Action
         $this->view->summary   = $summary;
         $this->view->listData  = $listData;
 
+        // 🎯 PASSING TANGGAL TERFILTER KE VIEW BIAR FORM & BADGE AUTO-FILL
         $this->view->filters   = [
-            'date'    => $rawDateInput,
+            'date'    => $filterDate, // Menggunakan $filterDate (default: hari ini jika kosong)
             'service' => $filterService,
             'sort_by' => $filterSort,
             'search'  => $filterSearch
