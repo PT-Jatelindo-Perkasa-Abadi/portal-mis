@@ -8,8 +8,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
             'basePath' => APPLICATION_PATH,
         ]);
 
-        Zend_Loader_Autoloader::getInstance()
-            ->registerNamespace('App_');
+        Zend_Loader_Autoloader::getInstance()->registerNamespace('App_');
 
         return $autoloader;
     }
@@ -31,7 +30,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         $front = Zend_Controller_Front::getInstance();
         $request = $front->getRequest();
 
-        $requestId = $request ? $request->getHeader('X-Request-ID') : null;
+        $requestId = $request?->getHeader('X-Request-ID');
 
         if (!$requestId) {
             $requestId = uniqid();
@@ -77,16 +76,12 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         Zend_Registry::set('logger', $zend_Log);
     }
 
-    protected function _initAcl()
-    {
-        $front = Zend_Controller_Front::getInstance();
-        $front->registerPlugin(new App_Plugin_Acl());
-    }
-
     protected function _initPlugins()
     {
+        require_once APPLICATION_PATH . '/internal/Acl.php';
         $front = Zend_Controller_Front::getInstance();
 
+        $front->registerPlugin(new App_Plugin_Acl());
         $front->registerPlugin(new App_Plugin_Layout());
         $front->registerPlugin(new App_Plugin_SecurityHeaders());
     }
