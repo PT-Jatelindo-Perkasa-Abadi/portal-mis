@@ -270,7 +270,7 @@ $isApiError = isset($this->isError) && $this->isError === true;
             <div class="d-flex align-items-center h-100">
                 <div class="px-3 py-2 d-flex align-items-center gap-2">
                     <span style="color: #595C60; font-size: 14px; white-space: nowrap;">Terakhir diperbarui</span>
-                    <span class="fw-bold" style="color: #3A7BF6; font-size: 14px; white-space: nowrap;"><?= date('H:i'); ?></span>
+                    <span class="fw-bold" style="color: #3A7BF6; font-size: 14px; white-space: nowrap;"><?= date('H:00'); ?></span>
                 </div>
 
                 <div style="width: 1px; height: 100%; background: #3A7BF6; opacity: 0.3;"></div>
@@ -551,7 +551,11 @@ $isApiError = isset($this->isError) && $this->isError === true;
                         <tr style="background: white; border-top: 1px #E7E8E8 solid; border-bottom: 1px #E7E8E8 solid; height: 56px;">
                             <th class="ps-4 fw-bold" style="color: #595C60; font-size: 14px; width: 58px;">No</th>
                             <th class="fw-bold" style="color: #595C60; font-size: 14px; width: 160px;"> <?= ($this->activeTab === 'mitra') ? 'Nama Mitra' : 'Kode IT Provider'; ?></th>
-                            <th class="fw-bold text-center" style="color: #595C60; font-size: 14px; width: 140px;">Nama IT Provider</th>
+
+                            <?php if ($this->currentUser['level'] != 'IT Provider'): ?>
+                                <th class="fw-bold text-center" style="color: #595C60; font-size: 14px; width: 140px;">Nama IT Provider</th>
+                            <?php endif; ?>
+
                             <th class="fw-bold text-center" style="color: #595C60; font-size: 14px; width: 140px;">Layanan</th>
                             <th class="fw-bold text-center" style="color: #595C60; font-size: 14px; width: 120px;">Lembar</th>
                             <th class="fw-bold text-end" style="color: #595C60; font-size: 14px; width: 160px;">Tagihan (Rp)</th>
@@ -598,8 +602,13 @@ $isApiError = isset($this->isError) && $this->isError === true;
                             foreach ($this->listData as $row): ?>
                                 <tr style="height: 64px; background: white; border-bottom: 1px #E7E8E8 solid;">
                                     <td class="ps-4 text-center" style="color: #12161C; font-size: 14px; font-weight: 400;"><?= $no++; ?></td>
+
                                     <td style="color: #12161C; font-size: 14px; font-weight: 400;"><?= isset($row['kode']) ? $row['kode'] : ''; ?></td>
-                                    <td class="text-center" style="color: #12161C; font-size: 14px; font-weight: 400;"><?= isset($row['nama']) ? $row['nama'] : ''; ?></td>
+
+                                    <?php if ($this->currentUser['level'] != 'IT Provider') : ?>
+                                        <td class="text-center" style="color: #12161C; font-size: 14px; font-weight: 400;"><?= isset($row['nama']) ? $row['nama'] : ''; ?></td>
+                                    <?php endif; ?>
+
                                     <td class="text-center">
                                         <?php
                                         $layananRaw = isset($row['layanan']) ? trim($row['layanan']) : '';
@@ -822,7 +831,7 @@ $isApiError = isset($this->isError) && $this->isError === true;
             });
         }
 
-        // TAMPILKAN HASILl
+        // TAMPILKAN HASIL
         setTimeout(function() {
             hideLoadingShimmer();
         }, 300);

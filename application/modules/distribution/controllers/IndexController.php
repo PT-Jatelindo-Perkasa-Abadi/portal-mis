@@ -5,6 +5,7 @@ class Distribution_IndexController extends Zend_Controller_Action
     public function indexAction()
     {
         $this->view->isError = false;
+        $this->view->currentUser = App_Service_Session::get('user');
 
         $api = new App_Service_Api();
         $_ = $api->authorization();
