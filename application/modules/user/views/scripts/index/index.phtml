@@ -20,6 +20,28 @@
             background-position: 200% 0;
         }
     }
+
+    .custom-dropdown-item {
+        border-radius: 8px !important;
+        padding: 10px 14px !important;
+        color: #12161C !important;
+        font-size: 14px;
+        font-weight: 500;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-decoration: none;
+    }
+
+    .custom-dropdown-item.active {
+        background-color: #EBF2FE !important;
+        color: #3A7BF6 !important;
+        font-weight: 600;
+    }
+
+    .custom-dropdown-item:hover:not(.active) {
+        background-color: #F8F9FA !important;
+    }
 </style>
 
 <!-- MAIN CONTAINER WARNA LIGHT PRESISI FIGMA -->
@@ -62,8 +84,8 @@
             </div>
         </div>
 
-        <!-- FORM SEARCH & MULTI-DROPDOWN FILTER -->
-        <div class="px-4 pb-3 bg-white">
+        <!-- FORM SEARCH & MULTI-DROPDOWN FILTER (Jarak 24px simetris ke badge) -->
+        <div class="px-4 pb-0 bg-white" style="margin-bottom: 24px;">
             <form id="filterUserForm" method="GET" action="" class="d-flex flex-wrap align-items-center gap-3 w-100 mx-0 mt-2">
                 <input type="hidden" name="level" id="input-level" value="<?= (isset($_GET['level']) && $_GET['level'] !== '') ? $this->escape($_GET['level']) : ''; ?>">
                 <input type="hidden" name="role" id="input-role" value="<?= (isset($_GET['role']) && $_GET['role'] !== '') ? $this->escape($_GET['role']) : ''; ?>">
@@ -102,16 +124,19 @@
 
                 <!-- Dropdown Level User -->
                 <div class="dropdown" id="ctx-level" style="width: 200px;">
-                    <?php $hasLevel = (isset($_GET['level']) && $_GET['level'] !== ''); ?>
+                    <?php
+                    $reqLevel = $_GET['level'] ?? '';
+                    $hasLevel = ($reqLevel !== '');
+                    ?>
                     <button class="btn btn-white w-100 rounded-3 d-flex justify-content-between align-items-center px-3" type="button" data-bs-toggle="dropdown"
                         style="height: 48px; border: 1px solid #E7E8E8; background: #fff; font-size: 14px;">
                         <span id="label-level" style="color: <?= $hasLevel ? '#12161C' : '#B8B9BB'; ?>; font-weight: <?= $hasLevel ? '600' : '500'; ?>;">
                             <?php
                             if ($hasLevel) {
-                                $levelLabel = $_GET['level'];
+                                $levelLabel = $reqLevel;
                                 if (!empty($this->listLevel)) {
                                     foreach ($this->listLevel as $lvl) {
-                                        if (isset($lvl['id']) && $lvl['id'] == $_GET['level']) {
+                                        if (isset($lvl['id']) && $lvl['id'] == $reqLevel) {
                                             $levelLabel = $lvl['level_name'];
                                             break;
                                         }
@@ -127,9 +152,19 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                         </svg>
                     </button>
-                    <ul class="dropdown-menu w-100 shadow-sm border-light-subtle rounded-3">
+                    <ul class="dropdown-menu w-100 shadow-sm border-light-subtle rounded-3 p-2">
                         <?php if (!empty($this->listLevel)): foreach ($this->listLevel as $level): ?>
-                                <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#" data-value="<?= $level['id']; ?>"><?= $level['level_name']; ?></a></li>
+                                <?php $isSelected = ($hasLevel && $reqLevel == $level['id']); ?>
+                                <li>
+                                    <a class="dropdown-item custom-dropdown-item <?= $isSelected ? 'active' : ''; ?>" href="#" data-value="<?= $level['id']; ?>">
+                                        <span><?= $this->escape($level['level_name']); ?></span>
+                                        <?php if ($isSelected): ?>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#198754" class="bi bi-check-lg" viewBox="0 0 16 16">
+                                                <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z" />
+                                            </svg>
+                                        <?php endif; ?>
+                                    </a>
+                                </li>
                         <?php endforeach;
                         endif; ?>
                     </ul>
@@ -137,16 +172,19 @@
 
                 <!-- Dropdown Role -->
                 <div class="dropdown" id="ctx-role" style="width: 200px;">
-                    <?php $hasRole = (isset($_GET['role']) && $_GET['role'] !== ''); ?>
+                    <?php
+                    $reqRole = $_GET['role'] ?? '';
+                    $hasRole = ($reqRole !== '');
+                    ?>
                     <button class="btn btn-white w-100 rounded-3 d-flex justify-content-between align-items-center px-3" type="button" data-bs-toggle="dropdown"
                         style="height: 48px; border: 1px solid #E7E8E8; background: #fff; font-size: 14px;">
                         <span id="label-role" style="color: <?= $hasRole ? '#12161C' : '#B8B9BB'; ?>; font-weight: <?= $hasRole ? '600' : '500'; ?>;">
                             <?php
                             if ($hasRole) {
-                                $roleLabel = $_GET['role'];
+                                $roleLabel = $reqRole;
                                 if (!empty($this->rolesData) && is_array($this->rolesData)) {
                                     foreach ($this->rolesData as $r) {
-                                        if (isset($r['id']) && $r['id'] == $_GET['role']) {
+                                        if (isset($r['id']) && $r['id'] == $reqRole) {
                                             $roleLabel = $r['role_name'];
                                             break;
                                         }
@@ -162,10 +200,20 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                         </svg>
                     </button>
-                    <ul class="dropdown-menu w-100 shadow-sm border-light-subtle rounded-3">
+                    <ul class="dropdown-menu w-100 shadow-sm border-light-subtle rounded-3 p-2">
                         <?php if (!empty($this->rolesData) && is_array($this->rolesData)): ?>
                             <?php foreach ($this->rolesData as $roleItem): ?>
-                                <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#" data-value="<?= $this->escape($roleItem['id']); ?>"><?= $this->escape(ucwords($roleItem['role_name'])); ?></a></li>
+                                <?php $isSelectedRole = ($hasRole && $reqRole == $roleItem['id']); ?>
+                                <li>
+                                    <a class="dropdown-item custom-dropdown-item <?= $isSelectedRole ? 'active' : ''; ?>" href="#" data-value="<?= $this->escape($roleItem['id']); ?>">
+                                        <span><?= $this->escape(ucwords($roleItem['role_name'])); ?></span>
+                                        <?php if ($isSelectedRole): ?>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#198754" class="bi bi-check-lg" viewBox="0 0 16 16">
+                                                <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z" />
+                                            </svg>
+                                        <?php endif; ?>
+                                    </a>
+                                </li>
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </ul>
@@ -173,14 +221,17 @@
 
                 <!-- Dropdown Status -->
                 <div class="dropdown" id="ctx-status" style="width: 200px;">
-                    <?php $hasStatus = (isset($_GET['status']) && $_GET['status'] !== ''); ?>
+                    <?php
+                    $reqStatus = $_GET['status'] ?? '';
+                    $hasStatus = ($reqStatus !== '');
+                    ?>
                     <button class="btn btn-white w-100 rounded-3 d-flex justify-content-between align-items-center px-3" type="button" data-bs-toggle="dropdown"
                         style="height: 48px; border: 1px solid #E7E8E8; background: #fff; font-size: 14px;">
                         <span id="label-status" style="color: <?= $hasStatus ? '#12161C' : '#B8B9BB'; ?>; font-weight: <?= $hasStatus ? '600' : '500'; ?>;">
                             <?php
                             if ($hasStatus) {
                                 $statusMap = array('active' => 'Aktif', 'nonactive' => 'Non-Aktif', 'blocked' => 'Blokir');
-                                echo $this->escape($statusMap[$_GET['status']] ?? $_GET['status']);
+                                echo $this->escape($statusMap[$reqStatus] ?? $reqStatus);
                             } else {
                                 echo 'Pilih Status';
                             }
@@ -190,10 +241,37 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                         </svg>
                     </button>
-                    <ul class="dropdown-menu w-100 shadow-sm border-light-subtle rounded-3">
-                        <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#" data-value="active">Aktif</a></li>
-                        <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#" data-value="nonactive">Non-Aktif</a></li>
-                        <li><a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#" data-value="blocked">Blokir</a></li>
+                    <ul class="dropdown-menu w-100 shadow-sm border-light-subtle rounded-3 p-2">
+                        <li>
+                            <a class="dropdown-item custom-dropdown-item <?= ($reqStatus === 'active') ? 'active' : ''; ?>" href="#" data-value="active">
+                                <span>Aktif</span>
+                                <?php if ($reqStatus === 'active'): ?>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#198754" class="bi bi-check-lg" viewBox="0 0 16 16">
+                                        <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z" />
+                                    </svg>
+                                <?php endif; ?>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item custom-dropdown-item <?= ($reqStatus === 'nonactive') ? 'active' : ''; ?>" href="#" data-value="nonactive">
+                                <span>Non-Aktif</span>
+                                <?php if ($reqStatus === 'nonactive'): ?>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#198754" class="bi bi-check-lg" viewBox="0 0 16 16">
+                                        <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z" />
+                                    </svg>
+                                <?php endif; ?>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item custom-dropdown-item <?= ($reqStatus === 'blocked') ? 'active' : ''; ?>" href="#" data-value="blocked">
+                                <span>Blokir</span>
+                                <?php if ($reqStatus === 'blocked'): ?>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#198754" class="bi bi-check-lg" viewBox="0 0 16 16">
+                                        <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z" />
+                                    </svg>
+                                <?php endif; ?>
+                            </a>
+                        </li>
                     </ul>
                 </div>
 
@@ -207,102 +285,86 @@
             </form>
         </div>
 
-        <!-- FILTER CHIP BADGE & RESET LINK -->
-        <div class="d-flex flex-wrap align-items-center gap-3 px-4 pb-4 bg-white border-bottom" style="border-color: #E7E8E8 !important;">
+        <!-- FILTER CHIP BADGE & RESET LINK (Jarak padding-bottom 24px ke border tabel) -->
+        <div class="d-flex flex-wrap align-items-center gap-3 px-4 bg-white border-bottom" style="border-color: #E7E8E8 !important; padding-bottom: 24px;">
             <?php
-            $isFilterActive = false;
             $searchText = isset($_GET['search']) ? strtolower(trim($_GET['search'])) : '';
+            $reqLevel   = $_GET['level'] ?? '';
+            $reqRole    = $_GET['role'] ?? '';
+            $reqStatus  = $_GET['status'] ?? '';
 
-            // 1. Chip Kata Kunci/Search
-            if ($searchText !== '') {
-                $isFilterActive = true;
-            ?>
+            // Flag Cek Apakah User Sedang Menggunakan Filter Kustom
+            $isUserFiltering = ($searchText !== '') || ($reqLevel !== '') || ($reqRole !== '') || ($reqStatus !== '');
+
+            // 1. Chip Kata Kunci Cari (Jika Ada)
+            if ($searchText !== ''): ?>
                 <div class="rounded-3 d-flex align-items-center justify-content-center px-3"
                     style="height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600;">
                     "<?= $this->escape($_GET['search']); ?>"
                 </div>
-                <?php
-            }
+            <?php endif; ?>
 
-            // 2. Chip Level User
-            if (isset($_GET['level']) && $_GET['level'] !== '') {
-                $activeLevelName = $_GET['level'];
+            <!-- 2. Chip Level User (DEFAULT: 'Semua Level User' / NAMA LEVEL SPESIFIK) -->
+            <?php
+            $badgeLevelText = 'Semua Level User';
+
+            if ($reqLevel !== '') {
+                $badgeLevelText = $reqLevel;
                 if (!empty($this->listLevel)) {
                     foreach ($this->listLevel as $lvl) {
-                        if (isset($lvl['id']) && $lvl['id'] == $_GET['level']) {
-                            $activeLevelName = $lvl['level_name'];
+                        if (isset($lvl['id']) && $lvl['id'] == $reqLevel) {
+                            $badgeLevelText = $lvl['level_name'];
                             break;
                         }
                     }
                 }
-
-                $levelLower = strtolower($activeLevelName);
-                if ($searchText === '' || strpos($searchText, $levelLower) === false) {
-                    $isFilterActive = true;
-                ?>
-                    <div class="rounded-3 d-flex align-items-center justify-content-center px-3"
-                        style="height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600;">
-                        <?= $this->escape($activeLevelName); ?>
-                    </div>
-                <?php
-                } else {
-                    $isFilterActive = true;
-                }
             }
 
-            // 3. Chip Role
-            if (isset($_GET['role']) && $_GET['role'] !== '') {
-                $activeRoleName = $_GET['role'];
+            // Cek jika user ngetik pencarian kata yang mewakili level
+            $isSearchingLevel = ($searchText !== '' && (
+                strpos($searchText, 'admin') !== false ||
+                strpos($searchText, 'provider') !== false ||
+                strpos($searchText, 'mitra') !== false
+            ));
+
+            if (!empty($badgeLevelText) && !($badgeLevelText === 'Semua Level User' && $isSearchingLevel)): ?>
+                <div class="rounded-3 d-flex align-items-center justify-content-center px-3"
+                    style="height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600;">
+                    <?= $this->escape($badgeLevelText); ?>
+                </div>
+            <?php endif; ?>
+
+            <!-- 3. Chip Role (Hanya Muncul Jika Dipilih Spesifik) -->
+            <?php if ($reqRole !== ''):
+                $activeRoleName = $reqRole;
                 if (!empty($this->rolesData) && is_array($this->rolesData)) {
                     foreach ($this->rolesData as $r) {
-                        if (isset($r['id']) && $r['id'] == $_GET['role']) {
+                        if (isset($r['id']) && $r['id'] == $reqRole) {
                             $activeRoleName = $r['role_name'];
                             break;
                         }
                     }
                 }
+            ?>
+                <div class="rounded-3 d-flex align-items-center justify-content-center px-3"
+                    style="height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600;">
+                    <?= $this->escape(ucwords($activeRoleName)); ?>
+                </div>
+            <?php endif; ?>
 
-                $roleLower = strtolower($activeRoleName);
-                if ($searchText === '' || strpos($searchText, $roleLower) === false) {
-                    $isFilterActive = true;
-                ?>
-                    <div class="rounded-3 d-flex align-items-center justify-content-center px-3"
-                        style="height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600;">
-                        <?= $this->escape(ucwords($activeRoleName)); ?>
-                    </div>
-                <?php
-                } else {
-                    $isFilterActive = true;
-                }
-            }
-
-            // 4. Chip Status
-            if (isset($_GET['status']) && $_GET['status'] !== '') {
+            <!-- 4. Chip Status (Hanya Muncul Jika Dipilih Spesifik) -->
+            <?php if ($reqStatus !== ''):
                 $statusMap = array('active' => 'Aktif', 'nonactive' => 'Non-Aktif', 'blocked' => 'Blokir');
-                $activeStatusName = $statusMap[$_GET['status']] ?? $_GET['status'];
+                $activeStatusName = $statusMap[$reqStatus] ?? $reqStatus;
+            ?>
+                <div class="rounded-3 d-flex align-items-center justify-content-center px-3"
+                    style="height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600;">
+                    <?= $this->escape($activeStatusName); ?>
+                </div>
+            <?php endif; ?>
 
-                $statusLower = strtolower($activeStatusName);
-                $isMatchStatus = (
-                    strpos($searchText, $statusLower) !== false ||
-                    ($statusLower === 'non-aktif' && (strpos($searchText, 'non') !== false || strpos($searchText, 'aktif') !== false))
-                );
-
-                if ($searchText === '' || !$isMatchStatus) {
-                    $isFilterActive = true;
-                ?>
-                    <div class="rounded-3 d-flex align-items-center justify-content-center px-3"
-                        style="height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600;">
-                        <?= $this->escape($activeStatusName); ?>
-                    </div>
-                <?php
-                } else {
-                    $isFilterActive = true;
-                }
-            }
-
-            // 5. Link Reset Data
-            if ($isFilterActive):
-                ?>
+            <!-- 5. Link Reset Data (MUNCUL JIKA USER UTAK-ATIK FILTER) -->
+            <?php if ($isUserFiltering): ?>
                 <a href="<?= $this->baseUrl('user'); ?>" onclick="showLoadingShimmer()" class="text-decoration-none fw-semibold" style="color: #595C60; font-size: 14px; margin-left: 4px;">Reset Data</a>
             <?php endif; ?>
         </div>
@@ -323,7 +385,7 @@
                     </tr>
                 </thead>
 
-                <!-- 🎯 SHIMMER TABLE BODY (Tampil Bawaan) -->
+                <!-- SHIMMER TABLE BODY (Tampil Bawaan) -->
                 <tbody id="shimmer-table-body">
                     <?php for ($i = 0; $i < 6; $i++): ?>
                         <tr class="border-bottom" style="border-color: #E7E8E8 !important; height: 64px; background: #fff;">
@@ -358,7 +420,7 @@
                     <?php endfor; ?>
                 </tbody>
 
-                <!-- 🎯 REAL DATA TABLE BODY (Disembunyikan Bawaan via d-none) -->
+                <!-- REAL DATA TABLE BODY (Disembunyikan Bawaan via d-none) -->
                 <tbody id="real-table-body" class="d-none">
                     <?php if (isset($this->users) && count($this->users) > 0): ?>
                         <?php
@@ -378,14 +440,14 @@
                                 <td>
                                     <?php
                                     $statusText = 'Non-Aktif';
-                                    $badgeStyle = 'background: #FDEFEF; color: #EB5757;'; // Red Badge
+                                    $badgeStyle = 'background: #FDEFEF; color: #EB5757;';
 
                                     if (isset($user['is_blocked']) && $user['is_blocked'] == 1) {
                                         $statusText = 'Blokir';
-                                        $badgeStyle = 'background: #E7E8E8; color: #595C60;'; // Grey Badge
+                                        $badgeStyle = 'background: #E7E8E8; color: #595C60;';
                                     } elseif (isset($user['is_active']) && $user['is_active'] == 1) {
                                         $statusText = 'Aktif';
-                                        $badgeStyle = 'background: #E9F8EB; color: #21B531;'; // Green Badge
+                                        $badgeStyle = 'background: #E9F8EB; color: #21B531;';
                                     }
                                     ?>
                                     <div class="d-inline-flex align-items-center justify-content-center rounded-3 fw-semibold px-2" style="height: 28px; min-width: 76px; font-size: 14px; <?= $badgeStyle; ?>">
@@ -512,7 +574,6 @@
 
 <!-- JAVASCRIPT ACTION INTERACTION -->
 <script type="text/javascript">
-    // --- FUNGSIONALITAS TOGGLE SHIMMER LOADING ---
     function showLoadingShimmer() {
         document.getElementById('real-table-body')?.classList.add('d-none');
         document.getElementById('shimmer-table-body')?.classList.remove('d-none');
@@ -525,7 +586,6 @@
 
     document.addEventListener("DOMContentLoaded", function() {
 
-        // Trigger shimmer ketika form disubmit
         const form = document.getElementById('filterUserForm');
         if (form) {
             form.addEventListener('submit', function() {
@@ -540,7 +600,7 @@
                 e.preventDefault();
 
                 const value = this.getAttribute("data-value");
-                const text = this.textContent.trim();
+                const text = this.querySelector("span") ? this.querySelector("span").textContent.trim() : this.textContent.trim();
 
                 const dropdownContainer = this.closest(".dropdown");
                 const buttonLabel = dropdownContainer.querySelector("button span");
@@ -548,12 +608,18 @@
                 if (value !== "") {
                     buttonLabel.style.setProperty('color', '#12161C', 'important');
                     buttonLabel.style.fontWeight = "600";
-                } else {
-                    buttonLabel.style.setProperty('color', '#B8B9BB', 'important');
-                    buttonLabel.style.fontWeight = "500";
+                    buttonLabel.textContent = text;
                 }
 
-                buttonLabel.textContent = text;
+                // Set Active Class & Checkmark Icon
+                dropdownContainer.querySelectorAll('.custom-dropdown-item').forEach(el => {
+                    el.classList.remove('active');
+                    const icon = el.querySelector('svg');
+                    if (icon) icon.remove();
+                });
+
+                this.classList.add('active');
+                this.insertAdjacentHTML('beforeend', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#198754" class="bi bi-check-lg" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/></svg>');
 
                 if (dropdownContainer.id === "ctx-level") {
                     document.getElementById("input-level").value = value;
@@ -579,7 +645,6 @@
             });
         });
 
-        // FIRST LOAD EXECUTION: Tampilkan shimmer 300ms saat halaman dimuat
         setTimeout(function() {
             hideLoadingShimmer();
         }, 300);
