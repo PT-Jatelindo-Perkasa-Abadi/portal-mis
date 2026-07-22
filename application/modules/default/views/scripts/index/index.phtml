@@ -68,7 +68,7 @@
                         </h2>
                     </div>
                 </div>
-                <?php if ($this->currentUser['level'] == 'IT Provider' && $this->currentUser['role'] == 'administrator') : ?>
+                <?php if ($this->currentUser['level'] == 'IT Provider') : ?>
                 <div class="col d-flex bg-white gap-4 p-4 rounded-3">
                     <img src="<?= $this->baseUrl('/assets/img/img-total-revenue.svg'); ?>" alt="image total revenue" />
                     <div class="d-flex flex-column align-item-center justify-content-between flex-fill">
