@@ -1,5 +1,5 @@
 
-<div class="container-fluid">
+<div class="container-fluid px-2 pb-4 pt-3 bg-light min-vh-100 text-dark">
 
     <h3 class="fw-bold mb-4 c-24">Laporan Transaksi</h3>
 
@@ -142,7 +142,7 @@
                     </div>
 
                     <div class="col-md-2 c-14">
-                        <select class="form-select select2" id="listitp">
+                        <select class="form-select select2" id="listitp" style="width:auto !important;">
                             <option value=""></option>
                             <?php foreach($this->listData as $key => $value){ ?>
 
@@ -156,7 +156,7 @@
                     </div>
 
                     <div class="col-md-2 c-14">
-                        <select class="form-select select2" id="layanan">
+                        <select class="form-select select2" id="layanan" style="width:auto !important;">
                              <?php foreach($this->layanan as $key => $value){ ?>
 
                                 <option value="<?php echo $key; ?>" <?php echo ($this->selectedLayanan == $value) ? 'selected="selected"' : ''; ?>>
