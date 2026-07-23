@@ -1,0 +1,363 @@
+
+    /*
+    body{
+        background:#f5f6fa;
+        font-family:'Segoe UI',sans-serif;
+    }
+    */
+
+    /* Dropdown */
+    .select2-dropdown {
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 24px rgba(0,0,0,.12);
+        padding: 8px;
+    }
+
+
+
+
+    /* Item */
+    .select2-results__option {
+        position: relative;
+        padding: 16px 20px;
+        border-radius: 12px;
+        font-size: 14px;
+        color: #111827;
+    }
+
+    /* Hover */
+    .select2-results__option--highlighted.select2-results__option--selectable {
+        background: #EEF4FF !important;
+        color: #111827 !important;
+    }
+
+
+
+    .custom-dropdown-menu {
+        border-radius: 12px !important;
+        padding: 8px !important;
+        border: 1px solid #E7E8E8 !important;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05) !important;
+        min-width: 200px;
+    }
+
+    .custom-dropdown-item {
+        border-radius: 8px !important;
+        padding: 10px 14px !important;
+        color: #12161C !important;
+        font-size: 14px;
+        font-weight: 500;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-decoration: none;
+    }
+
+    .custom-dropdown-item.active {
+        background-color: #EBF2FE !important;
+        color: #3A7BF6 !important;
+        font-weight: 600;
+    }
+
+    .custom-dropdown-item:hover:not(.active) {
+        background-color: #F8F9FA !important;
+    }
+
+    /* Container Tab */
+    .custom-tabs{
+        border-bottom:1px solid #E5E7EB;
+    }
+
+    /* Item Tab */
+    .custom-tabs .nav-link{
+        border:none;
+        border-radius:0;
+        background:transparent !important;
+        color:#6B7280;
+        font-weight:600;
+        padding:12px 4px;
+        margin-right:28px;
+        position:relative;
+        transition:.2s;
+    }
+
+    /* Hover */
+    .custom-tabs .nav-link:hover{
+        color:#2563EB;
+        background:transparent;
+    }
+
+    /* Active */
+    .custom-tabs .nav-link.active{
+        background:transparent !important;
+        color:#2563EB;
+    }
+
+    /* Garis bawah */
+    .custom-tabs .nav-link.active::after{
+        content:"";
+        position:absolute;
+        left:0;
+        right:0;
+        bottom:-1px;
+        height:3px;
+        background:#2563EB;
+        border-radius:3px 3px 0 0;
+    }
+    .card-dashboard{
+        border-radius:18px;
+        border:none;
+        box-shadow:0 0 10px rgba(0,0,0,.05);
+    }
+
+    .summary-item{
+        display:flex;
+        align-items:center;
+        gap:15px;
+        padding:15px;
+        border-right:1px solid #ececec;
+    }
+
+    .summary-item:last-child{
+        border-right:none;
+    }
+
+    .summary-icon{
+        width:55px;
+        height:55px;
+        border-radius:50%;
+        background:#edf4ff;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:26px;
+        color:#2f6fed;
+        background: #edf4ff url("../img/Logo-trx.png") no-repeat center center;
+    }
+
+    .summary-icon-tagihan{
+        width:55px;
+        height:55px;
+        border-radius:50%;
+        background:#edf4ff;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:26px;
+        color:#2f6fed;
+        background: #edf4ff url("../img/Logo-tagihan.png") no-repeat center center;
+    }
+
+    .summary-icon-admin{
+        width:55px;
+        height:55px;
+        border-radius:50%;
+        background:#edf4ff;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:26px;
+        color:#2f6fed;
+        background: #edf4ff url("../img/Logo-admin.png") no-repeat center center;
+    }
+
+    .summary-icon-nominal{
+        width:55px;
+        height:55px;
+        border-radius:50%;
+        background:#edf4ff;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:26px;
+        color:#2f6fed;
+        background: #edf4ff url("../img/Logo-nominal.png") no-repeat center center;
+    }
+
+
+
+    .summary-title{
+        color:#777;
+        font-size:14px;
+    }
+
+    .summary-value{
+        font-size:26px;
+        font-weight:700;
+    }
+
+    .badge-service{
+        border:1px solid #ddd;
+        background:white;
+        color:#555;
+        padding:6px 14px;
+        border-radius:10px;
+    }
+
+    .calendar-input-container {
+        position: relative;
+        height: 43px !important;
+        outline: 1px #E7E8E8 solid;
+        outline-offset: -1px;
+        background: #ffffff;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        padding-left: 16px;
+        padding-right: 16px;
+        border:none;
+    }
+
+    .custom-date-input-with-icon {
+        outline: none;
+        cursor: pointer;
+        color: #12161C;
+        font-size: 14px;
+        font-weight: 600;
+        background: transparent;
+      
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        z-index: 2;
+
+        background-image: url('<?= $this->baseUrl("assets/img/ic_calender.svg"); ?>');
+        background-repeat: no-repeat;
+        background-position: right center;
+        background-size: 22px 22px;
+        border: none;
+    }
+
+    .empty-date-logic:invalid::-webkit-datetime-edit {
+        color: transparent !important;
+    }
+
+    .empty-date-logic:invalid::before {
+        content: attr(data-placeholder);
+        color: #B8B9BB;
+        font-weight: 500;
+        position: absolute;
+        padding-left: 2px;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        z-index: 3;
+    }
+
+    .empty-date-logic:focus::-webkit-datetime-edit {
+        color: #12161C !important;
+    }
+
+    .empty-date-logic:focus::before {
+        display: none !important;
+    }
+
+    .custom-date-input-with-icon::-webkit-calendar-picker-indicator {
+        background: transparent !important;
+        color: transparent !important;
+        cursor: pointer;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        z-index: 5;
+    }
+
+    table th{
+        background:#fafafa;
+    }
+
+    .nav-tabs .nav-link.active{
+        color:#2f6fed;
+        font-weight:bold;
+    }
+    .c-24{
+        font-size:24px;
+    }
+
+    .c-16{
+        font-size:16px;
+    }
+
+    .c-14{
+        font-size:14px;
+    }
+
+    .custom-width-layanan {
+      /* Forces the column to stay exactly 300px wide */
+      flex: 0 0 300px !important;
+      max-width: 300px !important;
+    }
+
+    .cariinputcustoms{
+        width:300px;
+    }
+
+    .cariinputcustoms .position-relative{
+        position: relative;
+    }
+
+    .search-input{
+        /*height:56px;*/
+        padding-left:48px;   /* ruang untuk icon */
+        /*border-radius:16px;*/
+        font-size:16px;
+    }
+
+    .search-icon{
+        position:absolute;
+        left:16px;
+        top:50%;
+        transform:translateY(-50%);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        pointer-events:none;
+        z-index:2;
+    }
+
+    .hiddendiv{
+        display: none !important;
+    }
+
+
+    /**** MITRA WRAPER ****/
+
+    .overflow-auto{
+        overflow-x: auto;
+        overflow-y: hidden;
+
+        /* Firefox */
+        scrollbar-width: none;
+
+        /* IE & Edge */
+        -ms-overflow-style: none;
+    }
+
+    .overflow-auto::-webkit-scrollbar{
+        width: 0;
+        height: 0;
+        display: none;
+    }
+
+    .overflow-auto form{
+        min-width: 1300px;
+    }
+
+    .overflow-auto .col-md-1,
+    .overflow-auto .col-md-2,
+    .overflow-auto .col-auto,
+    .overflow-auto .col{
+        flex: 0 0 auto;
+}
+
+
+
+
+

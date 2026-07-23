@@ -7,41 +7,14 @@
     <?= $this->headTitle('Portal MIS')->setSeparator(' - '); ?>
     <meta name="theme-color" content="#0092D5">
     <link rel="icon" href="<?= $this->baseUrl('/assets/img/cropped-Jatelindo-Warna-32x32.webp'); ?>" sizes="32x32" />
-    <link rel="icon" href="<?= $this->baseUrl('/assets/img/cropped-Jatelindo-Warna-192x192.webp'); ?>" sizes="192x192" />
+    <link rel="icon" href="<?= $this->baseUrl('/assets/img/cropped-Jatelindo-Warna-192x192.webp'); ?>"
+        sizes="192x192" />
     <link rel="apple-touch-icon" href="<?= $this->baseUrl('/assets/img/cropped-Jatelindo-Warna-180x180.webp'); ?>" />
     <link rel="shortcut icon" href="<?= $this->baseUrl('/assets/img/'); ?>icon-launcher.png" />
     <link rel="stylesheet" href="<?= $this->baseUrl('/assets/css/fonts.css'); ?>" />
     <link rel="stylesheet" href="<?= $this->baseUrl('/assets/css/app.min.css'); ?>" />
-    <link rel="stylesheet" href="<?= $this->baseUrl('/assets/css/reports.css'); ?>" />
     <script src="<?= $this->baseUrl('/assets/js/app.min.js'); ?>"></script>
-    <script src="<?= $this->baseUrl('/assets/js/reports.js'); ?>"></script>
     <?= $this->headScript(); ?>
-
-    <style>
-        .header-account-link {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            padding: 16px 12px 0px 12px;
-            text-decoration: none !important;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            border-radius: 12px;
-        }
-
-        .header-account-link:hover {
-            background-color: #F8F9FA;
-        }
-
-        .profile-divider-line {
-            width: 100%;
-            height: 1px;
-            background-color: #E7E8E8;
-            margin-top: 16px;
-            margin-bottom: 0px;
-        }
-    </style>
 </head>
 
 <body>
@@ -67,35 +40,35 @@
                 <div class="header-logo">
                     <img src="<?= $this->baseUrl('/assets/img/logo-mis-black.svg'); ?>" alt="logo" />
                 </div>
-
-                <div class="header-account p-0">
-                    <a href="<?= $this->baseUrl('/profile/index/index'); ?>" class="header-account-link">
-                        <div class="account-initial mb-2"><?= $this->initialUser; ?></div>
-                        <div class="account-content d-flex flex-column align-items-center w-100" style="gap: 4px;">
-                            <h5 class="account-name m-0" style="color: #12161C; font-size: 14px; font-weight: 600; font-family: 'Sora', sans-serif; word-wrap: break-word; text-align: center; width: 100%;">
-                                <?= $this->user['fullName']; ?>
-                            </h5>
-                            <h5 class="account-role m-0" style="color: #FFA700; font-size: 12px; font-weight: 600; font-family: 'Sora', sans-serif; word-wrap: break-word; text-align: center; width: 100%;">
+                <div class="header-account">
+                    <div class="header-account-content">
+                        <div class="account-initial"><?= $this->initialUser; ?></div>
+                        <div class="account-content">
+                            <h5 class="account-name"><?= $this->user['fullName']; ?></h5>
+                            <h5 class="account-role">
                                 <?= $this->user['role']; ?>
                             </h5>
                         </div>
-                        <div class="profile-divider-line"></div>
+                    </div>
+                    <a href="/profile" class="header-account-footer">
+                        <span>Profile Details</span>
+                        <img src="<?= $this->baseUrl('assets/img/ic-arrow-right.svg'); ?>" alt="arrow right" />
                     </a>
                 </div>
             </div>
-
             <div class="sidebar-body">
                 <ul id="sidebarMenu" class="sidebar-menu-group">
                     <?php if (!empty($this->menus)): ?>
-                        <?php foreach ($this->menus as $menu): ?>
-                            <li class="menu-item <?= $this->activeMenu($menu['module'], $menu['controller']); ?>">
-                                <a href="<?= $this->baseUrl($menu['url']); ?>">
-                                    <span class="icon-menu <?= $this->escape($menu['icon']); ?>"></span>
-                                    <span><?= $this->escape($menu['name']); ?></span>
-                                </a>
-                            </li>
-                        <?php endforeach; ?>
+                    <?php foreach ($this->menus as $menu): ?>
+                    <li class="menu-item <?= $this->activeMenu($menu['module'], $menu['controller']); ?>">
+                        <a href="<?= $this->baseUrl($menu['url']); ?>">
+                            <span class="icon-menu <?= $this->escape($menu['icon']); ?>"></span>
+                            <span><?= $this->escape($menu['name']); ?></span>
+                        </a>
+                    </li>
+                    <?php endforeach; ?>
                     <?php else: ?>
+                        <!-- Fallback: no menu data in session (menus/level_menus not seeded yet) -->
                         <li class="menu-item <?= $this->activeMenu('default', 'index', 'index', 'active'); ?>">
                             <a href="/">
                                 <span class="icon-menu ic-dashboard"></span>
