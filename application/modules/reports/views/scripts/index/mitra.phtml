@@ -185,7 +185,7 @@
 
                 <!-- Area Filter -->
                 <div class="flex-grow-1 overflow-auto">
-                    <form class="d-flex flex-nowrap align-items-center gap-3 filter-form" id="formflow">
+                    <form class="d-flex flex-nowrap align-items-center gap-3 filter-form">
 
                         <div style="width:80px" class="col-md-1">
                             <select class="form-select c-14">
@@ -211,7 +211,7 @@
                         </div>
 
                         <div style="width:220px">
-                            <select class="form-select select2" id="listitp" style="width:auto !important;">
+                            <select class="form-select select2" id="listitp">
                                 <option value=""></option>
                                 <?php foreach($this->listData as $key => $value){ ?>
 
@@ -225,7 +225,7 @@
                         </div>
 
                         <div style="width:220px">
-                            <select class="form-select select2" id="listmitra" style="width:auto !important;">
+                            <select class="form-select select2" id="listmitra">
                                 <option value=""></option>
                                  <?php foreach($this->listDataPartner as $key => $value){ ?>
 
@@ -237,12 +237,12 @@
                             </select>
                         </div>
 
-                        <div style="width:180px" class="col-md-2 calendar-input-container">
+                        <div style="width:180px">
                             <input type="date" class="custom-date-input-with-icon empty-date-logic" value="<?=date('Y-m-d'); ?>" data-placeholder="Pilih tanggal" required>
                         </div>
 
                         <div style="width:220px">
-                            <select class="form-select select2" id="layanan" style="width:auto !important;">
+                            <select class="form-select select2" id="layanan">
                                  <?php foreach($this->layanan as $key => $value){ ?>
 
                                     <option value="<?php echo $key; ?>" <?php echo ($this->selectedLayanan == $value) ? 'selected="selected"' : ''; ?>>
