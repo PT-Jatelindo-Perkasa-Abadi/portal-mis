@@ -433,36 +433,33 @@ $isApiError = isset($this->isError) && $this->isError === true;
                     <span class="fw-semibold" style="color: #12161C; font-size: 14px;">Download Data</span>
                 </a>
 
-                <!-- 1. Badge Kata Kunci Cari (Jika Ada) -->
+                <!-- 1. Badge Kata Kunci -->
                 <?php if (!empty($this->filters['search'])): ?>
                     <div class="rounded-3 d-flex align-items-center justify-content-center px-3" style="height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600;">
                         "<?= $this->escape($this->filters['search']); ?>"
                     </div>
                 <?php endif; ?>
 
-                <!-- 2. Badge Tanggal (SELALU MUNCUL) -->
+                <!-- 2. Badge Tanggal -->
                 <?php if (!empty($badgeDateLabel)): ?>
                     <div id="badge-date" class="rounded-3 d-flex align-items-center justify-content-center px-3" style="height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600;">
                         Tanggal <?= $this->escape($badgeDateLabel); ?>
                     </div>
                 <?php endif; ?>
 
-                <!-- 3. Badge Layanan (OTOMATIS HILANG KETIKA SEARCH TIDAK KOSONG DAN DROPDOWN KOSONG) -->
+                <!-- 3. Badge Layanan -->
                 <?php if (!empty($badgeServiceLabel)): ?>
                     <div id="badge-service" class="rounded-3 d-flex align-items-center justify-content-center px-3" style="height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600;">
                         <?= $badgeServiceLabel; ?>
                     </div>
                 <?php endif; ?>
 
-                <!-- 4. Tombol Reset Data (MUNCUL JIKA USER UTAK-ATIK FILTER) -->
+                <!-- 4. Tombol Reset Data -->
                 <?php if ($isUserFiltering): ?>
                     <a href="<?= $this->baseUrl('distribution/index/index/type/' . $this->activeTab); ?>" onclick="showLoadingShimmer()" class="text-decoration-none fw-semibold" style="color: #595C60; font-size: 14px;">Reset Data</a>
                 <?php endif; ?>
             </div>
 
-            <!-- ----------------------------------------------------
-                 1. GRAFIK TRANSAKSI: SHIMMER vs REAL CONTENT
-                 ---------------------------------------------------- -->
             <!-- A. SHIMMER CONTAINER FOR CHART -->
             <div id="shimmer-chart-container" class="w-100 p-4 rounded-3 bg-white" style="outline: 1px #E7E8E8 solid; outline-offset: -1px; border-radius: 12px;">
                 <div class="shimmer-placeholder mb-4" style="width: 250px; height: 20px;"></div>
@@ -489,8 +486,13 @@ $isApiError = isset($this->isError) && $this->isError === true;
                 <div class="shimmer-placeholder w-100" style="height: 241px; border-radius: 8px;"></div>
             </div>
 
-            <!-- B. REAL CONTAINER FOR CHART -->
-            <div id="real-chart-container" class="w-100 p-4 rounded-3 bg-white d-none" style="outline: 1px #E7E8E8 solid; outline-offset: -1px; border-radius: 12px; position: relative;">
+            <!-- CONTAINER FOR CHART -->
+            <div id="real-chart-container"
+                data-api-error="<?= $isApiError ? 'true' : 'false'; ?>"
+                data-chart="<?= htmlspecialchars($this->chartJson ?? '{"labels":[],"prepaid":[],"postpaid":[],"non_taglist":[]}', ENT_QUOTES, 'UTF-8'); ?>"
+                class="w-100 p-4 rounded-3 bg-white d-none"
+                style="outline: 1px #E7E8E8 solid; outline-offset: -1px; border-radius: 12px; position: relative;">
+
                 <h6 class="fw-bold mb-4" style="color: #12161C; font-size: 16px;">Grafik Transaksi Top 10 <?= ($this->activeTab === 'mitra') ? 'Mitra' : 'IT Provider'; ?></h6>
 
                 <div class="row g-3 mb-4">
@@ -541,7 +543,7 @@ $isApiError = isset($this->isError) && $this->isError === true;
             </div>
 
             <!-- ----------------------------------------------------
-                 2. DATA TABLE: SHIMMER vs REAL CONTENT
+                 2. DATA TABLE: SHIMMER & REAL DATA
                  ---------------------------------------------------- -->
             <div class="table-responsive w-100" style="overflow-x: auto; margin-left: -24px; margin-right: -24px; width: calc(100% + 48px) !important;">
                 <table class="table align-middle table-hover mb-0 w-100" style="border-collapse: collapse;">
@@ -654,177 +656,6 @@ $isApiError = isset($this->isError) && $this->isError === true;
     </div>
 </div>
 
+<!-- LOAD SCRIPT EXTERNAL CHART.JS & DISTRIBUTION.JS -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script type="text/javascript">
-    let myDistributionChart = null;
-    const isApiError = <?= $isApiError ? 'true' : 'false'; ?>;
-
-    function showLoadingShimmer() {
-        document.getElementById('real-chart-container')?.classList.add('d-none');
-        document.getElementById('real-table-body')?.classList.add('d-none');
-
-        document.getElementById('shimmer-chart-container')?.classList.remove('d-none');
-        document.getElementById('shimmer-table-body')?.classList.remove('d-none');
-    }
-
-    function hideLoadingShimmer() {
-        if (isApiError) {
-            document.getElementById('shimmer-chart-container')?.classList.add('d-none');
-            document.getElementById('real-chart-container')?.classList.remove('d-none');
-            return;
-        }
-
-        document.getElementById('shimmer-chart-container')?.classList.add('d-none');
-        document.getElementById('shimmer-table-body')?.classList.add('d-none');
-
-        document.getElementById('real-chart-container')?.classList.remove('d-none');
-        document.getElementById('real-table-body')?.classList.remove('d-none');
-
-        if (!myDistributionChart) {
-            initDistributionChart();
-        }
-    }
-
-    function triggerReload(event) {
-        event.preventDefault();
-        showLoadingShimmer();
-        setTimeout(function() {
-            window.location.reload();
-        }, 300);
-    }
-
-    function initDistributionChart() {
-        if (isApiError) return;
-
-        const chartRawData = <?= $this->chartJson ?? '{"labels":[],"prepaid":[],"postpaid":[],"non_taglist":[]}'; ?>;
-        const ctx = document.getElementById('distributionBarChart')?.getContext('2d');
-        if (!ctx) return;
-
-        myDistributionChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: chartRawData.labels,
-                datasets: [{
-                        label: 'Prepaid',
-                        data: chartRawData.prepaid,
-                        backgroundColor: '#B38705',
-                        borderRadius: 2,
-                        barThickness: 24,
-                    },
-                    {
-                        label: 'Postpaid',
-                        data: chartRawData.postpaid,
-                        backgroundColor: '#FFC107',
-                        borderRadius: 2,
-                        barThickness: 24,
-                    },
-                    {
-                        label: 'Non-Taglist',
-                        data: chartRawData.non_taglist,
-                        backgroundColor: '#FFECB5',
-                        borderRadius: 2,
-                        barThickness: 24,
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: '#E7E8E8',
-                            drawTicks: false
-                        },
-                        border: {
-                            display: false
-                        },
-                        ticks: {
-                            color: '#595C60',
-                            padding: 12,
-                            font: {
-                                family: 'Sora',
-                                size: 12
-                            }
-                        },
-                        afterFit: function(scaleInstance) {
-                            scaleInstance.width = 40;
-                        }
-                    },
-                    x: {
-                        border: {
-                            display: false
-                        },
-                        ticks: {
-                            color: '#595C60',
-                            font: {
-                                family: 'Sora',
-                                size: 12,
-                                weight: '700'
-                            }
-                        },
-                        grid: {
-                            display: false
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    document.addEventListener("DOMContentLoaded", function() {
-
-        const form = document.getElementById('filterForm');
-        if (form) {
-            form.addEventListener('submit', function() {
-                showLoadingShimmer();
-            });
-        }
-
-        // Pilihan Service Dropdown
-        window.selectService = function(val, text, element) {
-            document.getElementById('value-service').value = val;
-
-            const labelService = document.getElementById('label-service');
-            labelService.innerText = text;
-            labelService.style.color = '#12161C';
-            labelService.style.fontWeight = '600';
-
-            element.closest('.dropdown-menu').querySelectorAll('.custom-dropdown-item').forEach(el => {
-                el.classList.remove('active');
-                const icon = el.querySelector('svg');
-                if (icon) icon.remove();
-            });
-
-            element.classList.add('active');
-            element.insertAdjacentHTML('beforeend', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#198754" class="bi bi-check-lg" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/></svg>');
-        };
-
-        const dateInput = document.querySelector('input[name="date"]');
-        const badgeDate = document.getElementById('badge-date');
-
-        if (dateInput) {
-            dateInput.addEventListener('input', function() {
-                if (!this.value) {
-                    if (badgeDate) badgeDate.style.display = 'none';
-                    if (this.form) {
-                        showLoadingShimmer();
-                        this.form.submit();
-                    }
-                }
-            });
-        }
-
-        // TAMPILKAN HASIL
-        setTimeout(function() {
-            hideLoadingShimmer();
-        }, 300);
-    });
-</script>
+<script src="<?= $this->baseUrl('assets/js/distribution.js'); ?>"></script>
