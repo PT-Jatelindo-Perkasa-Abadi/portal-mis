@@ -1,0 +1,34 @@
+/* Container DataTables */
+.dt-container{
+    width:100%;
+}
+
+/* Header */
+.dt-scroll-head{
+    overflow:hidden !important;
+}
+
+/* Body yang discroll */
+.dt-scroll-body{
+    overflow-x:auto !important;
+    overflow-y:auto !important;
+}
+
+/* Scrollbar */
+.dt-scroll-body::-webkit-scrollbar{
+    height:8px;
+}
+
+.dt-scroll-body::-webkit-scrollbar-thumb{
+    background:#C7C7C7;
+    border-radius:4px;
+}
+
+/* Tabel */
+table.dataTable{
+    width:100% !important;
+}
+
+#activitynow{
+    min-width:1800px !important;
+}

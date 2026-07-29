@@ -12,7 +12,7 @@
                         <?= $this->user['role']; ?>
                     </span>
                 </div>
-                <span class="badge badge-profile profile-active">Active</span>
+                <span class="badge badge-profile profile-active">Aktif</span>
             </div>
         </div>
         <div class="card-body">
@@ -22,7 +22,7 @@
                         aria-expanded="true" aria-controls="collapseInformation">
                         <div class="card-title">
                             <div class="d-flex flex-column">
-                                <h1 class="fs-6 font-bold mb-0">Account Information</h1>
+                                <h1 class="fs-6 font-bold mb-0">Informasi Akun</h1>
                             </div>
                         </div>
                     </div>
@@ -34,21 +34,14 @@
                                     <div class="d-flex flex-column">
                                         <div
                                             class="d-flex align-items-center justify-content-between py-3 border-bottom">
-                                            <span class="fs-7 text-neutral-70">Role</span>
+                                            <span class="fs-7 text-neutral-70">User ID</span>
                                             <span class="fs-7 text-neutral-100">
-                                                <?= $this->user['role']; ?>
+                                                <?= $this->user['id']; ?>
                                             </span>
                                         </div>
                                         <div
                                             class="d-flex align-items-center justify-content-between py-3 border-bottom">
-                                            <span class="fs-7 text-neutral-70">Username</span>
-                                            <span class="fs-7 text-neutral-100">
-                                                <?= $this->user['username']; ?>
-                                            </span>
-                                        </div>
-                                        <div
-                                            class="d-flex align-items-center justify-content-between py-3 border-bottom">
-                                            <span class="fs-7 text-neutral-70">Account Name</span>
+                                            <span class="fs-7 text-neutral-70">Nama</span>
                                             <span class="fs-7 text-neutral-100">
                                                 <?= $this->user['fullName']; ?>
                                             </span>
@@ -62,15 +55,16 @@
                                         </div>
                                         <div
                                             class="d-flex align-items-center justify-content-between py-3 border-bottom">
-                                            <span class="fs-7 text-neutral-70">Created At</span>
+                                            <span class="fs-7 text-neutral-70">Level User</span>
                                             <span class="fs-7 text-neutral-100">
-                                                <?= $this->user['createdAt']; ?>
+                                                <?= $this->user['level']; ?>
                                             </span>
                                         </div>
-                                        <div class="d-flex align-items-center justify-content-between py-3">
-                                            <span class="fs-7 text-neutral-70">Updated At</span>
+                                        <div
+                                            class="d-flex align-items-center justify-content-between py-3 border-bottom">
+                                            <span class="fs-7 text-neutral-70">Role</span>
                                             <span class="fs-7 text-neutral-100">
-                                                <?= $this->user['updatedAt']; ?>
+                                                <?= $this->user['role']; ?>
                                             </span>
                                         </div>
                                     </div>
@@ -85,13 +79,13 @@
                         <div class="accordion-body">
                             <div class="d-flex align-items-center justify-content-between p-4">
                                 <p class="form-label fs-6 text-neutral-100 fw-bold mb-0">
-                                    Settings
+                                    Pengaturan
                                 </p>
                                 <button class="btn btn-outline-warning bg-hover-warning-subtle" data-bs-toggle="modal"
                                     data-bs-target="#modalChangePassword">
                                     <div class="d-flex align-items-center gap-1">
                                         <span class="icon-lock"></span>
-                                        Change Password
+                                        Ubah Kata Sandi
                                     </div>
                                 </button>
                             </div>
@@ -108,7 +102,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Change Password</h5>
+                <h5 class="modal-title">Ubah Kata Sandi</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" tabindex="-1" data-bs-focus="false"
                     aria-label="Close"></button>
             </div>
@@ -117,7 +111,7 @@
                 <div class="modal-body">
                     <div class="form-content">
                         <div class="form-group">
-                            <label for="currentPassword" class="form-label">Current Password</label>
+                            <label for="currentPassword" class="form-label">Kata Sandi Saat Ini <span class="merahSandi">*</span></label>
                             <div class="input-append append-right">
                                 <input id="currentPassword" name="currentPassword" class="form-control" type="password"
                                     minlength="8" placeholder="Enter current password" required />
@@ -125,7 +119,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="newPassword" class="form-label">New Password</label>
+                            <label for="newPassword" class="form-label">Kata Sandi Baru <span class="merahSandi">*</span></label>
                             <div class="input-append append-right">
                                 <input id="newPassword" name="newPassword" class="form-control password-validate"
                                     type="password" minlength="8" placeholder="Enter new password" required />
@@ -134,24 +128,26 @@
                             <div class="term-password mt-2" style="display: none;">
                                 <div class="d-flex align-items-center gap-2" data-rule="length">
                                     <span class="ic icon-checklist"></span>
-                                    <span class="term-item">Minimum of 8 characters</span>
+                                    <span class="term-item">Minimal 8 Karakter</span>
                                 </div>
                                 <div class="d-flex align-items-center gap-2" data-rule="upper">
                                     <span class="ic icon-checklist"></span>
-                                    <span class="term-item">Must include uppercase letters (A-Z)</span>
-                                </div>
-                                <div class="d-flex align-items-center gap-2" data-rule="lower">
-                                    <span class="ic icon-checklist"></span>
-                                    <span class="term-item">Must include lowercase letters (a-z)</span>
+                                    <span class="term-item">Harus menyertakan huruf besar dan huruf kecil.</span>
                                 </div>
                                 <div class="d-flex align-items-center gap-2" data-rule="special">
                                     <span class="ic icon-checklist"></span>
-                                    <span class="term-item">Must include at least one special character</span>
+                                    <span class="term-item">Harus menyertakan setidaknya satu karakter khusus.</span>
+                                </div>
+                            </div>
+                            <div class="term-password-err mt-2" style="display: none;" id="term-password-2">
+                                <div class="d-flex align-items-center gap-2" data-rule="length">
+                                    <span class="ic icon-checklist-invalid"></span>
+                                    <span class="term-item">Kata Sandi baru tidak boleh sama dengan Kata Sandi lama</span>
                                 </div>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                            <label for="confirmPassword" class="form-label">Konfirmasi Kata Sandi Baru <span class="merahSandi">*</span></label>
                             <div class="input-append append-right">
                                 <input id="confirmPassword" name="confirmPassword"
                                     class="form-control password-validate" type="password" minlength="8"
@@ -161,27 +157,33 @@
                             <div class="term-password mt-2" style="display: none;">
                                 <div class="d-flex align-items-center gap-2" data-rule="length">
                                     <span class="ic icon-checklist"></span>
-                                    <span class="term-item">Minimum of 8 characters</span>
+                                    <span class="term-item">Minimal 8 Karakter</span>
                                 </div>
                                 <div class="d-flex align-items-center gap-2" data-rule="upper">
                                     <span class="ic icon-checklist"></span>
                                     <span class="term-item">Must include uppercase letters (A-Z)</span>
                                 </div>
-                                <div class="d-flex align-items-center gap-2" data-rule="lower">
-                                    <span class="ic icon-checklist"></span>
-                                    <span class="term-item">Must include lowercase letters (a-z)</span>
-                                </div>
                                 <div class="d-flex align-items-center gap-2" data-rule="special">
                                     <span class="ic icon-checklist"></span>
-                                    <span class="term-item">Must include at least one special character</span>
+                                    <span class="term-item">Harus menyertakan setidaknya satu karakter khusus.</span>
+                                </div>
+                            </div>
+                            <div class="term-password-err mt-2" style="display: none;" id="term-password-3"> 
+                                <div class="d-flex align-items-center gap-2" data-rule="length">
+                                    <span class="ic icon-checklist-invalid"></span>
+                                    <span class="term-item">Kata Sandi tidak sama dengan Kata Sandi Baru</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary w-100">
-                        Save Password
+                    <input id="sess" name="sess" class="form-control password-validate" type="hidden" value="<?= $this->user['session_token']; ?>"/>
+                    <input id="email" name="email" class="form-control password-validate" type="hidden" value="<?= $this->user['email']; ?>"/>
+                    <input id="ip" name="ip" class="form-control password-validate" type="hidden" value="<?= App_Log_Context::getIp(); ?>"/>
+                    <input id="useragent" name="useragent" class="form-control password-validate" type="hidden" value="<?= App_Log_Context::getUserAgent(); ?>"/>
+                    <button type="button" class="btn btn-primary w-100" id="ChngPass">
+                        Perbarui Kata Sandi
                     </button>
                 </div>
             </form>
@@ -189,7 +191,19 @@
     </div>
 </div>
 
-<?php if($this->success) : ?>
+<div id="loadingScreen">
+    <div class="loading-box">
+
+        <div class="spinner"></div>
+
+        <div class="loading-text">
+            Loading
+        </div>
+
+    </div>
+</div>
+
+
 <div id="modalSuccess" class="modal fade" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -198,10 +212,10 @@
                     <img src="<?= $this->baseUrl('assets/img/img-new-password.svg'); ?>" alt="image new password" />
                     <div class="d-flex flex-column align-items-center gap-2">
                         <h3 class="text-neutral-100 fs-5 fw-bold mb-0">
-                            Password Updated
+                            Kata Sandi Berhasil Diperbarui 
                         </h3>
                         <p class="text-neutral-70 text-sm text-center">
-                            Keep your password private to ensure your account's security
+                            Demi keamanan, silakan masuk kembali menggunakan kata sandi yang baru
                         </p>
                     </div>
                 </div>
@@ -209,21 +223,14 @@
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary flex-fill" data-bs-dismiss="modal"
-                    data-bs-target="#modalSuccess">Close</button>
+                    data-bs-target="#modalSuccess" id="btnModalSuccessok">Masuk Kembali</button>
             </div>
         </div>
     </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var modal = new bootstrap.Modal(document.getElementById('modalSuccess'));
-    modal.show();
-});
-</script>
-<?php endif; ?>
 
-<?php if ($this->error) : ?>
+
 <div class="modal fade" id="errorModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -232,10 +239,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     <img src="<?= $this->baseUrl('assets/img/img-new-password.svg'); ?>" alt="image new password" />
                     <div class="d-flex flex-column align-items-center gap-2">
                         <h3 class="text-neutral-100 fs-5 fw-bold mb-0">
-                            Unable to Update Password
+                            Kata Sandi Gagal Diperbarui
                         </h3>
-                        <p class="text-neutral-70 text-sm text-center">
-                            <?= $this->error; ?>
+                        <p class="text-neutral-70 text-sm text-center text-response">
+               
                         </p>
                     </div>
                 </div>
@@ -243,23 +250,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary flex-fill" data-bs-dismiss="modal"
-                    data-bs-target="#errorModal">Close</button>
+                    data-bs-target="#errorModal" id="btnModalErrorok">Ok</button>
             </div>
         </div>
     </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var modal = new bootstrap.Modal(document.getElementById('errorModal'));
-    modal.show();
-});
-</script>
-<?php endif; ?>
 
-<script>
-$(document).ready(function() {
-    app.FormValidation.init("#change-password-form");
-    app.ValidatePassword.init('.password-validate');
-});
-</script>
+

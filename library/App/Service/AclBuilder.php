@@ -31,11 +31,12 @@ class App_Service_AclBuilder
 
         // Baseline access every authenticated role gets, regardless of
         // menu configuration (mirrors App_Acl::buildDefault()).
-        $resources = ['default:index', 'profile:index'];
+        $resources = ['default:index', 'profile:index'] ;
         $permissions = [
             ['role' => $role, 'resource' => 'auth:index',    'actions' => ['logout']],
             ['role' => $role, 'resource' => 'default:index', 'actions' => null],
-            ['role' => $role, 'resource' => 'profile:index', 'actions' => null],
+            ['role' => $role, 'resource' => 'profile:index', 'actions' => ['index','changepass']],
+
         ];
 
         $actionsByResource = [];
