@@ -1,7 +1,5 @@
-<?php // index.phtml 
+<?php
 ?>
-
-<!-- STYLE CSS SHIMMER LOADING -->
 <style>
     .shimmer-placeholder {
         background: linear-gradient(90deg, #E7E8E8 25%, #F4F5F6 50%, #E7E8E8 75%);
@@ -84,14 +82,12 @@
             </div>
         </div>
 
-        <!-- FORM SEARCH & MULTI-DROPDOWN FILTER (Jarak 24px simetris ke badge) -->
         <div class="px-4 pb-0 bg-white" style="margin-bottom: 24px;">
             <form id="filterUserForm" method="GET" action="" class="d-flex flex-wrap align-items-center gap-3 w-100 mx-0 mt-2">
                 <input type="hidden" name="level" id="input-level" value="<?= (isset($_GET['level']) && $_GET['level'] !== '') ? $this->escape($_GET['level']) : ''; ?>">
                 <input type="hidden" name="role" id="input-role" value="<?= (isset($_GET['role']) && $_GET['role'] !== '') ? $this->escape($_GET['role']) : ''; ?>">
                 <input type="hidden" name="status" id="input-status" value="<?= (isset($_GET['status']) && $_GET['status'] !== '') ? $this->escape($_GET['status']) : ''; ?>">
 
-                <!-- Dropdown Limit Angka Entries -->
                 <div class="dropdown" id="ctx-limit">
                     <?php $currentLimit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10; ?>
                     <button class="btn btn-white text-dark fw-semibold bg-white rounded-3 d-flex justify-content-between align-items-center px-3" type="button" data-bs-toggle="dropdown"
@@ -293,10 +289,8 @@
             $reqRole    = $_GET['role'] ?? '';
             $reqStatus  = $_GET['status'] ?? '';
 
-            // Flag Cek Apakah User Sedang Menggunakan Filter Kustom
             $isUserFiltering = ($searchText !== '') || ($reqLevel !== '') || ($reqRole !== '') || ($reqStatus !== '');
 
-            // 1. Chip Kata Kunci Cari (Jika Ada)
             if ($searchText !== ''): ?>
                 <div class="rounded-3 d-flex align-items-center justify-content-center px-3"
                     style="height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600;">
@@ -304,7 +298,6 @@
                 </div>
             <?php endif; ?>
 
-            <!-- 2. Chip Level User (DEFAULT: 'Semua Level User' / NAMA LEVEL SPESIFIK) -->
             <?php
             $badgeLevelText = 'Semua Level User';
 
@@ -320,7 +313,6 @@
                 }
             }
 
-            // Cek jika user ngetik pencarian kata yang mewakili level
             $isSearchingLevel = ($searchText !== '' && (
                 strpos($searchText, 'admin') !== false ||
                 strpos($searchText, 'provider') !== false ||
@@ -573,80 +565,4 @@
 </div>
 
 <!-- JAVASCRIPT ACTION INTERACTION -->
-<script type="text/javascript">
-    function showLoadingShimmer() {
-        document.getElementById('real-table-body')?.classList.add('d-none');
-        document.getElementById('shimmer-table-body')?.classList.remove('d-none');
-    }
-
-    function hideLoadingShimmer() {
-        document.getElementById('shimmer-table-body')?.classList.add('d-none');
-        document.getElementById('real-table-body')?.classList.remove('d-none');
-    }
-
-    document.addEventListener("DOMContentLoaded", function() {
-
-        const form = document.getElementById('filterUserForm');
-        if (form) {
-            form.addEventListener('submit', function() {
-                showLoadingShimmer();
-            });
-        }
-
-        const filterItems = document.querySelectorAll(".dropdown-menu a:not(.limit-item)");
-
-        filterItems.forEach(item => {
-            item.addEventListener("click", function(e) {
-                e.preventDefault();
-
-                const value = this.getAttribute("data-value");
-                const text = this.querySelector("span") ? this.querySelector("span").textContent.trim() : this.textContent.trim();
-
-                const dropdownContainer = this.closest(".dropdown");
-                const buttonLabel = dropdownContainer.querySelector("button span");
-
-                if (value !== "") {
-                    buttonLabel.style.setProperty('color', '#12161C', 'important');
-                    buttonLabel.style.fontWeight = "600";
-                    buttonLabel.textContent = text;
-                }
-
-                // Set Active Class & Checkmark Icon
-                dropdownContainer.querySelectorAll('.custom-dropdown-item').forEach(el => {
-                    el.classList.remove('active');
-                    const icon = el.querySelector('svg');
-                    if (icon) icon.remove();
-                });
-
-                this.classList.add('active');
-                this.insertAdjacentHTML('beforeend', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#198754" class="bi bi-check-lg" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/></svg>');
-
-                if (dropdownContainer.id === "ctx-level") {
-                    document.getElementById("input-level").value = value;
-                } else if (dropdownContainer.id === "ctx-role") {
-                    document.getElementById("input-role").value = value;
-                } else if (dropdownContainer.id === "ctx-status") {
-                    document.getElementById("input-status").value = value;
-                }
-            });
-        });
-
-        const limitItems = document.querySelectorAll(".dropdown-menu a.limit-item");
-        limitItems.forEach(item => {
-            item.addEventListener("click", function(e) {
-                e.preventDefault();
-                const value = this.getAttribute("data-value");
-
-                document.getElementById("label-limit").textContent = value;
-                document.getElementById("input-limit").value = value;
-
-                showLoadingShimmer();
-                this.closest("form").submit();
-            });
-        });
-
-        setTimeout(function() {
-            hideLoadingShimmer();
-        }, 300);
-    });
-</script>
+<script src="<?= $this->baseUrl('assets/js/user/user-index.js'); ?>"></script>

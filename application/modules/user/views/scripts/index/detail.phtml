@@ -1,88 +1,72 @@
-<?php $user = $this->userDetail; ?>
+<?php
+$user = (isset($this->userDetail) && is_array($this->userDetail)) ? $this->userDetail : [];
+
+$currentLevelName = isset($user['level_name']) ? trim($user['level_name']) : '';
+$isItpLevel = (strcasecmp($currentLevelName, 'IT Provider') === 0);
+
+$tpCode = isset($this->tpCode) ? $this->tpCode : ($user['tp_code'] ?? null);
+$listItp = (isset($this->listItp) && is_array($this->listItp)) ? $this->listItp : [];
+
+$itpNameSelected = '-';
+if (!empty($tpCode) && !empty($listItp)) {
+    foreach ($listItp as $itp) {
+        if ($itp['code'] == $tpCode) {
+            $itpNameSelected = $itp['name'];
+            break;
+        }
+    }
+}
+?>
 
 <div style="margin-top: -8px; padding-top: 24px; padding-bottom: 24px; line-height: 1;">
     <a href="<?= $this->baseUrl('user'); ?>"
         class="text-decoration-none fw-semibold d-inline-flex align-items-center gap-2"
         style="font-size: 14px; color: #595C60;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"
-            style="margin-top: -1px;">
-            <path fill-rule="evenodd"
-                d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"
-                stroke="#595C60" stroke-width="0.5" />
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-top: -1px;">
+            <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" stroke="#595C60" stroke-width="0.5" />
         </svg>
         Kembali
     </a>
 </div>
 
-<div class="card border border-light-subtle shadow-sm rounded-4 mb-4 bg-white text-dark overflow-hidden"
-    style="margin-top: 0px; margin-bottom: 120px;">
+<input type="hidden" id="detail-id" value="<?= isset($user['id']) ? htmlspecialchars($user['id'], ENT_QUOTES, 'UTF-8') : ''; ?>">
+
+<div class="card border border-light-subtle shadow-sm rounded-4 mb-4 bg-white text-dark overflow-hidden" style="margin-top: 0px; margin-bottom: 120px;">
     <div class="card-body p-4 p-md-5 bg-white text-dark">
         <h3 class="fw-bold text-dark mb-1 fs-4">Detail User</h3>
         <p class="text-secondary mb-4 mb-md-5" style="font-size: 14px;">Data informasi akun user</p>
 
         <div class="row g-4">
+            <!-- BARIS 1 KIRI: STATUS USER -->
             <div class="col-md-6">
-                <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Status User <span
-                        class="text-danger">*</span></label>
+                <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Status User <span class="text-danger">*</span></label>
                 <div class="input-group">
                     <input type="text" class="form-control border-0 py-3 px-3 rounded-start-3 text-dark fw-bold"
                         style="background-color: #f1f3f9; color: #1e293b !important; font-size: 14px;"
-                        value="<?= isset($user['status']) ? htmlspecialchars($user['status'], ENT_QUOTES, 'UTF-8') : '-'; ?>"
-                        readonly>
-                    <span class="input-group-text border-0 text-dark rounded-end-3"
-                        style="background-color: #f1f3f9;"><i class="bi bi-chevron-down fw-bold"></i></span>
+                        value="<?= isset($user['status']) ? htmlspecialchars($user['status'], ENT_QUOTES, 'UTF-8') : '-'; ?>" readonly>
+                    <span class="input-group-text border-0 text-dark rounded-end-3" style="background-color: #f1f3f9;"><i class="bi bi-chevron-down fw-bold"></i></span>
                 </div>
             </div>
 
+            <!-- BARIS 1 KANAN: EMAIL -->
             <div class="col-md-6">
-                <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">ID User <span
-                        class="text-danger">*</span></label>
-                <div class="input-group">
-                    <input type="text" id="detail-id"
-                        class="form-control border-0 py-3 px-3 rounded-start-3 text-dark fw-bold"
-                        style="background-color: #f1f3f9; color: #1e293b !important; font-size: 14px;"
-                        value="<?= isset($user['id']) ? htmlspecialchars($user['id'], ENT_QUOTES, 'UTF-8') : '-'; ?>"
-                        readonly>
-                    <span class="input-group-text border-0 text-dark rounded-end-3"
-                        style="background-color: #f1f3f9;"><i class="bi bi-chevron-down fw-bold"></i></span>
-                </div>
+                <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Email <span class="text-danger">*</span></label>
+                <input type="email" id="detail-email" class="form-control border-0 py-3 px-3 rounded-3 text-dark fw-bold"
+                    style="background-color: #f1f3f9; color: #1e293b !important; font-size: 14px;"
+                    value="<?= isset($user['email']) ? htmlspecialchars($user['email'], ENT_QUOTES, 'UTF-8') : '-'; ?>" readonly>
             </div>
 
+            <!-- BARIS 2 KIRI: NAMA -->
             <div class="col-md-6">
-                <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Nama <span
-                        class="text-danger">*</span></label>
+                <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Nama <span class="text-danger">*</span></label>
                 <input type="text" id="detail-nama" class="form-control border-0 py-3 px-3 rounded-3 text-dark fw-bold"
                     style="background-color: #f1f3f9; color: #1e293b !important; font-size: 14px;"
-                    value="<?= isset($user['full_name']) ? htmlspecialchars($user['full_name'], ENT_QUOTES, 'UTF-8') : '-'; ?>"
-                    readonly>
+                    value="<?= isset($user['full_name']) ? htmlspecialchars($user['full_name'], ENT_QUOTES, 'UTF-8') : '-'; ?>" readonly>
             </div>
 
+            <!-- BARIS 2 KANAN: ROLE -->
             <div class="col-md-6">
-                <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Email <span
-                        class="text-danger">*</span></label>
-                <input type="email" id="detail-email"
-                    class="form-control border-0 py-3 px-3 rounded-3 text-dark fw-bold"
-                    style="background-color: #f1f3f9; color: #1e293b !important; font-size: 14px;"
-                    value="<?= isset($user['email']) ? htmlspecialchars($user['email'], ENT_QUOTES, 'UTF-8') : '-'; ?>"
-                    readonly>
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Level User <span
-                        class="text-danger">*</span></label>
-                <div class="input-group">
-                    <input type="text" class="form-control border-0 py-3 px-3 rounded-start-3 text-dark fw-bold"
-                        style="background-color: #f1f3f9; color: #1e293b !important; font-size: 14px;"
-                        value="<?= isset($user['level_name']) ? htmlspecialchars($user['level_name'], ENT_QUOTES, 'UTF-8') : '-'; ?>"
-                        readonly>
-                    <span class="input-group-text border-0 text-dark rounded-end-3"
-                        style="background-color: #f1f3f9;"><i class="bi bi-chevron-down fw-bold"></i></span>
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Role <span
-                        class="text-danger">*</span></label>
+                <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Role <span class="text-danger">*</span></label>
                 <div class="input-group">
                     <?php
                     $displayRole = '-';
@@ -97,49 +81,48 @@
                         }
                     }
                     ?>
-                    <input type="text" id="detail-role"
-                        class="form-control border-0 py-3 px-3 rounded-start-3 text-dark fw-bold"
+                    <input type="text" id="detail-role" class="form-control border-0 py-3 px-3 rounded-start-3 text-dark fw-bold"
                         style="background-color: #f1f3f9; color: #1e293b !important; font-size: 14px;"
                         value="<?= htmlspecialchars($displayRole, ENT_QUOTES, 'UTF-8'); ?>" readonly>
-                    <span class="input-group-text border-0 text-dark rounded-end-3"
-                        style="background-color: #f1f3f9;"><i class="bi bi-chevron-down fw-bold"></i></span>
+                    <span class="input-group-text border-0 text-dark rounded-end-3" style="background-color: #f1f3f9;"><i class="bi bi-chevron-down fw-bold"></i></span>
                 </div>
             </div>
 
-            <?php if (isset($this->tpCode)): ?>
+            <!-- BARIS 3 KIRI: LEVEL USER -->
+            <div class="col-md-6">
+                <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Level User <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <input type="text" class="form-control border-0 py-3 px-3 rounded-start-3 text-dark fw-bold"
+                        style="background-color: #f1f3f9; color: #1e293b !important; font-size: 14px;"
+                        value="<?= isset($user['level_name']) ? htmlspecialchars($user['level_name'], ENT_QUOTES, 'UTF-8') : '-'; ?>" readonly>
+                    <span class="input-group-text border-0 text-dark rounded-end-3" style="background-color: #f1f3f9;"><i class="bi bi-chevron-down fw-bold"></i></span>
+                </div>
+            </div>
+
+            <!-- BARIS 3 KANAN: NAMA IT PROVIDER -->
+            <?php if ($isItpLevel): ?>
                 <div class="col-md-6">
-                    <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">IT Provider <span
-                            class="text-danger">*</span></label>
+                    <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Nama IT Provider <span class="text-danger">*</span></label>
                     <div class="input-group">
-                        <select class="form-select border-0 py-3 px-3 rounded-start-3 text-dark fw-bold"
-                            style="background-color: #f1f3f9; color: #1e293b !important; font-size: 14px; appearance: none; -webkit-appearance: none;"
-                            disabled>
-                            <option value="">-</option>
-                            <?php if (!empty($this->listItp) && is_array($this->listItp)): ?>
-                                <?php foreach ($this->listItp as $itp): ?>
-                                    <option <?= (isset($this->tpCode) && ($this->tpCode == $itp['code'])) ? 'selected' : ''; ?>
-                                        value="<?= htmlspecialchars($itp['code'], ENT_QUOTES, 'UTF-8'); ?>">
-                                        <?= htmlspecialchars($itp['name'], ENT_QUOTES, 'UTF-8'); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </select>
-                        <span class="input-group-text border-0 text-dark rounded-end-3"
-                            style="background-color: #f1f3f9;"><i class="bi bi-chevron-down fw-bold"></i></span>
+                        <input type="text" class="form-control border-0 py-3 px-3 rounded-start-3 text-dark fw-bold"
+                            style="background-color: #f1f3f9; color: #1e293b !important; font-size: 14px;"
+                            value="<?= htmlspecialchars($itpNameSelected, ENT_QUOTES, 'UTF-8'); ?>" readonly>
+                        <span class="input-group-text border-0 text-dark rounded-end-3" style="background-color: #f1f3f9;"><i class="bi bi-chevron-down fw-bold"></i></span>
                     </div>
                 </div>
-            <?php endif ?>
+            <?php endif; ?>
         </div>
     </div>
 </div>
 
-<div
-    style="position: fixed; bottom: 0; right: 0; width: calc(100% - 152px); background-color: #f8fafc; border-top: 1px solid #dee2e6; z-index: 999; padding-left: 40px; padding-right: 40px;">
+<div style="position: fixed; bottom: 0; right: 0; width: calc(100% - 152px); background-color: #f8fafc; border-top: 1px solid #dee2e6; z-index: 999; padding-left: 40px; padding-right: 40px;">
     <div class="d-flex justify-content-between align-items-center gap-3 py-3">
-        <span class="text-secondary fw-medium text-start" style="font-size: 14px; white-space: nowrap;">Klik Edit untuk
-            mengubah data user atau reset kata sandi</span>
+        <span class="text-secondary fw-medium text-start" style="font-size: 14px; white-space: nowrap;">Klik Edit untuk mengubah data user atau reset kata sandi</span>
         <div class="d-flex gap-3 align-items-center">
             <button type="button" id="btnTriggerResetPassword"
+                data-reset-url="<?= $this->baseUrl('user/index/reset-password'); ?>"
+                data-img-success="<?= $this->baseUrl('assets/img/img-succes-password.svg'); ?>"
+                data-img-error="<?= $this->baseUrl('assets/img/img-new-password.svg'); ?>"
                 class="btn btn-white bg-white px-4 py-2 rounded-3 fw-bold d-flex align-items-center gap-2 border border-danger text-danger shadow-sm"
                 style="font-size: 14px; height: 40px;">
                 <i class="bi bi-lock-fill"></i> Reset Kata Sandi
@@ -153,32 +136,22 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalKonfirmasiReset" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-    aria-hidden="true">
+<!-- MODAL KONFIRMASI RESET & MODAL STATUS -->
+<div class="modal fade" id="modalKonfirmasiReset" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
         <div class="modal-content border-0 rounded-4 shadow p-4 bg-white text-dark">
             <div class="modal-body text-center p-0">
                 <div class="mb-4">
-                    <img src="<?= $this->baseUrl('assets/img/img-create.svg'); ?>" alt="Konfirmasi Reset"
-                        style="width: 220px; height: auto;">
+                    <img src="<?= $this->baseUrl('assets/img/img-create.svg'); ?>" alt="Konfirmasi Reset" style="width: 220px; height: auto;">
                 </div>
                 <h4 class="fw-bold text-dark mb-2" style="font-size: 20px;">Reset Kata Sandi?</h4>
                 <p class="text-secondary mb-4 px-2" style="font-size: 14px;">Kata sandi akun user akan direset</p>
-
                 <div class="row g-3">
                     <div class="col-6">
-                        <button type="button"
-                            class="btn w-100 py-2.5 fw-bold bg-white text-dark border border-light-subtle rounded-3"
-                            data-bs-dismiss="modal" style="font-size: 14px; height: 44px;">
-                            Batal
-                        </button>
+                        <button type="button" class="btn w-100 py-2.5 fw-bold bg-white text-dark border border-light-subtle rounded-3" data-bs-dismiss="modal" style="font-size: 14px; height: 44px;">Batal</button>
                     </div>
                     <div class="col-6">
-                        <button type="button" id="btnProsesResetPassword"
-                            class="btn w-100 py-2.5 fw-bold text-white rounded-3 shadow-sm"
-                            style="background-color: #3b82f6; border: none; font-size: 14px; height: 44px;">
-                            Reset
-                        </button>
+                        <button type="button" id="btnProsesResetPassword" class="btn w-100 py-2.5 fw-bold text-white rounded-3 shadow-sm" style="background-color: #3b82f6; border: none; font-size: 14px; height: 44px;">Reset</button>
                     </div>
                 </div>
             </div>
@@ -186,122 +159,25 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalStatus" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-    aria-hidden="true">
+<div class="modal fade" id="modalStatus" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
         <div class="modal-content border-0 rounded-4 shadow p-4 bg-white text-dark" style="min-height: 320px;">
-            <div class="modal-body p-0 d-flex flex-column align-items-center justify-content-center position-relative"
-                style="min-height: 280px;">
-
-                <div id="contentLoading" class="text-center w-100 position-absolute top-50 start-50 translate-middle"
-                    style="transition: opacity 0.2s ease-in-out; opacity: 1;">
-                    <div class="spinner-border text-primary mb-3" role="status"
-                        style="width: 3rem; height: 3rem; stroke-width: 3;"></div>
-                    <div class="text-secondary fw-bold" style="font-size: 14px; letter-spacing: 0.5px;">Memproses
-                        Data...</div>
+            <div class="modal-body p-0 d-flex flex-column align-items-center justify-content-center position-relative" style="min-height: 280px;">
+                <div id="contentLoading" class="text-center w-100 position-absolute top-50 start-50 translate-middle" style="transition: opacity 0.2s ease-in-out; opacity: 1;">
+                    <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem; stroke-width: 3;"></div>
+                    <div class="text-secondary fw-bold" style="font-size: 14px; letter-spacing: 0.5px;">Memproses Data...</div>
                 </div>
-
-                <div id="contentResponse" class="d-none w-100 text-center"
-                    style="transition: opacity 0.3s ease-in-out; opacity: 0;">
+                <div id="contentResponse" class="d-none w-100 text-center" style="transition: opacity 0.3s ease-in-out; opacity: 0;">
                     <div class="mb-4">
                         <img id="statusImage" src="" alt="Status" style="width: 200px; height: auto;">
                     </div>
                     <h4 id="statusTitle" class="fw-bold text-dark mb-2" style="font-size: 20px;"></h4>
-                    <p id="statusMessage" class="text-secondary mb-4 px-3" style="font-size: 14px; line-height: 1.5;">
-                    </p>
-                    <button type="button" id="btnStatusOke"
-                        class="btn w-100 py-2.5 fw-bold text-white rounded-3 shadow-sm"
-                        style="background-color: #3b82f6; border: none; font-size: 14px; height: 44px;">
-                        Oke
-                    </button>
+                    <p id="statusMessage" class="text-secondary mb-4 px-3" style="font-size: 14px; line-height: 1.5;"></p>
+                    <button type="button" id="btnStatusOke" class="btn w-100 py-2.5 fw-bold text-white rounded-3 shadow-sm" style="background-color: #3b82f6; border: none; font-size: 14px; height: 44px;">Oke</button>
                 </div>
-
             </div>
         </div>
     </div>
 </div>
 
-<script type="text/javascript">
-    document.addEventListener("DOMContentLoaded", function () {
-        const modalKonfirmasiReset = new bootstrap.Modal(document.getElementById('modalKonfirmasiReset'));
-        const modalStatus = new bootstrap.Modal(document.getElementById('modalStatus'));
-
-        let isActionSuccess = false;
-
-        document.getElementById('btnTriggerResetPassword').addEventListener('click', function (e) {
-            e.preventDefault();
-            modalKonfirmasiReset.show();
-        });
-
-        document.getElementById('btnProsesResetPassword').addEventListener('click', function () {
-            modalKonfirmasiReset.hide();
-
-            const loadingArea = document.getElementById('contentLoading');
-            const responseArea = document.getElementById('contentResponse');
-
-            loadingArea.style.opacity = '1';
-            loadingArea.classList.remove('d-none');
-            responseArea.classList.add('d-none');
-            responseArea.style.opacity = '0';
-
-            modalStatus.show();
-
-            const formData = new FormData();
-            const roleText = document.getElementById('detail-role').value;
-            const roleId = (roleText === 'Administrator') ? 1 : 2;
-            formData.append('id', document.getElementById('detail-id').value);
-            formData.append('email', document.getElementById('detail-email').value);
-            formData.append('fullName', document.getElementById('detail-nama').value);
-            formData.append('role', roleId);
-
-            fetch('<?= $this->baseUrl("user/index/reset-password"); ?>', {
-                method: 'POST',
-                body: formData
-            }).then(response => response.json())
-                .then(data => {
-                    loadingArea.style.opacity = '0';
-
-                    setTimeout(function () {
-                        loadingArea.classList.add('d-none');
-
-                        if (data.success || data.code == 200) {
-                            isActionSuccess = true;
-                            document.getElementById('statusImage').src = '<?= $this->baseUrl("assets/img/img-succes-password.svg"); ?>';
-                            document.getElementById('statusTitle').textContent = 'Reset Berhasil';
-                            document.getElementById('statusMessage').textContent = 'Kata sandi baru berhasil dikirim ke email user.';
-                        } else {
-                            isActionSuccess = false;
-                            document.getElementById('statusImage').src = '<?= $this->baseUrl("assets/img/img-new-password.svg"); ?>';
-                            document.getElementById('statusTitle').textContent = 'Reset Gagal';
-                            document.getElementById('statusMessage').textContent = data.msg ? data.msg : "Gagal menyetel ulang kata sandi.";
-                        }
-
-                        responseArea.classList.remove('d-none');
-                        setTimeout(function () {
-                            responseArea.style.opacity = '1';
-                        }, 50);
-                    }, 200);
-                }).catch(error => {
-                    loadingArea.style.opacity = '0';
-                    setTimeout(function () {
-                        loadingArea.classList.add('d-none');
-                        isActionSuccess = false;
-                        document.getElementById('statusImage').src = '<?= $this->baseUrl("assets/img/img-new-password.svg"); ?>';
-                        document.getElementById('statusTitle').textContent = 'Reset Gagal';
-                        document.getElementById('statusMessage').textContent = "Terjadi kendala koneksi ke server.";
-                        responseArea.classList.remove('d-none');
-                        setTimeout(function () {
-                            responseArea.style.opacity = '1';
-                        }, 50);
-                    }, 200);
-                });
-        });
-
-        document.getElementById('btnStatusOke').addEventListener('click', function () {
-            modalStatus.hide();
-            if (isActionSuccess) {
-                window.location.reload();
-            }
-        });
-    });
-</script>
+<script src="<?= $this->baseUrl('assets/js/user/user-detail.js'); ?>"></script>

@@ -1,4 +1,4 @@
-<?php // create.phtml 
+<?php
 ?>
 
 <div style="margin-top: -8px; padding-top: 24px; padding-bottom: 24px; line-height: 1;">
@@ -15,7 +15,11 @@
     </a>
 </div>
 
-<form id="formTambahUser" method="POST" action="<?= $this->baseUrl('user/index/save'); ?>">
+<!-- 🎯 FORM DENGAN ATTRIBUTE DATA UNTUK DIBACA JS -->
+<form id="formTambahUser" method="POST" action="<?= $this->baseUrl('user/index/save'); ?>"
+    data-redirect-url="<?= $this->baseUrl('user/index/index'); ?>"
+    data-img-success="<?= $this->baseUrl('assets/img/img-create.svg'); ?>"
+    data-img-failed="<?= $this->baseUrl('assets/img/img-confirm-failed.svg'); ?>">
 
     <input type="hidden" name="status" id="input-status" value="1">
     <input type="hidden" name="level_user" id="input-level" value="1">
@@ -89,16 +93,8 @@
                             <?php if (!empty($this->listRoles) && is_array($this->listRoles)): ?>
                                 <?php foreach ($this->listRoles as $role): ?>
                                     <?php
-
                                     $originalName = strtolower($role['role_name']);
                                     $displayName = ucwords($originalName);
-
-                                    // if ($originalName === 'admin') {
-                                    //     $displayName = 'Administrator';
-                                    // } else {
-                                    //     $displayName = ucwords($originalName);
-                                    // }
-                            
                                     ?>
                                     <li>
                                         <a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#"
@@ -268,240 +264,5 @@
     </div>
 </div>
 
-
-<script type="text/javascript">
-    document.addEventListener("DOMContentLoaded", function () {
-        const modalKonfirmasi = new bootstrap.Modal(document.getElementById('modalKonfirmasi'));
-        const modalLoading = new bootstrap.Modal(document.getElementById('modalLoading'));
-        const modalSukses = new bootstrap.Modal(document.getElementById('modalSukses'));
-
-        const dropdownItems = document.querySelectorAll(".dropdown-menu a");
-        dropdownItems.forEach(item => {
-            item.addEventListener("click", function (e) {
-                e.preventDefault();
-                const value = this.getAttribute("data-value");
-                const text = this.textContent;
-                const dropdownContainer = this.closest(".col-md-6");
-                const buttonLabel = dropdownContainer.querySelector("button span");
-
-                buttonLabel.textContent = text;
-                buttonLabel.style.setProperty('color', '#12161C', 'important');
-
-                if (dropdownContainer.id === "ctx-status") {
-                    document.getElementById("input-status").value = value;
-                } else if (dropdownContainer.id === "ctx-level") {
-                    document.getElementById("input-level").value = value;
-                } else if (dropdownContainer.id === "ctx-role") {
-                    document.getElementById("input-role").value = value;
-                }
-            });
-        });
-
-        document.getElementById('formTambahUser').addEventListener('submit', function (event) {
-            event.preventDefault();
-            modalKonfirmasi.show();
-        });
-
-        document.getElementById('btnProsesSubmit').addEventListener('click', function () {
-            modalKonfirmasi.hide();
-            modalLoading.show();
-
-            const formData = new FormData();
-            formData.append('status', document.getElementById('input-status').value);
-            formData.append('level_user', document.getElementById('input-level').value);
-            formData.append('role', document.getElementById('input-role').value);
-            formData.append('email', document.getElementById('email').value);
-            formData.append('fullName', document.getElementById('fullName').value);
-
-            fetch('<?= $this->baseUrl("user/index/save"); ?>', {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => response.json())
-                .then(data => {
-
-                    if (data.success || data.code == 200) {
-                        modalSukses.show();
-                    } else {
-                        alert("Gagal memproses: " + data.msg);
-                    }
-                    $('#modalLoading').modal('hide');
-                })
-                .catch(error => {
-                    modalLoading.hide();
-                    alert("Terjadi kendala koneksi ke server.");
-                });
-        });
-
-        document.getElementById('btnSuksesOke').addEventListener('click', function () {
-            modalSukses.hide();
-            window.location.href = '<?= $this->baseUrl("user/index/index"); ?>';
-        });
-    });
-</script>
-
-<script type="text/javascript">
-    document.addEventListener("DOMContentLoaded", function () {
-        const modalKonfirmasi = new bootstrap.Modal(document.getElementById('modalKonfirmasi'));
-        const modalStatus = new bootstrap.Modal(document.getElementById('modalStatus'));
-
-        let isActionSuccess = false;
-
-        // Level yang mewajibkan pilihan IT Provider
-        const ITP_LEVEL_ID = '2';
-
-        const ctxItp = document.getElementById('ctx-itp');
-        const inputItp = document.getElementById('input-itp');
-        const labelItp = document.getElementById('label-itp');
-        const itpError = document.getElementById('itp-error');
-        const btnItp = document.getElementById('btn-itp');
-
-        function toggleItp(levelValue) {
-            if (levelValue === ITP_LEVEL_ID) {
-                ctxItp.classList.remove('d-none');
-            } else {
-                // sembunyikan + reset pilihan agar tidak terkirim nilai lama
-                ctxItp.classList.add('d-none');
-                inputItp.value = '';
-                labelItp.textContent = 'Pilih IT provider';
-                labelItp.style.setProperty('color', '#B8B9BB', 'important');
-                hideItpError();
-            }
-        }
-
-        function showItpError() {
-            itpError.classList.remove('d-none');
-            btnItp.classList.add('border-danger');
-        }
-
-        function hideItpError() {
-            itpError.classList.add('d-none');
-            btnItp.classList.remove('border-danger');
-        }
-
-        // Handle Pilihan Dropdown Menu
-        const dropdownItems = document.querySelectorAll(".dropdown-menu a");
-        dropdownItems.forEach(item => {
-            item.addEventListener("click", function (e) {
-                e.preventDefault();
-                const value = this.getAttribute("data-value");
-                const text = this.textContent;
-                const dropdownContainer = this.closest(".col-md-6");
-                const buttonLabel = dropdownContainer.querySelector("button span");
-
-                buttonLabel.textContent = text;
-                buttonLabel.style.setProperty('color', '#12161C', 'important');
-
-                if (dropdownContainer.id === "ctx-status") {
-                    document.getElementById("input-status").value = value;
-                } else if (dropdownContainer.id === "ctx-level") {
-                    document.getElementById("input-level").value = value;
-                    toggleItp(value);
-                } else if (dropdownContainer.id === "ctx-role") {
-                    document.getElementById("input-role").value = value;
-                } else if (dropdownContainer.id === "ctx-itp") {
-                    inputItp.value = value;
-                    hideItpError();
-                }
-            });
-        });
-
-        // Intercept Submit Form untuk Memunculkan Modal Konfirmasi
-        document.getElementById('formTambahUser').addEventListener('submit', function (event) {
-            event.preventDefault();
-
-            // IT Provider wajib dipilih jika level-nya IT Provider
-            if (document.getElementById('input-level').value === ITP_LEVEL_ID && inputItp.value === '') {
-                showItpError();
-                ctxItp.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                return;
-            }
-
-            modalKonfirmasi.show();
-        });
-
-        // Eksekusi Submit Saat Tombol Proses di Modal Konfirmasi di-Klik
-        document.getElementById('btnProsesSubmit').addEventListener('click', function () {
-            modalKonfirmasi.hide();
-
-            // Set ke state Loading awal sebelum modal dibuka
-            const loadingArea = document.getElementById('contentLoading');
-            const responseArea = document.getElementById('contentResponse');
-
-            loadingArea.style.opacity = '1';
-            loadingArea.classList.remove('d-none');
-            responseArea.classList.add('d-none');
-            responseArea.style.opacity = '0';
-
-            modalStatus.show();
-
-            // Susun Data Form
-            const formData = new FormData();
-            formData.append('status', document.getElementById('input-status').value);
-            formData.append('level_user', document.getElementById('input-level').value);
-            formData.append('role', document.getElementById('input-role').value);
-            formData.append('itp_code', inputItp.value);
-            formData.append('email', document.getElementById('email').value);
-            formData.append('fullName', document.getElementById('fullName').value);
-
-            // Kirim Data via Fetch API ke Backend
-            fetch('<?= $this->baseUrl("user/index/save"); ?>', {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => response.json())
-                .then(data => {
-                    // Jalankan skenario transisi pudar (Fade out loading -> Fade in response)
-                    loadingArea.style.opacity = '0';
-
-                    setTimeout(function () {
-                        loadingArea.classList.add('d-none');
-
-                        // Siapkan konten respons di latar belakang
-                        if (data.success || data.code == 200) {
-                            isActionSuccess = true;
-                            document.getElementById('statusImage').src = '<?= $this->baseUrl("assets/img/img-create.svg"); ?>';
-                            document.getElementById('statusTitle').textContent = 'Berhasil Ditambahkan';
-                            document.getElementById('statusMessage').textContent = 'Data user telah berhasil ditambahkan';
-                        } else {
-                            isActionSuccess = false;
-                            document.getElementById('statusImage').src = '<?= $this->baseUrl("assets/img/img-confirm-failed.svg"); ?>';
-                            document.getElementById('statusTitle').textContent = 'Gagal Ditambahkan';
-                            document.getElementById('statusMessage').textContent = data.msg ? data.msg : "Terjadi kesalahan saat menambahkan user";
-                        }
-
-                        // Pemicu Fade In Elemen Respons
-                        responseArea.classList.remove('d-none');
-                        setTimeout(function () {
-                            responseArea.style.opacity = '1';
-                        }, 50);
-
-                    }, 200); // Sinkron dengan durasi CSS transition opacity loading
-                })
-                .catch(error => {
-                    loadingArea.style.opacity = '0';
-                    setTimeout(function () {
-                        loadingArea.classList.add('d-none');
-
-                        isActionSuccess = false;
-                        document.getElementById('statusImage').src = '<?= $this->baseUrl("assets/img/img-confirm-failed.svg"); ?>';
-                        document.getElementById('statusTitle').textContent = 'Gagal Ditambahkan';
-                        document.getElementById('statusMessage').textContent = "Terjadi kendala koneksi ke server.";
-
-                        responseArea.classList.remove('d-none');
-                        setTimeout(function () {
-                            responseArea.style.opacity = '1';
-                        }, 50);
-                    }, 200);
-                });
-        });
-
-        // Handle Aksi Tombol Oke pada Modal Status
-        document.getElementById('btnStatusOke').addEventListener('click', function () {
-            modalStatus.hide();
-            if (isActionSuccess) {
-                window.location.href = '<?= $this->baseUrl("user/index/index"); ?>';
-            }
-        });
-    });
-</script>
+<!-- PEMANGGILAN SCRIPT EXTERNAL USER CREATE -->
+<script src="<?= $this->baseUrl('assets/js/user/user-create.js'); ?>"></script>
