@@ -35,7 +35,8 @@ class App_Acl extends Zend_Acl
          */
         $aclConfig = App_Service_Session::get('acl_config');
 
-        // Zend_Debug::dump($aclConfig);
+        #Zend_Debug::dump($aclConfig);
+       
 
         if (!empty($aclConfig)) {
             $this->buildFromApi($aclConfig);
@@ -146,6 +147,7 @@ class App_Acl extends Zend_Acl
          */
         $this->add(new Zend_Acl_Resource('default:index'));
         $this->add(new Zend_Acl_Resource('profile:index'));
+        $this->add(new Zend_Acl_Resource('profile:changepass'));
         $this->add(new Zend_Acl_Resource('user:index'));
 
         /**
@@ -196,12 +198,12 @@ class App_Acl extends Zend_Acl
          * PROFILE
          * ======================
          */
-        $this->allow('maker', 'profile:index');
-        $this->allow('checker', 'profile:index');
-        $this->allow('admin', 'profile:index');
-        $this->allow('admin mis', 'profile:index');
-        $this->allow('guest mis', 'profile:index');
-        $this->allow('viewer', 'profile:index');
+        $this->allow('maker', 'profile:index',['changepass']);
+        $this->allow('checker', 'profile:index',['changepass']);
+        $this->allow('admin', 'profile:index',['changepass']);
+        $this->allow('admin mis', 'profile:index',['changepass']);
+        $this->allow('guest mis', 'profile:index',['changepass']);
+        $this->allow('viewer', 'profile:index',['changepass']);
 
         /**
          * ======================
