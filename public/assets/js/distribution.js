@@ -1,5 +1,19 @@
 let myDistributionChart = null;
 
+$(document).ready(function () {
+    if ($('#listmitra').length) {
+        $('#listmitra').select2({
+            placeholder: "Pilih Mitra Acquirer",
+            width: '100%',
+            allowClear: true
+        });
+        
+        $('#listmitra').on('select2:select select2:clear', function () {
+            $('input[name="search"]').val('');
+        });
+    }
+});
+
 function showLoadingShimmer() {
     document.getElementById('real-chart-container')?.classList.add('d-none');
     document.getElementById('real-table-body')?.classList.add('d-none');

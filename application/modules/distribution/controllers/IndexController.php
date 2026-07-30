@@ -25,15 +25,22 @@ class Distribution_IndexController extends Zend_Controller_Action
         $filterService = $this->_getParam('service', '');
         $filterSort    = $this->_getParam('sort_by', 'total');
         $filterSearch  = $this->_getParam('search', '');
+        $filterMitra   = $this->_getParam('mitra_code', '');
 
         $modelAps = new Distribution_Model_Aps();
 
+        // 1. Ambil data dari API backend
         $result = $modelAps->getDistributionData($activeTab, $filterDate, $filterService, $filterSort);
         $this->view->isError = !$result['success'];
         $listData = $result['data'];
 
-        $listData = $modelAps->filterSearchData($listData, $filterSearch);
+        // 🎯 MODIFIKASI 1: Hilangkan kondisi ($activeTab === 'mitra') agar opsi master mitra selalu ada di dropdown
+        $this->view->listMitraAcquirer = $modelAps->getMasterMitraList();
 
+        // 3. Filter data secara lokal di PHP berdasarkan kata kunci search DAN mitra yang dipilih
+        $listData = $modelAps->filterSearchData($listData, $filterSearch, $filterMitra);
+
+        // 4. Fitur Export Excel
         $isDownload = $this->_getParam('download', 'false');
         if ($isDownload === 'true') {
             $this->_helper->layout->disableLayout();
@@ -43,18 +50,25 @@ class Distribution_IndexController extends Zend_Controller_Action
             exit;
         }
 
+        // 5. Olah Chart & Summary dari $listData yang SUDAH DIFILTER
         $chartSummary = $modelAps->processChartAndSummary($listData);
 
-        $this->view->activeTab = $activeTab;
-        $this->view->summary   = $chartSummary['summary'];
-        $this->view->chartJson = $chartSummary['chartJson'];
-        $this->view->listData  = $listData;
+        // 🎯 MODIFIKASI 2: Tambahkan flag pengecekan apakah user sedang melakukan filter
+        $isUserFiltering = !empty($filterSearch) || !empty($filterService) || !empty($filterMitra);
+
+        // 🎯 MODIFIKASI 3: Kirim variabel $isUserFiltering ke view
+        $this->view->isUserFiltering = $isUserFiltering;
+        $this->view->activeTab       = $activeTab;
+        $this->view->summary         = $chartSummary['summary'];
+        $this->view->chartJson       = $chartSummary['chartJson'];
+        $this->view->listData        = $listData;
 
         $this->view->filters = [
-            'date'    => $filterDate,
-            'service' => $filterService,
-            'sort_by' => $filterSort,
-            'search'  => $filterSearch
+            'date'       => $filterDate,
+            'service'    => $filterService,
+            'sort_by'    => $filterSort,
+            'search'     => $filterSearch,
+            'mitra_code' => $filterMitra
         ];
     }
 
