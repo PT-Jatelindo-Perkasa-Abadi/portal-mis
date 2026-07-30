@@ -10,9 +10,37 @@ class Distribution_Model_Aps
     }
 
     /**
+     * Mengekstrak daftar unik Mitra Acquirer dari $listData untuk dropdown filter
+     */
+    public function getMitraAcquirerListFromData($listData)
+    {
+        if (empty($listData) || !is_array($listData)) {
+            return [];
+        }
+
+        $uniqueMitra = [];
+
+        foreach ($listData as $row) {
+            if (!is_array($row)) continue;
+
+            $code = $row['kode'] ?? $row['KODE'] ?? $row['mitra_code'] ?? null;
+            $name = $row['nama'] ?? $row['NAMA'] ?? $row['mitra_name'] ?? $code;
+
+            if (!empty($code) && !isset($uniqueMitra[$code])) {
+                $uniqueMitra[$code] = [
+                    'code' => (string) $code,
+                    'name' => (string) $name
+                ];
+            }
+        }
+
+        return array_values($uniqueMitra);
+    }
+
+    /**
      * Mengambil data distribusi dari API berdasarkan parameter filter
      */
-    public function getDistributionData($activeTab, $filterDate, $filterService, $filterSort)
+    public function getDistributionData($activeTab, $filterDate, $filterService, $filterSort, $mitraCode = '')
     {
         $this->_api->authorization();
 
@@ -36,6 +64,7 @@ class Distribution_Model_Aps
             $orderBy = "total_fee";
         }
 
+        // 🎯 MODIFIKASI: Kirim string kosong "" di parameter ke-4 agar API selalu mengembalikan seluruh data transaksi
         $payload = [$filterDate, $productCode, $orderBy, ""];
         $apiUrl  = ($activeTab === 'mitra')
             ? '/service/proxy/service/alias/get-distribution-mitra'
@@ -61,45 +90,88 @@ class Distribution_Model_Aps
     }
 
     /**
-     * Melakukan pencarian global pada list data
+     * 🎯 MODIFIKASI: Melakukan pencarian kata kunci DAN filter Mitra Acquirer secara lokal di PHP
      */
-    public function filterSearchData($listData, $filterSearch)
+    public function filterSearchData($listData, $filterSearch = '', $filterMitra = '')
     {
-        if (empty($filterSearch) || !is_array($listData) || empty($listData)) {
+        if (!is_array($listData) || empty($listData)) {
+            return [];
+        }
+
+        if (empty($filterSearch) && empty($filterMitra)) {
             return $listData;
         }
 
-        $searchKeyword = strtolower(trim($filterSearch));
-        $filteredList  = [];
+        $filteredList = [];
 
         foreach ($listData as $value) {
-            $kodeData   = isset($value["kode"]) ? strtolower($value["kode"]) : '';
-            $namaData   = isset($value["nama"]) ? strtolower($value["nama"]) : '';
-            $layananRaw = isset($value["layanan"]) ? trim($value["layanan"]) : '';
+            $kodeData  = isset($value["kode"]) ? strtolower($value["kode"]) : '';
+            $namaData  = isset($value["nama"]) ? strtolower($value["nama"]) : '';
 
-            $namaLayanan = in_array(strtolower($layananRaw), ['nontaglist', 'non-taglist'])
-                ? 'non-taglist'
-                : strtolower($layananRaw);
+            // 🎯 Ambil nama mitra dari berbagai kemungkinan field pada data Sub Mitra
+            $namaMitra = isset($value["nama_mitra"])
+                ? strtolower($value["nama_mitra"])
+                : (isset($value["mitra"]) ? strtolower($value["mitra"]) : '');
 
-            $lembar  = isset($value['lembar']) ? (string)$value['lembar'] : (isset($value['jumlah']) ? (string)$value['jumlah'] : '0');
-            $tagihan = isset($value['tagihan']) ? str_replace('.', '', (string)$value['tagihan']) : '0';
-            $admin   = isset($value['admin']) ? str_replace('.', '', (string)$value['admin']) : '0';
-            $total   = isset($value['total']) ? str_replace('.', '', (string)$value['total']) : '0';
+            // 1. Filter Mitra Acquirer (cek di nama data DAN nama mitra)
+            if (!empty($filterMitra)) {
+                $mitraLower = strtolower(trim($filterMitra));
+                $matchMitra = (
+                    strpos($kodeData, $mitraLower) !== false ||
+                    strpos($namaData, $mitraLower) !== false ||
+                    strpos($namaMitra, $mitraLower) !== false
+                );
 
-            if (
-                strpos($kodeData, $searchKeyword) !== false ||
-                strpos($namaData, $searchKeyword) !== false ||
-                strpos($namaLayanan, $searchKeyword) !== false ||
-                strpos($lembar, $searchKeyword) !== false ||
-                strpos($tagihan, $searchKeyword) !== false ||
-                strpos($admin, $searchKeyword) !== false ||
-                strpos($total, $searchKeyword) !== false
-            ) {
-                $filteredList[] = $value;
+                if (!$matchMitra) {
+                    continue; // Lewati baris ini jika nama mitra tidak cocok
+                }
             }
+
+            // 2. Filter Search Input (Kata Kunci)
+            if (!empty($filterSearch)) {
+                $searchKeyword = strtolower(trim($filterSearch));
+                $layananRaw    = isset($value["layanan"]) ? trim($value["layanan"]) : '';
+                $namaLayanan   = in_array(strtolower($layananRaw), ['nontaglist', 'non-taglist']) ? 'non-taglist' : strtolower($layananRaw);
+
+                $lembar  = isset($value['lembar']) ? (string)$value['lembar'] : (isset($value['jumlah']) ? (string)$value['jumlah'] : '0');
+                $tagihan = isset($value['tagihan']) ? str_replace('.', '', (string)$value['tagihan']) : '0';
+                $admin   = isset($value['admin']) ? str_replace('.', '', (string)$value['admin']) : '0';
+                $total   = isset($value['total']) ? str_replace('.', '', (string)$value['total']) : '0';
+
+                $matchSearch = (
+                    strpos($kodeData, $searchKeyword) !== false ||
+                    strpos($namaData, $searchKeyword) !== false ||
+                    strpos($namaMitra, $searchKeyword) !== false ||
+                    strpos($namaLayanan, $searchKeyword) !== false ||
+                    strpos($lembar, $searchKeyword) !== false ||
+                    strpos($tagihan, $searchKeyword) !== false ||
+                    strpos($admin, $searchKeyword) !== false ||
+                    strpos($total, $searchKeyword) !== false
+                );
+
+                if (!$matchSearch) {
+                    continue;
+                }
+            }
+
+            $filteredList[] = $value;
         }
 
         return $filteredList;
+    }
+
+    /**
+     * Master List Mitra Acquirer (Selalu tampil di dropdown)
+     */
+    public function getMasterMitraList()
+    {
+        return [
+            ['code' => 'Jatelindo Perkasa Abadi',    'name' => 'Jatelindo Perkasa Abadi'],
+            ['code' => 'Magna Karsa Mulya',          'name' => 'Magna Karsa Mulya'],
+            ['code' => 'Value Stream International', 'name' => 'Value Stream International'],
+            ['code' => 'Gerbang Sinergi Prima',      'name' => 'Gerbang Sinergi Prima'],
+            ['code' => 'Sarana Yukti Bandhana',      'name' => 'Sarana Yukti Bandhana'],
+        ];
     }
 
     /**
@@ -108,49 +180,54 @@ class Distribution_Model_Aps
     public function processChartAndSummary($listData)
     {
         $summary = ['prepaid' => 0, 'postpaid' => 0, 'non_taglist' => 0];
-        $chartLabels = [];
-        $chartDataPrepaid = [];
-        $chartDataPostpaid = [];
+        $chartLabels         = [];
+        $chartDataPrepaid    = [];
+        $chartDataPostpaid   = [];
         $chartDataNonTaglist = [];
-        $processedChartData = [];
+        $groupedData         = [];
 
         if (is_array($listData) && !empty($listData)) {
             foreach ($listData as $value) {
-                if (isset($value["kode"])) {
-                    $processedChartData[$value["kode"]] = [
-                        'nama'     => $value["nama"] ?? $value["kode"],
-                        'prepaid'  => 0,
-                        'postpaid' => 0,
+                // 1. Ambil Nama Tampilan (Sub Mitra atau Mitra) secara fleksibel
+                $namaDisplay = !empty($value["nama"])
+                    ? $value["nama"]
+                    : (!empty($value["nama_mitra"]) ? $value["nama_mitra"] : ($value["kode"] ?? 'Lainnya'));
+
+                // 2. Buat Key Unik untuk Grouping berdasarkan Nama (Bukan hanya Kode)
+                $groupKey = strtolower(trim($namaDisplay));
+
+                // 3. Inisialisasi jika grup nama belum ada
+                if (!isset($groupedData[$groupKey])) {
+                    $groupedData[$groupKey] = [
+                        'nama'       => $namaDisplay,
+                        'prepaid'    => 0,
+                        'postpaid'   => 0,
                         'nontaglist' => 0
                     ];
                 }
-            }
-            foreach ($listData as $value) {
-                if (isset($value["kode"])) {
-                    $nilaiLembar = $value['lembar'] ?? ($value['jumlah'] ?? 0);
-                    switch (strtolower($value['layanan'] ?? '')) {
-                        case 'prepaid':
-                            $processedChartData[$value["kode"]]["prepaid"] = $nilaiLembar;
-                            break;
-                        case 'postpaid':
-                            $processedChartData[$value["kode"]]["postpaid"] = $nilaiLembar;
-                            break;
-                        case 'nontaglist':
-                        case 'non-taglist':
-                            $processedChartData[$value["kode"]]["nontaglist"] = $nilaiLembar;
-                            break;
-                    }
+
+                $nilaiLembar = intval($value['lembar'] ?? ($value['jumlah'] ?? 0));
+                $layanan     = strtolower(trim($value['layanan'] ?? ''));
+
+                // 4. Akumulasi (Gunakan += agar data dijumlahkan, bukan ditimpa)
+                if ($layanan === 'prepaid') {
+                    $groupedData[$groupKey]['prepaid'] += $nilaiLembar;
+                    $summary['prepaid'] += $nilaiLembar;
+                } elseif ($layanan === 'postpaid') {
+                    $groupedData[$groupKey]['postpaid'] += $nilaiLembar;
+                    $summary['postpaid'] += $nilaiLembar;
+                } elseif (in_array($layanan, ['nontaglist', 'non-taglist'])) {
+                    $groupedData[$groupKey]['nontaglist'] += $nilaiLembar;
+                    $summary['non_taglist'] += $nilaiLembar;
                 }
             }
-            foreach ($processedChartData as $key => $value) {
-                $chartLabels[]         = $value["nama"];
-                $chartDataPrepaid[]    = $value["prepaid"];
-                $chartDataPostpaid[]   = $value["postpaid"];
-                $chartDataNonTaglist[] = $value["nontaglist"];
 
-                $summary["prepaid"]     += $value["prepaid"];
-                $summary["postpaid"]    += $value["postpaid"];
-                $summary["non_taglist"] += $value["nontaglist"];
+            // 5. Susun ke array format Chart JS
+            foreach ($groupedData as $item) {
+                $chartLabels[]         = $item['nama'];
+                $chartDataPrepaid[]    = $item['prepaid'];
+                $chartDataPostpaid[]   = $item['postpaid'];
+                $chartDataNonTaglist[] = $item['nontaglist'];
             }
         }
 
