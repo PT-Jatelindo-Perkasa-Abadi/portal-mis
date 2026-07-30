@@ -24,7 +24,7 @@ class App_Service_EmailTemplate
         $layoutView->subject = $subject;
         $layoutView->content = $content;
 
-        $layoutView->logoUrl = self::getAssetUrl('/assets/img/logo-mis-email.png');
+        $layoutView->logoUrl = self::getAssetUrl('/assets/img/logo-asp-email.png');
         $layoutView->backgroundHeader = self::getAssetUrl('/assets/img/background-header-email.png');
 
         return $layoutView->render('layouts/default.phtml');
