@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // Level yang mewajibkan pilihan IT Provider
+    // Level ID 2 = Mitra Acquirer (IT Provider)
     const ITP_LEVEL_ID = '2';
 
     const ctxItp = document.getElementById('ctx-itp');
@@ -14,7 +14,6 @@ document.addEventListener("DOMContentLoaded", function () {
         if (levelValue === ITP_LEVEL_ID) {
             ctxItp.classList.remove('d-none');
         } else {
-            // Sembunyikan + reset pilihan agar tidak terkirim nilai lama
             ctxItp.classList.add('d-none');
             if (inputItp) inputItp.value = '';
             if (labelItp) {
@@ -68,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // Inisialisasi Modal Bootstrap
+    // Modal Initializations
     const elModalKonfirmasi = document.getElementById('modalKonfirmasiEdit');
     const elModalLoading = document.getElementById('modalLoadingEdit');
     const elModalSukses = document.getElementById('modalSuksesEdit');
@@ -90,7 +89,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 return false;
             }
 
-            // IT Provider wajib dipilih jika level-nya IT Provider
             if (levelVal === ITP_LEVEL_ID && inputItp && inputItp.value === '') {
                 showItpError();
                 if (ctxItp) ctxItp.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -146,11 +144,8 @@ document.addEventListener("DOMContentLoaded", function () {
         btnSelesaiEdit.addEventListener('click', function () {
             if (modalSukses) modalSukses.hide();
 
-            // Ambil redirect URL dari data-attribute tombol
-            const redirectUrl = this.getAttribute('data-redirect-url');
-            if (redirectUrl) {
-                window.location.href = redirectUrl;
-            }
+            const redirectUrl = this.getAttribute('data-redirect-url') || "<?= $this->baseUrl('user'); ?>";
+            window.location.href = redirectUrl;
         });
     }
 });

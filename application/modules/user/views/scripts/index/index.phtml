@@ -1,5 +1,7 @@
-<?php
+<?php // index.phtml 
 ?>
+
+<!-- STYLE CSS SHIMMER LOADING -->
 <style>
     .shimmer-placeholder {
         background: linear-gradient(90deg, #E7E8E8 25%, #F4F5F6 50%, #E7E8E8 75%);
@@ -82,12 +84,14 @@
             </div>
         </div>
 
+        <!-- FORM SEARCH & MULTI-DROPDOWN FILTER -->
         <div class="px-4 pb-0 bg-white" style="margin-bottom: 24px;">
             <form id="filterUserForm" method="GET" action="" class="d-flex flex-wrap align-items-center gap-3 w-100 mx-0 mt-2">
                 <input type="hidden" name="level" id="input-level" value="<?= (isset($_GET['level']) && $_GET['level'] !== '') ? $this->escape($_GET['level']) : ''; ?>">
                 <input type="hidden" name="role" id="input-role" value="<?= (isset($_GET['role']) && $_GET['role'] !== '') ? $this->escape($_GET['role']) : ''; ?>">
                 <input type="hidden" name="status" id="input-status" value="<?= (isset($_GET['status']) && $_GET['status'] !== '') ? $this->escape($_GET['status']) : ''; ?>">
 
+                <!-- Dropdown Limit Angka Entries -->
                 <div class="dropdown" id="ctx-limit">
                     <?php $currentLimit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10; ?>
                     <button class="btn btn-white text-dark fw-semibold bg-white rounded-3 d-flex justify-content-between align-items-center px-3" type="button" data-bs-toggle="dropdown"
@@ -138,6 +142,11 @@
                                         }
                                     }
                                 }
+                                if (strcasecmp($levelLabel, 'Admin MIS') === 0 || strcasecmp($levelLabel, 'MIS') === 0) {
+                                    $levelLabel = 'ASP';
+                                } elseif (strcasecmp($levelLabel, 'IT Provider') === 0) {
+                                    $levelLabel = 'Mitra Acquirer';
+                                }
                                 echo $this->escape($levelLabel);
                             } else {
                                 echo 'Pilih Level User';
@@ -150,10 +159,18 @@
                     </button>
                     <ul class="dropdown-menu w-100 shadow-sm border-light-subtle rounded-3 p-2">
                         <?php if (!empty($this->listLevel)): foreach ($this->listLevel as $level): ?>
-                                <?php $isSelected = ($hasLevel && $reqLevel == $level['id']); ?>
+                                <?php
+                                $isSelected = ($hasLevel && $reqLevel == $level['id']);
+                                $displayLvlName = $level['level_name'];
+                                if (strcasecmp($displayLvlName, 'Admin MIS') === 0 || strcasecmp($displayLvlName, 'MIS') === 0) {
+                                    $displayLvlName = 'ASP';
+                                } elseif (strcasecmp($displayLvlName, 'IT Provider') === 0) {
+                                    $displayLvlName = 'Mitra Acquirer';
+                                }
+                                ?>
                                 <li>
                                     <a class="dropdown-item custom-dropdown-item <?= $isSelected ? 'active' : ''; ?>" href="#" data-value="<?= $level['id']; ?>">
-                                        <span><?= $this->escape($level['level_name']); ?></span>
+                                        <span><?= $this->escape($displayLvlName); ?></span>
                                         <?php if ($isSelected): ?>
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#198754" class="bi bi-check-lg" viewBox="0 0 16 16">
                                                 <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z" />
@@ -281,7 +298,7 @@
             </form>
         </div>
 
-        <!-- FILTER CHIP BADGE & RESET LINK (Jarak padding-bottom 24px ke border tabel) -->
+        <!-- FILTER CHIP BADGE & RESET LINK -->
         <div class="d-flex flex-wrap align-items-center gap-3 px-4 bg-white border-bottom" style="border-color: #E7E8E8 !important; padding-bottom: 24px;">
             <?php
             $searchText = isset($_GET['search']) ? strtolower(trim($_GET['search'])) : '';
@@ -289,15 +306,11 @@
             $reqRole    = $_GET['role'] ?? '';
             $reqStatus  = $_GET['status'] ?? '';
 
+            // Flag Cek Apakah User Sedang Menggunakan Filter Kustom
             $isUserFiltering = ($searchText !== '') || ($reqLevel !== '') || ($reqRole !== '') || ($reqStatus !== '');
+            ?>
 
-            if ($searchText !== ''): ?>
-                <div class="rounded-3 d-flex align-items-center justify-content-center px-3"
-                    style="height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600;">
-                    "<?= $this->escape($_GET['search']); ?>"
-                </div>
-            <?php endif; ?>
-
+            <!-- 1. Chip Level User (DEFAULT: 'Semua Level User' / NAMA LEVEL SPESIFIK) -->
             <?php
             $badgeLevelText = 'Semua Level User';
 
@@ -313,20 +326,21 @@
                 }
             }
 
-            $isSearchingLevel = ($searchText !== '' && (
-                strpos($searchText, 'admin') !== false ||
-                strpos($searchText, 'provider') !== false ||
-                strpos($searchText, 'mitra') !== false
-            ));
+            // Convert Tampilan Nama Level
+            if (strcasecmp($badgeLevelText, 'Admin MIS') === 0 || strcasecmp($badgeLevelText, 'MIS') === 0) {
+                $badgeLevelText = 'ASP';
+            } elseif (strcasecmp($badgeLevelText, 'IT Provider') === 0) {
+                $badgeLevelText = 'Mitra Acquirer';
+            }
 
-            if (!empty($badgeLevelText) && !($badgeLevelText === 'Semua Level User' && $isSearchingLevel)): ?>
+            if (!empty($badgeLevelText)): ?>
                 <div class="rounded-3 d-flex align-items-center justify-content-center px-3"
                     style="height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600;">
                     <?= $this->escape($badgeLevelText); ?>
                 </div>
             <?php endif; ?>
 
-            <!-- 3. Chip Role (Hanya Muncul Jika Dipilih Spesifik) -->
+            <!-- 2. Chip Role (Hanya Muncul Jika Dipilih Spesifik) -->
             <?php if ($reqRole !== ''):
                 $activeRoleName = $reqRole;
                 if (!empty($this->rolesData) && is_array($this->rolesData)) {
@@ -344,7 +358,7 @@
                 </div>
             <?php endif; ?>
 
-            <!-- 4. Chip Status (Hanya Muncul Jika Dipilih Spesifik) -->
+            <!-- 3. Chip Status (Hanya Muncul Jika Dipilih Spesifik) -->
             <?php if ($reqStatus !== ''):
                 $statusMap = array('active' => 'Aktif', 'nonactive' => 'Non-Aktif', 'blocked' => 'Blokir');
                 $activeStatusName = $statusMap[$reqStatus] ?? $reqStatus;
@@ -355,7 +369,7 @@
                 </div>
             <?php endif; ?>
 
-            <!-- 5. Link Reset Data (MUNCUL JIKA USER UTAK-ATIK FILTER) -->
+            <!-- 4. Link Reset Data (MUNCUL JIKA USER UTAK-ATIK FILTER) -->
             <?php if ($isUserFiltering): ?>
                 <a href="<?= $this->baseUrl('user'); ?>" onclick="showLoadingShimmer()" class="text-decoration-none fw-semibold" style="color: #595C60; font-size: 14px; margin-left: 4px;">Reset Data</a>
             <?php endif; ?>
@@ -422,12 +436,20 @@
                             $no = (($pages->current - 1) * $pages->itemCountPerPage) + 1;
                         }
                         foreach ($this->users as $user): ?>
+                            <?php
+                            $rowLevelName = $user['level_user'] ?? '-';
+                            if (strcasecmp($rowLevelName, 'Admin MIS') === 0 || strcasecmp($rowLevelName, 'MIS') === 0) {
+                                $rowLevelName = 'ASP';
+                            } elseif (strcasecmp($rowLevelName, 'IT Provider') === 0) {
+                                $rowLevelName = 'Mitra Acquirer';
+                            }
+                            ?>
                             <tr class="text-dark border-bottom" style="border-color: #E7E8E8 !important; font-size: 14px; background: #fff;">
                                 <td class="py-3 ps-4" style="color: #12161C; font-weight: 400;"><?= $no++; ?></td>
                                 <td class="text-center" style="color: #12161C; font-weight: 400;"><?= isset($user['id_user']) ? $user['id_user'] : '-'; ?></td>
                                 <td class="text-truncate pe-2" style="max-width: 160px; color: #12161C; font-weight: 400;"><?= $user['fullName'] ?? '-'; ?></td>
                                 <td class="text-truncate pe-2" style="max-width: 220px; color: #12161C; font-weight: 400;"><?= $user['email'] ?? '-'; ?></td>
-                                <td style="color: #12161C; font-weight: 400;"><?= $user['level_user'] ?? '-'; ?></td>
+                                <td style="color: #12161C; font-weight: 400;"><?= $rowLevelName; ?></td>
                                 <td style="color: #12161C; font-weight: 400;"><?= $user['role'] ?? '-'; ?></td>
                                 <td>
                                     <?php
@@ -565,4 +587,80 @@
 </div>
 
 <!-- JAVASCRIPT ACTION INTERACTION -->
-<script src="<?= $this->baseUrl('assets/js/user/user-index.js'); ?>"></script>
+<script type="text/javascript">
+    function showLoadingShimmer() {
+        document.getElementById('real-table-body')?.classList.add('d-none');
+        document.getElementById('shimmer-table-body')?.classList.remove('d-none');
+    }
+
+    function hideLoadingShimmer() {
+        document.getElementById('shimmer-table-body')?.classList.add('d-none');
+        document.getElementById('real-table-body')?.classList.remove('d-none');
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+
+        const form = document.getElementById('filterUserForm');
+        if (form) {
+            form.addEventListener('submit', function() {
+                showLoadingShimmer();
+            });
+        }
+
+        const filterItems = document.querySelectorAll(".dropdown-menu a:not(.limit-item)");
+
+        filterItems.forEach(item => {
+            item.addEventListener("click", function(e) {
+                e.preventDefault();
+
+                const value = this.getAttribute("data-value");
+                const text = this.querySelector("span") ? this.querySelector("span").textContent.trim() : this.textContent.trim();
+
+                const dropdownContainer = this.closest(".dropdown");
+                const buttonLabel = dropdownContainer.querySelector("button span");
+
+                if (value !== "") {
+                    buttonLabel.style.setProperty('color', '#12161C', 'important');
+                    buttonLabel.style.fontWeight = "600";
+                    buttonLabel.textContent = text;
+                }
+
+                // Set Active Class & Checkmark Icon
+                dropdownContainer.querySelectorAll('.custom-dropdown-item').forEach(el => {
+                    el.classList.remove('active');
+                    const icon = el.querySelector('svg.bi-check-lg');
+                    if (icon) icon.remove();
+                });
+
+                this.classList.add('active');
+                this.insertAdjacentHTML('beforeend', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#198754" class="bi bi-check-lg" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/></svg>');
+
+                if (dropdownContainer.id === "ctx-level") {
+                    document.getElementById("input-level").value = value;
+                } else if (dropdownContainer.id === "ctx-role") {
+                    document.getElementById("input-role").value = value;
+                } else if (dropdownContainer.id === "ctx-status") {
+                    document.getElementById("input-status").value = value;
+                }
+            });
+        });
+
+        const limitItems = document.querySelectorAll(".dropdown-menu a.limit-item");
+        limitItems.forEach(item => {
+            item.addEventListener("click", function(e) {
+                e.preventDefault();
+                const value = this.getAttribute("data-value");
+
+                document.getElementById("label-limit").textContent = value;
+                document.getElementById("input-limit").value = value;
+
+                showLoadingShimmer();
+                this.closest("form").submit();
+            });
+        });
+
+        setTimeout(function() {
+            hideLoadingShimmer();
+        }, 300);
+    });
+</script>
