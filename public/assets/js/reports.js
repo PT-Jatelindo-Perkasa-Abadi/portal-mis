@@ -44,7 +44,7 @@ $(function () {
     });
 
     $('#listitp').select2({
-        placeholder: "Pilih IT Provider",
+        placeholder: "Pilih Mitra Acquirer",
         width: '100%',
         allowClear: true
     });
@@ -63,7 +63,7 @@ $(function () {
     });
 
     $('#listmitra').select2({
-        placeholder: "Pilih Mitra",
+        placeholder: "Pilih Sub Mitra Acquirera",
         width: '100%',
         allowClear: true
     });

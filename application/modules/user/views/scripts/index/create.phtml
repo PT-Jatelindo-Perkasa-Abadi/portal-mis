@@ -1,4 +1,4 @@
-<?php
+<?php // create.phtml 
 ?>
 
 <div style="margin-top: -8px; padding-top: 24px; padding-bottom: 24px; line-height: 1;">
@@ -15,7 +15,7 @@
     </a>
 </div>
 
-<!-- 🎯 FORM DENGAN ATTRIBUTE DATA UNTUK DIBACA JS -->
+<!-- FORM DENGAN ATTRIBUTE DATA UNTUK DIBACA JS -->
 <form id="formTambahUser" method="POST" action="<?= $this->baseUrl('user/index/save'); ?>"
     data-redirect-url="<?= $this->baseUrl('user/index/index'); ?>"
     data-img-success="<?= $this->baseUrl('assets/img/img-create.svg'); ?>"
@@ -34,6 +34,7 @@
 
             <div class="row g-4">
 
+                <!-- STATUS USER -->
                 <div class="col-md-6" id="ctx-status">
                     <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Status User <span
                             class="text-danger">*</span></label>
@@ -52,12 +53,12 @@
                         </button>
                         <ul class="dropdown-menu w-100 shadow-sm border-light-subtle rounded-3">
                             <li><a class="dropdown-item py-2 text-dark fw-medium" href="#" data-value="1">Aktif</a></li>
-                            <li><a class="dropdown-item py-2 text-dark fw-medium" href="#" data-value="0">Non-Aktif</a>
-                            </li>
+                            <li><a class="dropdown-item py-2 text-dark fw-medium" href="#" data-value="0">Non-Aktif</a></li>
                         </ul>
                     </div>
                 </div>
 
+                <!-- EMAIL -->
                 <div class="col-md-6">
                     <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Email <span
                             class="text-danger">*</span></label>
@@ -67,6 +68,7 @@
                         placeholder="Masukan email" required>
                 </div>
 
+                <!-- NAMA -->
                 <div class="col-md-6">
                     <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Nama <span
                             class="text-danger">*</span></label>
@@ -75,6 +77,7 @@
                         style="font-size: 14px; height: 48px;" placeholder="User MIS" required>
                 </div>
 
+                <!-- ROLE -->
                 <div class="col-md-6" id="ctx-role">
                     <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Role <span
                             class="text-danger">*</span></label>
@@ -94,7 +97,7 @@
                                 <?php foreach ($this->listRoles as $role): ?>
                                     <?php
                                     $originalName = strtolower($role['role_name']);
-                                    $displayName = ucwords($originalName);
+                                    $displayName  = ucwords($originalName);
                                     ?>
                                     <li>
                                         <a class="dropdown-item py-2 text-dark fw-medium fs-7" href="#"
@@ -113,6 +116,7 @@
                     </div>
                 </div>
 
+                <!-- LEVEL USER (ALIAS ASP & MITRA ACQUIRER) -->
                 <div class="col-md-6" id="ctx-level">
                     <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Level User <span
                             class="text-danger">*</span></label>
@@ -129,10 +133,18 @@
                         </button>
                         <ul class="dropdown-menu w-100 shadow-sm border-light-subtle rounded-3">
                             <?php foreach ($this->listLevel as $level): ?>
+                                <?php
+                                $displayLvlName = $level['level_name'];
+                                if (strcasecmp($displayLvlName, 'Admin MIS') === 0 || strcasecmp($displayLvlName, 'MIS') === 0) {
+                                    $displayLvlName = 'ASP';
+                                } elseif (strcasecmp($displayLvlName, 'IT Provider') === 0) {
+                                    $displayLvlName = 'Mitra Acquirer';
+                                }
+                                ?>
                                 <li>
                                     <a class="dropdown-item py-2 text-dark fw-medium" href="#"
                                         data-value="<?= $level['id']; ?>">
-                                        <?= $level['level_name']; ?>
+                                        <?= $displayLvlName; ?>
                                     </a>
                                 </li>
                             <?php endforeach; ?>
@@ -140,6 +152,7 @@
                     </div>
                 </div>
 
+                <!-- IT PROVIDER (MUNCUL HANYA APABILA LEVEL MITRA ACQUIRER DIPILIH) -->
                 <div class="col-md-6 d-none" id="ctx-itp">
                     <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">IT Provider <span
                             class="text-danger">*</span></label>
@@ -173,6 +186,7 @@
         </div>
     </div>
 
+    <!-- FIXED BOTTOM BAR -->
     <div
         style="position: fixed; bottom: 0; left: 152px; right: 0; background-color: #f8fafc; border-top: 1px solid #dee2e6; z-index: 99; box-sizing: border-box;">
         <div class="d-flex justify-content-between align-items-center gap-3 py-3 px-4">
@@ -194,6 +208,7 @@
     </div>
 </form>
 
+<!-- MODAL KONFIRMASI -->
 <div class="modal fade" id="modalKonfirmasi" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
@@ -228,6 +243,7 @@
     </div>
 </div>
 
+<!-- MODAL STATUS (LOADING & RESPONSE) -->
 <div class="modal fade" id="modalStatus" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
