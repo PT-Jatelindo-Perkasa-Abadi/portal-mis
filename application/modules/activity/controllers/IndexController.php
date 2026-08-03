@@ -64,12 +64,13 @@ class Activity_IndexController extends App_Controller_Base
                         1 => 'Tanggal&Waktu',
                         2 => 'ID User',
                         3 => 'Nama User',
-                        4 => 'Level User',
-                        5 => 'Role',
-                        6 => 'Menu',
-                        7 => 'Tab Menu',
-                        8 => 'Browser',
-                        9 => 'Deskripsi'
+                        4 => 'Email',
+                        5 => 'Level User',
+                        6 => 'Role',
+                        7 => 'Menu',
+                        8 => 'Tab Menu',
+                        9 => 'Browser',
+                        10 => 'Deskripsi'
                     );
 
                
