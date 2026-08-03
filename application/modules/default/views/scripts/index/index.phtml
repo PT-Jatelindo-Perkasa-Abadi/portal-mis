@@ -83,7 +83,7 @@
                     <img src="<?= $this->baseUrl('/assets/img/img-total-disbursement.svg'); ?>"
                         alt="image total file" />
                     <div class="d-flex flex-column align-item-center justify-content-between flex-fill">
-                        <h5 class="fs-7 text-neutral-70 mb-0">Total Lembar</h5>
+                        <h5 class="fs-7 text-neutral-70 mb-0">Total Lembar Transaksi</h5>
                         <h2 class="fs-5 fw-bold text-neutral-100 mb-0" data-field="total_sheet">
                             <div class="skeleton-cell w-100 float-end"></div>
                         </h2>
@@ -280,7 +280,7 @@
         </div>
     </div>
 
-    <?php if ($this->currentUser['role'] == 'administrator') : ?>
+    <!-- <?php if ($this->currentUser['role'] == 'administrator') : ?> -->
     <div class="row g-4 mb-4">
         <div class="col-lg-6">
             <div class="p-4 border border-neutral-10 rounded-3">
@@ -365,7 +365,7 @@
         <div class="col-lg-6">
             <div class="p-4 border border-neutral-10 rounded-3">
                 <div class="d-flex flex-column gap-4">
-                    <h2 class="fs-6 text-neutral-100 fw-bold mb-0">API Log</h2>
+                    <h2 class="fs-6 text-neutral-100 fw-bold mb-0">Konektivitas</h2>
                     <div class="d-flex flex-column gap-3 mb-3">
                         <div class="card card-item-log">
                             <img src="<?= $this->baseUrl('/assets/img/ic-log-connection.svg'); ?>" alt="icon ping" />
@@ -388,12 +388,20 @@
                         <div class="card card-progress-log">
                             <div class="progress-point">
                                 <img src="<?= $this->baseUrl('/assets/img/img-log-point.svg'); ?>" alt="point" />
-                                <span>170.10.172.100</span>
+                                <?php if ($this->currentUser['level'] == 'IT Provider') : ?>
+                                <span>Server Mitra Acquirer</span>
+                                <?php else : ?>
+                                <span>Server ASP</span>
+                                <?php endif; ?>
                             </div>
                             <div id="progressBar" class="progress-bar" style="--progress: 0%"></div>
                             <div class="progress-point">
                                 <img src="<?= $this->baseUrl('/assets/img/img-log-point.svg'); ?>" alt="point" />
-                                <span>Server MIS</span>
+                                <?php if ($this->currentUser['level'] == 'IT Provider') : ?>
+                                <span>Server ASP</span>
+                                <?php  else : ?>
+                                <span>Server PLN</span>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -404,7 +412,7 @@
             </div>
         </div>
     </div>
-    <?php endif; ?>
+    <!-- <?php endif; ?> -->
 </div>
 
 <script type="text/javascript">
