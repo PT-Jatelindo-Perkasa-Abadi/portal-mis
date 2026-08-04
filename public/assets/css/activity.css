@@ -1,34 +1,103 @@
-/* Container DataTables */
-.dt-container{
-    width:100%;
+.dt-container {
+    width: 100%;
 }
 
-/* Header */
-.dt-scroll-head{
-    overflow:hidden !important;
+.dt-scroll-head {
+    overflow: hidden !important;
 }
 
-/* Body yang discroll */
-.dt-scroll-body{
-    overflow-x:auto !important;
-    overflow-y:auto !important;
+.dt-scroll-body {
+    overflow-x: auto !important;
+    overflow-y: auto !important;
 }
 
-/* Scrollbar */
-.dt-scroll-body::-webkit-scrollbar{
-    height:8px;
+.dt-scroll-body::-webkit-scrollbar {
+    height: 8px;
 }
 
-.dt-scroll-body::-webkit-scrollbar-thumb{
-    background:#C7C7C7;
-    border-radius:4px;
+.dt-scroll-body::-webkit-scrollbar-thumb {
+    background: #C7C7C7;
+    border-radius: 4px;
 }
 
-/* Tabel */
-table.dataTable{
-    width:100% !important;
+table.dataTable {
+    width: 100% !important;
+    margin: 0 !important;
 }
 
-#activitynow{
-    min-width:1800px !important;
+#activitynow {
+    min-width: 1800px !important;
+}
+
+table.dataTable thead tr,
+.dataTables_scrollHeadInner table thead tr {
+    display: table-row !important;
+}
+
+#activitynow th,
+#activitynow td,
+.dataTables_scrollHeadInner th,
+.dataTables_scrollBody td,
+table.dataTable thead th,
+table.dataTable tbody td {
+    box-sizing: border-box !important;
+    padding-left: 16px !important;
+    padding-right: 24px !important;
+    text-align: left !important;
+    white-space: nowrap !important;
+    word-break: keep-all !important;
+    vertical-align: middle !important;
+}
+
+#activitynow th:first-child,
+#activitynow td:first-child,
+.dataTables_scrollHeadInner th:first-child,
+.dataTables_scrollBody td:first-child {
+    text-align: center !important;
+}
+
+#activitynow thead tr th,
+.dataTables_scrollHeadInner table thead tr th,
+#activitynow tbody tr td,
+.dataTables_scrollBody table tbody tr td {
+    padding-top: 21px !important;
+    padding-bottom: 21px !important;
+}
+
+.dataTables_scrollBody thead,
+.dataTables_scrollBody thead tr,
+.dataTables_scrollBody thead tr th,
+.dt-scroll-body table thead,
+.dt-scroll-body table thead tr,
+.dt-scroll-body table thead tr th {
+    display: none !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    visibility: hidden !important;
+}
+
+.skeleton-box {
+    display: inline-block !important;
+    height: 16px !important;
+    background: linear-gradient(90deg, #E7E8E8 25%, #F4F5F6 50%, #E7E8E8 75%) !important;
+    background-size: 200% 100% !important;
+    animation: shimmerAnim 1.5s infinite ease-in-out !important;
+    border-radius: 20px !important;
+    vertical-align: middle !important;
+}
+
+.sk-w-30  { width: 30px !important; }
+.sk-w-60  { width: 60% !important; }
+.sk-w-80  { width: 80% !important; }
+.sk-w-100 { width: 100% !important; }
+
+@keyframes shimmerAnim {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
 }

@@ -111,35 +111,39 @@
 
             <!-- Table -->
 
+            <!-- Table -->
             <div class="table-container">
-
                 <table class="table table-hover align-middle w-100" id="activitynow">
-
                     <thead>
-
                         <tr>
-
                             <th>No</th>
-                            <th>Tanggal&Waktu</th>
+                            <th>Tanggal & Waktu</th>
                             <th>Nama User</th>
                             <th>Email</th>
-                            <th>Level User</th>
+                            <th>Level&nbsp;User</th>
                             <th>Role</th>
-                            <th>Aktifitas</th>
+                            <th>Aktivitas</th>
                             <th>Browser</th>
                             <th>Deskripsi</th>
-
                         </tr>
-
                     </thead>
-
                     <tbody>
-
-
+                        <!-- 🎯 INITIAL SHIMMER LOADING (6 BARIS KAPSUL MEMBULAT) -->
+                        <?php for ($i = 0; $i < 6; $i++): ?>
+                            <tr style="height: 64px;">
+                                <td class="text-center"><span class="skeleton-box sk-w-30"></span></td>
+                                <td><span class="skeleton-box sk-w-80"></span></td>
+                                <td><span class="skeleton-box sk-w-80"></span></td>
+                                <td><span class="skeleton-box sk-w-100"></span></td>
+                                <td><span class="skeleton-box sk-w-60"></span></td>
+                                <td><span class="skeleton-box sk-w-60"></span></td>
+                                <td><span class="skeleton-box sk-w-80"></span></td>
+                                <td><span class="skeleton-box sk-w-60"></span></td>
+                                <td><span class="skeleton-box sk-w-100"></span></td>
+                            </tr>
+                        <?php endfor; ?>
                     </tbody>
-
                 </table>
-
             </div>
 
         </div>

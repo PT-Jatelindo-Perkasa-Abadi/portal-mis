@@ -195,6 +195,7 @@ class User_IndexController extends App_Controller_Base
                 $userDetail['status'] = 'Non-Aktif';
             }
         }
+        
 
         if ($userDetail !== null) {
             $userSession = new Zend_Session_Namespace('UserDetailCache');
@@ -303,7 +304,7 @@ class User_IndexController extends App_Controller_Base
                         $newUserId = $response['msg']['id'];
                     }
 
-                    $roleDisplay = ($roleValue === 2) ? 'Administrator' : 'Viewer';
+                    $roleDisplay = ($roleValue === 1) ? 'Administrator' : 'Viewer';
                     $loginUrl = $this->getBaseUrl() . '/auth/login';
 
                     // Render template .phtml
