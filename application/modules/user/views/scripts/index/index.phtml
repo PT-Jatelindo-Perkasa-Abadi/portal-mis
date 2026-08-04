@@ -470,15 +470,20 @@
                                 </td>
                                 <td class="pe-4">
                                     <div class="d-flex gap-2">
+                                        <!-- Tombol Edit -->
                                         <a href="<?= $this->baseUrl('user/index/edit/id/' . ($user['id_user'] ?? '')); ?>"
-                                            class="btn btn-sm d-flex align-items-center justify-content-center gap-1 bg-white fw-bold px-0 text-decoration-none rounded-3"
-                                            style="height: 36px; width: 68px; font-size: 12px; color: #FFA700; border: 1px solid #FFA700; transition: all 0.2s;">
-                                            <i class="bi bi-pencil" style="-webkit-text-stroke: 0.3px #FFA700;"></i> Edit
+                                            class="btn btn-sm btn-action-edit d-flex align-items-center justify-content-center gap-1 px-0"
+                                            style="height: 36px; width: 68px; font-size: 12px;">
+                                            <img src="<?= $this->baseUrl('assets/img/ic-edit-detail.svg'); ?>" alt="Edit" style="width: 14px; height: 14px; object-fit: contain;">
+                                            Edit
                                         </a>
+
+                                        <!-- Tombol Detail -->
                                         <a href="<?= $this->baseUrl('user/index/detail/id/' . ($user['id_user'] ?? '')); ?>"
-                                            class="btn btn-sm d-flex align-items-center justify-content-center gap-1 bg-white fw-bold px-0 text-decoration-none rounded-3"
-                                            style="height: 36px; width: 68px; font-size: 12px; color: #3A7BF6; border: 1px solid #3A7BF6; transition: all 0.2s;">
-                                            <i class="bi bi-eye" style="-webkit-text-stroke: 0.3px #3A7BF6;"></i> Detail
+                                            class="btn btn-sm btn-action-detail d-flex align-items-center justify-content-center gap-1 px-0"
+                                            style="height: 36px; width: 68px; font-size: 12px;">
+                                            <img src="<?= $this->baseUrl('assets/img/ic-detail.index.svg'); ?>" alt="Detail" style="width: 14px; height: 14px; object-fit: contain;">
+                                            Detail
                                         </a>
                                     </div>
                                 </td>

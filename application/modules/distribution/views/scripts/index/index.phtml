@@ -312,11 +312,15 @@ $isApiError = isset($this->isError) && $this->isError === true;
         </div>
     </div>
 
+    <?php
+    $showItProviderTab = ($this->isAllowed('distribution:index', 'itp-tab') || $this->isAllowed('distribution:index', 'it-provider'));
+    ?>
+
     <!-- TAB MENU -->
     <div class="w-100 mb-4 border-bottom" style="border-color: #E7E8E8 !important; height: 48px;">
         <div class="d-flex align-items-end gap-4" style="height: 100%;">
 
-            <?php if ($this->isAllowed('distribution:index', 'itp-tab') || $this->isAllowed('distribution:index', 'it-provider')): ?>
+            <?php if ($showItProviderTab): ?>
                 <div class="d-flex flex-column align-items-center justify-content-end" style="height: 100%; position: relative;">
                     <a href="<?= $this->baseUrl('distribution/index/index/type/it-provider'); ?>"
                         onclick="showLoadingShimmer()"
@@ -331,10 +335,10 @@ $isApiError = isset($this->isError) && $this->isError === true;
             <?php endif; ?>
 
             <div class="d-flex flex-column align-items-center justify-content-end" style="height: 100%; position: relative;">
-                <a href="<?= $this->baseUrl('distribution/index/index/type/mitra'); ?>"
-                    onclick="showLoadingShimmer()"
+                <a href="<?= $showItProviderTab ? $this->baseUrl('distribution/index/index/type/mitra') : 'javascript:void(0);'; ?>"
+                    <?= $showItProviderTab ? 'onclick="showLoadingShimmer()"' : 'style="cursor: default;"'; ?>
                     class="text-decoration-none pb-2 px-1 fw-semibold"
-                    style="font-size: 16px; color: <?= ($this->activeTab === 'mitra') ? '#3A7BF6' : '#595C60'; ?>; text-align: center;">
+                    style="font-size: 16px; color: <?= ($this->activeTab === 'mitra') ? '#3A7BF6' : '#595C60'; ?>; text-align: center; <?= !$showItProviderTab ? 'cursor: default !important;' : ''; ?>">
                     Sub Mitra Acquirer
                 </a>
                 <?php if ($this->activeTab === 'mitra'): ?>
@@ -549,7 +553,7 @@ $isApiError = isset($this->isError) && $this->isError === true;
                 class="w-100 p-4 rounded-3 bg-white d-none"
                 style="outline: 1px #E7E8E8 solid; outline-offset: -1px; border-radius: 12px; position: relative;">
 
-                <h6 class="fw-bold mb-4" style="color: #12161C; font-size: 16px;">Grafik Transaksi Top 10 <?= ($this->activeTab === 'mitra') ? 'Mitra' : 'IT Provider'; ?></h6>
+                <h6 class="fw-bold mb-4" style="color: #12161C; font-size: 16px;">Grafik Transaksi Top 10 <?= ($this->activeTab === 'mitra') ? 'Sub Mitra Acquirer' : 'Mitra Acquirer'; ?></h6>
 
                 <div class="row g-3 mb-4">
                     <div class="col-md-4">
@@ -615,11 +619,11 @@ $isApiError = isset($this->isError) && $this->isError === true;
                                 <th class="fw-bold text-start" style="color: #595C60; font-size: 14px; min-width: 200px;">Nama Mitra Acquirer</th>
                             <?php endif; ?>
 
-                            <th class="fw-bold text-center" style="color: #595C60; font-size: 14px; width: 130px;">Layanan</th>
-                            <th class="fw-bold text-center" style="color: #595C60; font-size: 14px; width: 100px;">Lembar</th>
-                            <th class="fw-bold text-end" style="color: #595C60; font-size: 14px; width: 160px;">Tagihan (Rp)</th>
-                            <th class="fw-bold text-end" style="color: #595C60; font-size: 14px; min-width: 220px; white-space: nowrap;">Admin Mitra Acquirer (Rp)</th>
-                            <th class="fw-bold text-end pe-4" style="color: #595C60; font-size: 14px; width: 160px;">Total (Rp)</th>
+                            <th class="fw-bold text-start" style="color: #595C60; font-size: 14px; width: 130px;">Layanan</th>
+                            <th class="fw-bold text-end" style="color: #595C60; font-size: 14px; width: 100px;">Lembar</th>
+                            <th class="fw-bold text-center" style="color: #595C60; font-size: 14px; width: 160px;">Tagihan (Rp)</th>
+                            <th class="fw-bold text-start" style="color: #595C60; font-size: 14px; min-width: 220px; white-space: nowrap;">Admin Mitra Acquirer (Rp)</th>
+                            <th class="fw-bold text-start pe-4" style="color: #595C60; font-size: 14px; width: 160px;">Total (Rp)</th>
                         </tr>
                     </thead>
 
@@ -689,15 +693,15 @@ $isApiError = isset($this->isError) && $this->isError === true;
                                         <?= isset($row['lembar']) ? $row['lembar'] : (isset($row['jumlah']) ? $row['jumlah'] : 0); ?>
                                     </td>
 
-                                    <td class="text-end" style="color: #12161C; font-size: 14px; font-weight: 400;">
+                                    <td class="text-center" style="color: #12161C; font-size: 14px; font-weight: 400;">
                                         <?= isset($row['tagihan']) ? number_format((float)str_replace('.', '', $row['tagihan']), 0, ',', '.') : '0'; ?>
                                     </td>
 
-                                    <td class="text-end" style="color: #12161C; font-size: 14px; font-weight: 400;">
+                                    <td class="text-start" style="color: #12161C; font-size: 14px; font-weight: 400;">
                                         <?= isset($row['admin']) ? number_format((float)str_replace('.', '', $row['admin']), 0, ',', '.') : '0'; ?>
                                     </td>
 
-                                    <td class="text-end pe-4" style="color: #12161C; font-size: 14px; font-weight: 400;">
+                                    <td class="text-start pe-4" style="color: #12161C; font-size: 14px; font-weight: 400;">
                                         <?= isset($row['total']) ? number_format((float)str_replace('.', '', $row['total']), 0, ',', '.') : '0'; ?>
                                     </td>
                                 </tr>
