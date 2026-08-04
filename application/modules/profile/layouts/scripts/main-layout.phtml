@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-    <?= $this->headTitle('Portal MIS')->setSeparator(' - '); ?>
+    <?= $this->headTitle('ASP Portal Biller')->setSeparator(' - '); ?>
     <meta name="theme-color" content="#0092D5">
     <link rel="icon" href="<?= $this->baseUrl('/assets/img/cropped-Jatelindo-Warna-32x32.webp'); ?>" sizes="32x32" />
     <link rel="icon" href="<?= $this->baseUrl('/assets/img/cropped-Jatelindo-Warna-192x192.webp'); ?>"
@@ -68,31 +68,31 @@
                     </li>
                     <?php endforeach; ?>
                     <?php else: ?>
-                        <!-- Fallback: no menu data in session (menus/level_menus not seeded yet) -->
-                        <li class="menu-item <?= $this->activeMenu('default', 'index', 'index', 'active'); ?>">
-                            <a href="/">
-                                <span class="icon-menu ic-dashboard"></span>
-                                <span>Dashboard</span>
-                            </a>
-                        </li>
-                        <li class="menu-item <?= $this->activeMenu('summary', 'index', 'index', 'active'); ?>">
-                            <a href="/distribution/index/index">
-                                <span class="icon-menu ic-summary"></span>
-                                <span>Rangkuman Distribusi</span>
-                            </a>
-                        </li>
-                        <li class="menu-item <?= $this->activeMenu('history', 'index', 'index', 'active'); ?>">
-                            <a href="/">
-                                <span class="icon-menu ic-report"></span>
-                                <span>Laporan Transaksi</span>
-                            </a>
-                        </li>
-                        <li class="menu-item <?= $this->activeMenu('users', 'index', 'index', 'active'); ?>">
-                            <a href="/user/index/index">
-                                <span class="icon-menu ic-users"></span>
-                                <span>Kelola User</span>
-                            </a>
-                        </li>
+                    <!-- Fallback: no menu data in session (menus/level_menus not seeded yet) -->
+                    <li class="menu-item <?= $this->activeMenu('default', 'index', 'index', 'active'); ?>">
+                        <a href="/">
+                            <span class="icon-menu ic-dashboard"></span>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="menu-item <?= $this->activeMenu('summary', 'index', 'index', 'active'); ?>">
+                        <a href="/distribution/index/index">
+                            <span class="icon-menu ic-summary"></span>
+                            <span>Rangkuman Distribusi</span>
+                        </a>
+                    </li>
+                    <li class="menu-item <?= $this->activeMenu('history', 'index', 'index', 'active'); ?>">
+                        <a href="/">
+                            <span class="icon-menu ic-report"></span>
+                            <span>Laporan Transaksi</span>
+                        </a>
+                    </li>
+                    <li class="menu-item <?= $this->activeMenu('users', 'index', 'index', 'active'); ?>">
+                        <a href="/user/index/index">
+                            <span class="icon-menu ic-users"></span>
+                            <span>Kelola User</span>
+                        </a>
+                    </li>
                     <?php endif; ?>
                 </ul>
             </div>
