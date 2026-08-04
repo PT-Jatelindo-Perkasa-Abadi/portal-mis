@@ -1,59 +1,111 @@
-.dt-container {
-    width: 100%;
+/* ========================================================
+   1. CONTAINER & SCROLL LOCK
+   ======================================================== */
+.container-fluid,
+.card,
+.card-body,
+.table-container,
+.dt-container,
+.dataTables_wrapper {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Kunci agar scroll horizontal HANYA terjadi di dalam area tabel DataTables */
+.dataTables_wrapper {
+    overflow: hidden !important;
 }
 
 .dt-scroll-head {
     overflow: hidden !important;
+    width: 100% !important;
 }
 
-.dt-scroll-body {
+.dt-scroll-body,
+.dataTables_scrollBody {
     overflow-x: auto !important;
     overflow-y: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
 }
 
-.dt-scroll-body::-webkit-scrollbar {
+.dt-scroll-body::-webkit-scrollbar,
+.dataTables_scrollBody::-webkit-scrollbar {
     height: 8px;
 }
 
-.dt-scroll-body::-webkit-scrollbar-thumb {
+.dt-scroll-body::-webkit-scrollbar-thumb,
+.dataTables_scrollBody::-webkit-scrollbar-thumb {
     background: #C7C7C7;
     border-radius: 4px;
 }
 
-table.dataTable {
-    width: 100% !important;
+table.dataTable,
+.dataTables_scrollHeadInner table,
+.dataTables_scrollBody table {
     margin: 0 !important;
+    padding: 0 !important;
+    table-layout: fixed !important;
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
 }
 
-#activitynow {
-    min-width: 1800px !important;
+/* Presisi min-width pas dengan jumlah lebar seluruh kolom (1620px) */
+#activitynow,
+.dataTables_scrollHeadInner table,
+.dataTables_scrollBody table {
+    min-width: 1620px !important;
+    width: 1620px !important;
 }
 
-table.dataTable thead tr,
+/* ========================================================
+   2. FIX GARIS BORDER PENUH & DESKRIPSI FULL
+   ======================================================== */
+#activitynow tbody tr,
+.dataTables_scrollBody table tbody tr,
+#activitynow thead tr,
 .dataTables_scrollHeadInner table thead tr {
-    display: table-row !important;
+    border-bottom: 1px solid #E7E8E8 !important;
 }
 
 #activitynow th,
 #activitynow td,
-.dataTables_scrollHeadInner th,
-.dataTables_scrollBody td,
-table.dataTable thead th,
-table.dataTable tbody td {
+.dataTables_scrollHeadInner table th,
+.dataTables_scrollBody table td {
     box-sizing: border-box !important;
     padding-left: 16px !important;
-    padding-right: 24px !important;
+    padding-right: 16px !important;
     text-align: left !important;
     white-space: nowrap !important;
     word-break: keep-all !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
     vertical-align: middle !important;
+    border: none !important;
+}
+
+/* Khusus Kolom Deskripsi: Tampil penuh tanpa ellipsis */
+#activitynow td.col-deskripsi,
+#activitynow th.col-deskripsi,
+.dataTables_scrollBody table td.col-deskripsi {
+    text-overflow: clip !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+}
+
+table.dataTable thead th,
+.dataTables_scrollHeadInner table thead th {
+    white-space: nowrap !important;
+    word-break: keep-all !important;
 }
 
 #activitynow th:first-child,
 #activitynow td:first-child,
-.dataTables_scrollHeadInner th:first-child,
-.dataTables_scrollBody td:first-child {
+.dataTables_scrollHeadInner table th:first-child,
+.dataTables_scrollBody table td:first-child {
     text-align: center !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
 }
 
 #activitynow thead tr th,
@@ -64,20 +116,38 @@ table.dataTable tbody td {
     padding-bottom: 21px !important;
 }
 
-.dataTables_scrollBody thead,
-.dataTables_scrollBody thead tr,
-.dataTables_scrollBody thead tr th,
+/* ========================================================
+   3. SEMBUNYIKAN HEADER BAYANGAN PADA SCROLLBODY
+   ======================================================== */
+.dataTables_scrollBody table thead,
+.dataTables_scrollBody table thead tr,
+.dataTables_scrollBody table thead tr th,
 .dt-scroll-body table thead,
 .dt-scroll-body table thead tr,
 .dt-scroll-body table thead tr th {
     display: none !important;
+    visibility: hidden !important;
     height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
     padding: 0 !important;
     margin: 0 !important;
     border: none !important;
-    visibility: hidden !important;
+    line-height: 0 !important;
+    font-size: 0 !important;
 }
 
+.dataTables_scrollBody table thead tr th::before,
+.dataTables_scrollBody table thead tr th::after,
+.dt-scroll-body table thead tr th::before,
+.dt-scroll-body table thead tr th::after {
+    display: none !important;
+    content: "" !important;
+}
+
+/* ========================================================
+   4. SHIMMER SKELETON LOADING
+   ======================================================== */
 .skeleton-box {
     display: inline-block !important;
     height: 16px !important;
@@ -88,16 +158,115 @@ table.dataTable tbody td {
     vertical-align: middle !important;
 }
 
-.sk-w-30  { width: 30px !important; }
-.sk-w-60  { width: 60% !important; }
-.sk-w-80  { width: 80% !important; }
-.sk-w-100 { width: 100% !important; }
+.sk-w-30 {
+    width: 30px !important;
+}
+
+.sk-w-60 {
+    width: 60% !important;
+}
+
+.sk-w-80 {
+    width: 80% !important;
+}
+
+.sk-w-100 {
+    width: 100% !important;
+}
 
 @keyframes shimmerAnim {
     0% {
         background-position: -200% 0;
     }
+
     100% {
         background-position: 200% 0;
     }
+}
+
+/* ========================================================
+   5. STYLING TOMBOL ACTION
+   ======================================================== */
+.btn-action-reset {
+    background-color: #ffffff !important;
+    color: #EB5757 !important;
+    border: 1px solid #EB5757 !important;
+    border-radius: 8px !important;
+    font-weight: 700 !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+.btn-action-reset img,
+.btn-action-reset i {
+    transition: filter 0.2s ease-in-out !important;
+}
+
+.btn-action-reset:hover,
+.btn-action-reset:focus,
+.btn-action-reset:active {
+    background-color: #EB5757 !important;
+    color: #ffffff !important;
+    border-color: #EB5757 !important;
+    box-shadow: none !important;
+}
+
+.btn-action-reset:hover img,
+.btn-action-reset:hover i {
+    filter: brightness(0) invert(1) !important;
+}
+
+.btn-action-edit {
+    background-color: #ffffff !important;
+    color: #FFA700 !important;
+    border: 1px solid #FFA700 !important;
+    border-radius: 8px !important;
+    font-weight: 700 !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+.btn-action-edit img,
+.btn-action-edit i {
+    transition: filter 0.2s ease-in-out !important;
+}
+
+.btn-action-edit:hover,
+.btn-action-edit:focus,
+.btn-action-edit:active {
+    background-color: #FFA700 !important;
+    color: #ffffff !important;
+    border-color: #FFA700 !important;
+    box-shadow: none !important;
+}
+
+.btn-action-edit:hover img,
+.btn-action-edit:hover i {
+    filter: brightness(0) invert(1) !important;
+}
+
+.btn-action-detail {
+    background-color: #ffffff !important;
+    color: #3A7BF6 !important;
+    border: 1px solid #3A7BF6 !important;
+    border-radius: 8px !important;
+    font-weight: 700 !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+.btn-action-detail img,
+.btn-action-detail i {
+    transition: filter 0.2s ease-in-out !important;
+}
+
+.btn-action-detail:hover,
+.btn-action-detail:focus,
+.btn-action-detail:active {
+    background-color: #3A7BF6 !important;
+    color: #ffffff !important;
+    border-color: #3A7BF6 !important;
+    box-shadow: none !important;
+}
+
+.btn-action-detail:hover img,
+.btn-action-detail:hover i {
+    filter: brightness(0) invert(1) !important;
 }
