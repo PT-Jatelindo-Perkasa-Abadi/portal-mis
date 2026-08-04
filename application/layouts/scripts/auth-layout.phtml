@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-    <?= $this->headTitle('Portal MIS')->setSeparator(' - '); ?>
+    <?= $this->headTitle('ASP Portal Biller')->setSeparator(' - '); ?>
     <meta name="theme-color" content="#0092D5">
     <link rel="apple-touch-icon" href="<?= $this->baseUrl('/assets/img/cropped-Jatelindo-Warna-180x180.webp'); ?>" />
     <link rel="shortcut icon" href="<?= $this->baseUrl('/assets/img/'); ?>icon-launcher.png" />
@@ -31,15 +31,16 @@
     </div>
 
     <div class="main">
-    <div class="auth-side-cover">
-        <div class="d-flex align-items-start">
-            <img src="<?= $this->baseUrl('assets/img/logo-asp-white.svg'); ?>" class="img-fluid" style="width: 160px; height: auto;" />
+        <div class="auth-side-cover">
+            <div class="d-flex align-items-start">
+                <img src="<?= $this->baseUrl('assets/img/logo-asp-white.svg'); ?>" class="img-fluid"
+                    style="width: 160px; height: auto;" />
+            </div>
+        </div>
+        <div class="auth-side-form">
+            <?=$this->layout()->content; ?>
         </div>
     </div>
-    <div class="auth-side-form">
-        <?=$this->layout()->content; ?>
-    </div>
-</div>
 </body>
 
 </html>
