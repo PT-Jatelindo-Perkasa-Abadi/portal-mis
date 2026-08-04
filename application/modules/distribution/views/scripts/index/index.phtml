@@ -47,16 +47,6 @@ if (!empty($activeDate)) {
     $badgeDateLabel = date('d/m/Y');
 }
 
-$hasItProviderAccess = ($this->isAllowed('user:index', 'create') || $this->isAllowed('distribution:index', 'it-provider'));
-
-if (!$hasItProviderAccess) {
-    $this->activeTab = 'mitra';
-} else {
-    if (empty($this->activeTab)) {
-        $this->activeTab = 'it-provider';
-    }
-}
-
 // 🎯 LOGIKA BADGE LAYANAN SINKRON DENGAN SEARCH
 $activeService = !empty($this->filters['service']) ? strtolower($this->filters['service']) : '';
 $searchText    = isset($this->filters['search']) ? strtolower(trim($this->filters['search'])) : '';

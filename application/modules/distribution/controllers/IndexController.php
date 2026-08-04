@@ -5,9 +5,16 @@ class Distribution_IndexController extends Zend_Controller_Action
     public function indexAction()
     {
         $this->view->isError = false;
-        $this->view->currentUser = App_Service_Session::get('user');
 
-        $activeTab = $this->_getParam('type', 'it-provider');
+        // $this->view->currentUser = App_Service_Session::get('user');
+        // $activeTab = $this->_getParam('type', 'it-provider');
+
+        $currentUser = App_Service_Session::get('user');
+        $this->view->currentUser = $currentUser;
+
+        $currentParam = $currentUser['level'] == 'IT Provider' ? 'mitra' : 'it-provider';
+        $activeTab = $this->_getParam('type', $currentParam);
+
 
         date_default_timezone_set('Asia/Jakarta');
         $today = date('Y-m-d');
@@ -71,6 +78,9 @@ class Distribution_IndexController extends Zend_Controller_Action
             'mitra_code' => $filterMitra
         ];
     }
+
+
+
 
     // public function indexAction()
     // {

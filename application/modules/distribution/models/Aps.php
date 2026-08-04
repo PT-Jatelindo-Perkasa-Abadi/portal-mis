@@ -250,7 +250,16 @@ class Distribution_Model_Aps
         set_include_path(get_include_path() . PATH_SEPARATOR . APPLICATION_PATH . '/../library');
         require_once '../library/Spreadsheet/Excel/Writer.php';
 
-        $filename = "Rangkuman_Distribusi_" . ($activeTab === 'mitra' ? 'Mitra' : 'ITP') . "_" . date('Ymd_His') . ".xls";
+        // Penentuan label berdasarkan tab aktif
+        $isSubMitra = ($activeTab === 'submitra' || $activeTab === 'mitra');
+
+        $fileSuffix  = $isSubMitra ? 'Sub_Mitra_Acquirer' : 'Mitra_Acquirer';
+        $labelHeader = $isSubMitra ? 'SUB MITRA ACQUIRER' : 'MITRA ACQUIRER';
+        $colCode     = $isSubMitra ? 'Kode Sub Mitra' : 'Kode Mitra Acquirer';
+        $colName     = $isSubMitra ? 'Nama Sub Mitra' : 'Nama Mitra Acquirer';
+        $colAdmin    = $isSubMitra ? 'Admin Sub Mitra (Rp)' : 'Admin Mitra Acquirer (Rp)';
+
+        $filename = "Rangkuman_Distribusi_" . $fileSuffix . "_" . date('Ymd_His') . ".xls";
 
         $workbook = new Spreadsheet_Excel_Writer();
         $workbook->send($filename);
@@ -294,21 +303,19 @@ class Distribution_Model_Aps
         $format_total_text->setAlign('center');
         $format_total_text->setBorder(1);
 
+        // Penyesuaian lebar kolom agar teks header baru muat
         $worksheet->setColumn(0, 0, 8);
-        $worksheet->setColumn(1, 1, 18);
-        $worksheet->setColumn(2, 2, 32);
+        $worksheet->setColumn(1, 1, 22);
+        $worksheet->setColumn(2, 2, 35);
         $worksheet->setColumn(3, 3, 16);
         $worksheet->setColumn(4, 4, 14);
         $worksheet->setColumn(5, 5, 20);
-        $worksheet->setColumn(6, 6, 20);
+        $worksheet->setColumn(6, 6, 26);
         $worksheet->setColumn(7, 7, 20);
-
-        $colCode = ($activeTab === 'mitra') ? 'Kode Mitra' : 'Kode IT Provider';
-        $colName = ($activeTab === 'mitra') ? 'Nama Mitra' : 'Nama IT Provider';
 
         $worksheet->write(0, 0, "REKAP RANGKUMAN DISTRIBUSI", $format_bold);
         $worksheet->write(1, 0, "PERIODE FILTER TANGGAL : " . $filterDate, $format_bold);
-        $worksheet->write(2, 0, "KATEGORI DISTRIBUSI   : " . strtoupper($activeTab), $format_bold);
+        $worksheet->write(2, 0, "KATEGORI DISTRIBUSI   : " . $labelHeader, $format_bold);
 
         $worksheet->write(4, 0, 'No', $format_header);
         $worksheet->write(4, 1, $colCode, $format_header);
@@ -316,7 +323,7 @@ class Distribution_Model_Aps
         $worksheet->write(4, 3, 'Layanan', $format_header);
         $worksheet->write(4, 4, 'Lembar', $format_header);
         $worksheet->write(4, 5, 'Tagihan (Rp)', $format_header);
-        $worksheet->write(4, 6, 'Admin ITP (Rp)', $format_header);
+        $worksheet->write(4, 6, $colAdmin, $format_header);
         $worksheet->write(4, 7, 'Total (Rp)', $format_header);
 
         $total_lembar = 0;
