@@ -323,7 +323,7 @@ class User_IndexController extends App_Controller_Base
 
                     $emailPayload = [
                         'to' => [$email],
-                        'subject' => 'Informasi Akun Baru - Portal MIS',
+                        'subject' => 'Informasi Akun Baru - ASP Portal Biller',
                         'body' => $body,
                         'isHtml' => true
                     ];
@@ -529,7 +529,7 @@ class User_IndexController extends App_Controller_Base
             );
             $emailPayload = [
                 'to' => [$email],
-                'subject' => 'Informasi Akun Baru - Portal MIS',
+                'subject' => 'Informasi Akun Baru - ASP Portal Biller',
                 'body' => $body,
                 'isHtml' => true
             ];
@@ -631,7 +631,7 @@ class User_IndexController extends App_Controller_Base
 
                     $emailPayload = [
                         'to' => [$email],
-                        'subject' => 'Pemberitahuan Perubahan Kata Sandi - Portal MIS',
+                        'subject' => 'Pemberitahuan Perubahan Kata Sandi - ASP Portal Biller',
                         'body' => $body,
                         'isHtml' => true
                     ];
