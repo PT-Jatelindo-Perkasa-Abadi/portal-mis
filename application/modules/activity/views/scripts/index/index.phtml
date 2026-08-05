@@ -12,8 +12,10 @@
                 <div class="row g-3 mt-2">
                     <form method="POST" action="" class="d-flex align-items-center gap-3 w-100 m-0">
                         <div class="col-md-1">
-                            <select class="form-select c-14">
+                            <select id="lengthData" class="form-select c-14">
                                 <option>10</option>
+                                <option>25</option>
+                                <option>50</option>
                             </select>
                         </div>
 
@@ -22,7 +24,8 @@
                                 <span class="search-icon">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                                         <circle cx="11" cy="11" r="7" stroke="#9CA3AF" stroke-width="2" />
-                                        <path d="M20 20L17 17" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" />
+                                        <path d="M20 20L17 17" stroke="#9CA3AF" stroke-width="2"
+                                            stroke-linecap="round" />
                                     </svg>
                                 </span>
                                 <input type="text" class="form-control search-input" placeholder="Cari" id="keyword">
@@ -30,14 +33,15 @@
                         </div>
 
                         <div class="col-md-2 calendar-input-container">
-                            <input type="date" class="custom-date-input-with-icon empty-date-logic" value="<?= date('Y-m-d'); ?>" data-placeholder="Pilih tanggal" required>
+                            <input type="date" class="custom-date-input-with-icon empty-date-logic"
+                                value="<?= date('Y-m-d'); ?>" data-placeholder="Pilih tanggal" required>
                         </div>
 
                         <div class="col-md-2 c-14">
                             <select class="form-select select2" id="leveluser" style="width:100% !important;">
                                 <option value=""></option>
                                 <?php foreach ($this->listDatalevel as $key => $value) { ?>
-                                    <?php
+                                <?php
                                     $displayLvlName = $value['level_name'];
                                     if (strcasecmp($displayLvlName, 'Admin MIS') === 0 || strcasecmp($displayLvlName, 'MIS') === 0) {
                                         $displayLvlName = 'ASP';
@@ -45,9 +49,9 @@
                                         $displayLvlName = 'Mitra Acquirer';
                                     }
                                     ?>
-                                    <option value="<?php echo $value['id']; ?>">
-                                        <?php echo $displayLvlName; ?>
-                                    </option>
+                                <option value="<?php echo $value['id']; ?>">
+                                    <?php echo $displayLvlName; ?>
+                                </option>
                                 <?php } ?>
                             </select>
                         </div>
@@ -56,9 +60,9 @@
                             <select class="form-select select2" id="roleuser" style="width:100% !important;">
                                 <option value=""></option>
                                 <?php foreach ($this->listDataRoles as $key => $value) { ?>
-                                    <option value="<?php echo $value['id']; ?>">
-                                        <?php echo $value['role_name']; ?>
-                                    </option>
+                                <option value="<?php echo $value['id']; ?>">
+                                    <?php echo $value['role_name']; ?>
+                                </option>
                                 <?php } ?>
                             </select>
                         </div>
@@ -73,12 +77,20 @@
 
                 <!-- Badges Filter -->
                 <div class="d-flex gap-3 mt-3">
-                    <div id="badge-date-report" class="rounded-3 d-flex align-items-center justify-content-center px-3" style="height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600;">
+                    <div id="badge-date-report" class="rounded-3 d-flex align-items-center justify-content-center px-3"
+                        style="height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600;">
                         Tanggal <?= date("d/m/Y"); ?>
                     </div>
-                    <div id="badge-level-activity" class="rounded-3 d-flex align-items-center justify-content-center px-3" style="height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600; display: none !important;"></div>
-                    <div id="badge-role-activity" class="rounded-3 d-flex align-items-center justify-content-center px-3" style="height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600; display: none !important;"></div>
-                    <button class="btn btn-link text-dark c-14" id="btn-report-reset" style="color: #595C60; font-size: 14px; text-decoration: none;">
+                    <div id="badge-level-activity"
+                        class="rounded-3 d-flex align-items-center justify-content-center px-3"
+                        style="height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600; display: none !important;">
+                    </div>
+                    <div id="badge-role-activity"
+                        class="rounded-3 d-flex align-items-center justify-content-center px-3"
+                        style="height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600; display: none !important;">
+                    </div>
+                    <button class="btn btn-link text-dark c-14" id="btn-report-reset"
+                        style="color: #595C60; font-size: 14px; text-decoration: none;">
                         Reset Data
                     </button>
                 </div>
@@ -102,17 +114,17 @@
                     </thead>
                     <tbody>
                         <?php for ($i = 0; $i < 6; $i++): ?>
-                            <tr style="height: 64px;">
-                                <td class="text-center"><span class="skeleton-box sk-w-30"></span></td>
-                                <td><span class="skeleton-box sk-w-80"></span></td>
-                                <td><span class="skeleton-box sk-w-80"></span></td>
-                                <td><span class="skeleton-box sk-w-100"></span></td>
-                                <td><span class="skeleton-box sk-w-60"></span></td>
-                                <td><span class="skeleton-box sk-w-60"></span></td>
-                                <td><span class="skeleton-box sk-w-80"></span></td>
-                                <td><span class="skeleton-box sk-w-60"></span></td>
-                                <td><span class="skeleton-box sk-w-100"></span></td>
-                            </tr>
+                        <tr style="height: 64px;">
+                            <td class="text-center"><span class="skeleton-box sk-w-30"></span></td>
+                            <td><span class="skeleton-box sk-w-80"></span></td>
+                            <td><span class="skeleton-box sk-w-80"></span></td>
+                            <td><span class="skeleton-box sk-w-100"></span></td>
+                            <td><span class="skeleton-box sk-w-60"></span></td>
+                            <td><span class="skeleton-box sk-w-60"></span></td>
+                            <td><span class="skeleton-box sk-w-80"></span></td>
+                            <td><span class="skeleton-box sk-w-60"></span></td>
+                            <td><span class="skeleton-box sk-w-100"></span></td>
+                        </tr>
                         <?php endfor; ?>
                     </tbody>
                 </table>
