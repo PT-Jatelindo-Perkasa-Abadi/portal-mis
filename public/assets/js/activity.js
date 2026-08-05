@@ -1,6 +1,9 @@
 $(document).ready(function () {
+
+    // 1. Matikan Popup Alert Warning DataTables
     $.fn.dataTable.ext.errMode = 'throw';
 
+    // 2. Helper Shimmer Loading (Skeleton 6 Baris Capsule)
     function renderTableShimmer() {
         var shimmerRows = '';
         for (var i = 0; i < 6; i++) {
@@ -20,18 +23,24 @@ $(document).ready(function () {
         $('#activitynow tbody').html(shimmerRows);
     }
 
+    // 3. Inisialisasi Select2
     $('#leveluser').select2({ placeholder: "Pilih Level User", width: '100%', allowClear: true });
     $('#roleuser').select2({ placeholder: "Pilih Role", width: '100%', allowClear: true });
 
+    // 4. Button Search Handler
     $('#btnSearchActivity').on('click', function () {
+        let length = parseInt($('#lengthData').val(), 10);
+
         renderTableShimmer();
-        table.ajax.reload(null, true);
+        table.page.len(length);
+        $('#activitynow').DataTable().ajax.reload(null, true);
     });
 
+    // 5. Inisialisasi DataTables dengan Ukuran Kolom Terkunci
     var table = $('#activitynow').DataTable({
         scrollX: true,
         scrollCollapse: true,
-        autoWidth: false,
+        autoWidth: false, // Wajib false agar menggunakan width dari JS
         responsive: false,
         processing: false,
         serverSide: true,
@@ -66,34 +75,51 @@ $(document).ready(function () {
 
         drawCallback: function () {
             var api = this.api();
-            $('.dataTables_scrollBody thead').remove();
-
-            setTimeout(function () {
-                api.columns.adjust();
-            }, 50);
+            if (api.page.info().recordsDisplay == 0) {
+                $('.dataTables_bottom').hide();
+            } else {
+                $('.dataTables_bottom').show();
+            }
+            // Force re-align header dan body setiap selesai render
+            api.columns.adjust();
         },
 
-        // Total sum = 70 + 160 + 160 + 220 + 140 + 150 + 150 + 160 + 410 = 1620px
+        // Diberikan width spesifik pada setiap kolom agar LURUS SEJAJAR 100%
         columns: [
             {
                 data: null,
                 orderable: false,
                 defaultContent: '-',
-                width: '70px',
+                width: '60px',
                 className: 'text-center c-12',
                 render: function (data, type, row, meta) {
                     return meta.settings._iDisplayStart + meta.row + 1;
                 }
             },
-            { data: 'created_at', defaultContent: '-', width: '160px', className: 'c-12' },
-            { data: 'full_name', defaultContent: '-', width: '160px', className: 'c-12' },
-            { data: 'email', defaultContent: '-', width: '220px', className: 'c-12' },
+            {
+                data: 'created_at',
+                defaultContent: '-',
+                width: '180px',
+                className: 'c-12',
+            },
+            {
+                data: 'full_name',
+                defaultContent: '-',
+                width: '180px',
+                className: 'c-12',
+            },
+            {
+                data: 'email',
+                defaultContent: '-',
+                width: '250px',
+                className: 'c-12',
+            },
             {
                 data: 'level_name',
                 defaultContent: '-',
                 width: '140px',
                 className: 'c-12',
-                render: function (data) {
+                render: function (data, type, row) {
                     if (!data) return '-';
                     var lvl = data.toString().trim().toLowerCase();
                     if (lvl === 'admin mis' || lvl === 'mis' || lvl === 'asp') {
@@ -104,14 +130,56 @@ $(document).ready(function () {
                     return data;
                 }
             },
-            { data: 'role_name', defaultContent: '-', width: '150px', className: 'c-12' },
-            { data: 'menu', defaultContent: '-', width: '150px', className: 'c-12' },
-            { data: 'browser', defaultContent: '-', width: '160px', className: 'c-12' },
-            { data: 'deskripsi', defaultContent: '-', width: '410px', className: 'c-12 col-deskripsi' }
+            {
+                data: 'role_name',
+                defaultContent: '-',
+                width: '160px',
+                className: 'c-12',
+                render: function (data, type, row) {
+                    const role = data;
+                    const roleName = role.charAt(0).toUpperCase() + role.slice(1);
+
+                    return roleName;
+                }
+            },
+            {
+                data: 'menu',
+                defaultContent: '-',
+                width: '160px',
+                className: 'c-12',
+                render: function (data, type, row) {
+                    const menu = data;
+                    const menuName = menu.charAt(0).toUpperCase() + menu.slice(1);
+
+                    return menuName;
+                }
+            },
+            {
+                data: 'browser',
+                defaultContent: '-',
+                width: '180px',
+                className: 'c-12',
+            },
+            {
+                data: 'deskripsi',
+                defaultContent: '-',
+                width: '300px',
+                className: 'c-12',
+            }
         ]
     });
 
+    // Sesuaikan kembali kolom ketika ukuran jendela browser berubah
     $(window).on('resize', function () {
         table.columns.adjust();
     });
+
+    // Disable enter keyword search
+    $('#keyword').on('keydown', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            return false;
+        }
+    });
+
 });
