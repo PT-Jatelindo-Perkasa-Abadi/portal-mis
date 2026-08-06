@@ -5,17 +5,15 @@
     <div class="card card-dashboard rounded-4 overflow-hidden">
         <div class="card-body p-0 overflow-hidden">
 
+            <!-- Header (Tetap Terlihat) -->
             <div class="p-4">
-
-                <!-- Header -->
                 <div class="d-flex justify-content-between align-items-center">
-
                     <h5 class="fw-bold m-0 c-16">
                         List Data
                     </h5>
 
                     <button
-                        class="btn btn-link p-0 border-0 shadow-none"
+                        class="btn btn-link p-0 border-0 shadow-none card-header-toggle"
                         type="button"
                         data-bs-toggle="collapse"
                         data-bs-target="#activityContent"
@@ -24,6 +22,7 @@
 
                         <svg
                             id="collapseArrow"
+                            class="icon-toggle-collapse"
                             xmlns="http://www.w3.org/2000/svg"
                             width="20"
                             height="20"
@@ -40,11 +39,14 @@
                         </svg>
 
                     </button>
-
                 </div>
+            </div>
 
-                <!-- COLLAPSE -->
-                <div class="collapse show mt-3" id="activityContent">
+            <!-- 🎯 PEMBUNGKUS COLLAPSE (Membungkus Filter, Badge, Tabel & Pagination) -->
+            <div class="collapse show" id="activityContent">
+
+                <!-- Section Filter & Badges -->
+                <div class="px-4 pt-2 pb-3">
 
                     <!-- Filter -->
                     <div class="row g-3 mt-2">
@@ -114,7 +116,7 @@
                     </div>
 
                     <!-- Badges Filter -->
-                    <div class="d-flex gap-3 mt-3">
+                    <div class="d-flex align-items-center gap-3 mt-2">
                         <div id="badge-date-report" class="rounded-3 d-flex align-items-center justify-content-center px-3"
                             style="height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600;">
                             Tanggal <?= date("d/m/Y"); ?>
@@ -133,47 +135,46 @@
                         </button>
                     </div>
 
-                    <hr>
-
-                    <div class="table-container w-100 position-relative overflow-hidden">
-                        <table class="table table-hover align-middle w-100 m-0" id="activitynow">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Tanggal & Waktu</th>
-                                    <th>Nama User</th>
-                                    <th>Email</th>
-                                    <th>Level&nbsp;User</th>
-                                    <th>Role</th>
-                                    <th>Aktivitas</th>
-                                    <th>Browser</th>
-                                    <th class="col-deskripsi">Deskripsi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php for ($i = 0; $i < 6; $i++): ?>
-                                    <tr style="height: 64px;">
-                                        <td class="text-center"><span class="skeleton-box sk-w-30"></span></td>
-                                        <td><span class="skeleton-box sk-w-80"></span></td>
-                                        <td><span class="skeleton-box sk-w-80"></span></td>
-                                        <td><span class="skeleton-box sk-w-100"></span></td>
-                                        <td><span class="skeleton-box sk-w-60"></span></td>
-                                        <td><span class="skeleton-box sk-w-60"></span></td>
-                                        <td><span class="skeleton-box sk-w-80"></span></td>
-                                        <td><span class="skeleton-box sk-w-60"></span></td>
-                                        <td><span class="skeleton-box sk-w-100"></span></td>
-                                    </tr>
-                                <?php endfor; ?>
-                            </tbody>
-                        </table>
-                    </div>
-
                 </div>
-                <!-- END COLLAPSE -->
 
-            </div>
+                <!-- Area Scroll Khusus Tabel (Sekarang ikut tertutup) -->
+                <div class="table-container w-100 position-relative overflow-hidden">
+                    <table class="table table-hover align-middle w-100 m-0" id="activitynow">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Tanggal & Waktu</th>
+                                <th>Nama User</th>
+                                <th>Email</th>
+                                <th>Level&nbsp;User</th>
+                                <th>Role</th>
+                                <th>Aktivitas</th>
+                                <th>Browser</th>
+                                <th class="col-deskripsi">Deskripsi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php for ($i = 0; $i < 6; $i++): ?>
+                                <tr style="height: 64px;">
+                                    <td class="text-center"><span class="skeleton-box sk-w-30"></span></td>
+                                    <td><span class="skeleton-box sk-w-80"></span></td>
+                                    <td><span class="skeleton-box sk-w-80"></span></td>
+                                    <td><span class="skeleton-box sk-w-100"></span></td>
+                                    <td><span class="skeleton-box sk-w-60"></span></td>
+                                    <td><span class="skeleton-box sk-w-60"></span></td>
+                                    <td><span class="skeleton-box sk-w-80"></span></td>
+                                    <td><span class="skeleton-box sk-w-60"></span></td>
+                                    <td><span class="skeleton-box sk-w-100"></span></td>
+                                </tr>
+                            <?php endfor; ?>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Tempatkan Pagination di sini jika ada -->
+
+            </div> <!-- 🎯 END COLLAPSE -->
 
         </div>
     </div>
-
 </div>

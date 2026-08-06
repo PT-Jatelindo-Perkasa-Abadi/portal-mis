@@ -2,7 +2,6 @@ $(document).ready(function () {
 
     $.fn.dataTable.ext.errMode = 'throw';
 
-
     const activityContent = document.getElementById('activityContent');
     const collapseArrow = document.getElementById('collapseArrow');
 
@@ -41,24 +40,69 @@ $(document).ready(function () {
         $('#activitynow tbody').html(shimmerRows);
     }
 
-    // 3. Inisialisasi Select2
     $('#leveluser').select2({ placeholder: "Pilih Level User", width: '100%', allowClear: true });
     $('#roleuser').select2({ placeholder: "Pilih Role", width: '100%', allowClear: true });
 
-    // 4. Button Search Handler
+    function updateBadges() {
+        let dateVal = $('.custom-date-input-with-icon').val();
+        if (dateVal) {
+            let parts = dateVal.split('-');
+            if (parts.length === 3) {
+                $('#badge-date-report').text('Tanggal ' + parts[2] + '/' + parts[1] + '/' + parts[0]).show();
+            }
+        } else {
+            $('#badge-date-report').hide();
+        }
+
+        let levelVal = $('#leveluser').val();
+        let levelText = $('#leveluser option:selected').text().trim();
+        if (levelVal && levelVal !== '') {
+            $('#badge-level-activity')
+                .text(levelText)
+                .attr('style', 'height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600; display: flex !important;');
+        } else {
+            $('#badge-level-activity').attr('style', 'display: none !important;');
+        }
+
+        let roleVal = $('#roleuser').val();
+        let roleText = $('#roleuser option:selected').text().trim();
+        if (roleVal && roleVal !== '') {
+            $('#badge-role-activity')
+                .text(roleText)
+                .attr('style', 'height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600; display: flex !important;');
+        } else {
+            $('#badge-role-activity').attr('style', 'display: none !important;');
+        }
+    }
+
+    $('#btn-report-reset').on('click', function (e) {
+        e.preventDefault();
+
+        var today = new Date().toISOString().split('T')[0];
+        $('.custom-date-input-with-icon').val(today);
+        $('#leveluser').val(null).trigger('change.select2');
+        $('#roleuser').val(null).trigger('change.select2');
+        $('#keyword').val('');
+
+        updateBadges();
+
+        renderTableShimmer();
+        table.ajax.reload(null, true);
+    });
+
     $('#btnSearchActivity').on('click', function () {
         let length = parseInt($('#lengthData').val(), 10) || 10;
 
+        updateBadges();
         renderTableShimmer();
         table.page.len(length);
         table.ajax.reload(null, true);
     });
 
-    // 5. Inisialisasi DataTables dengan Ukuran Kolom Terkunci
     var table = $('#activitynow').DataTable({
         scrollX: true,
         scrollCollapse: true,
-        autoWidth: false, // Wajib false agar menggunakan width dari JS
+        autoWidth: false,
         responsive: false,
         processing: false,
         serverSide: true,
@@ -196,6 +240,7 @@ $(document).ready(function () {
     $('#keyword').on('keydown', function (e) {
         if (e.key === 'Enter') {
             e.preventDefault();
+            $('#btnSearchActivity').click();
             return false;
         }
     });
