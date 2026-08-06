@@ -41,9 +41,11 @@ $(document).ready(function () {
         $('#activitynow tbody').html(shimmerRows);
     }
 
+    // 3. Inisialisasi Select2
     $('#leveluser').select2({ placeholder: "Pilih Level User", width: '100%', allowClear: true });
     $('#roleuser').select2({ placeholder: "Pilih Role", width: '100%', allowClear: true });
 
+    // 4. Button Search Handler
     $('#btnSearchActivity').on('click', function () {
         let length = parseInt($('#lengthData').val(), 10) || 10;
 
@@ -52,10 +54,11 @@ $(document).ready(function () {
         table.ajax.reload(null, true);
     });
 
+    // 5. Inisialisasi DataTables dengan Ukuran Kolom Terkunci
     var table = $('#activitynow').DataTable({
         scrollX: true,
         scrollCollapse: true,
-        autoWidth: false,
+        autoWidth: false, // Wajib false agar menggunakan width dari JS
         responsive: false,
         processing: false,
         serverSide: true,
