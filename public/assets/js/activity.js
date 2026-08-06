@@ -2,7 +2,6 @@ $(document).ready(function () {
 
     $.fn.dataTable.ext.errMode = 'throw';
 
-    // 1. Logic Collapse Arrow
     const activityContent = document.getElementById('activityContent');
     const collapseArrow = document.getElementById('collapseArrow');
 
@@ -18,7 +17,6 @@ $(document).ready(function () {
 
     }
 
-    // 2. Shimmer Skeleton Loading
     function renderTableShimmer() {
         var shimmerRows = '';
         var currentLimit = parseInt($('#lengthData').val(), 10) || 10;
@@ -42,16 +40,10 @@ $(document).ready(function () {
         $('#activitynow tbody').html(shimmerRows);
     }
 
-    // 3. Inisialisasi Select2
     $('#leveluser').select2({ placeholder: "Pilih Level User", width: '100%', allowClear: true });
     $('#roleuser').select2({ placeholder: "Pilih Role", width: '100%', allowClear: true });
 
-<<<<<<< HEAD
-    // 4. Button Search Handler
-=======
-    // 4. Logic Manajemen Badge Filter
     function updateBadges() {
-        // Badge Tanggal
         let dateVal = $('.custom-date-input-with-icon').val();
         if (dateVal) {
             let parts = dateVal.split('-');
@@ -62,7 +54,6 @@ $(document).ready(function () {
             $('#badge-date-report').hide();
         }
 
-        // Badge Level User
         let levelVal = $('#leveluser').val();
         let levelText = $('#leveluser option:selected').text().trim();
         if (levelVal && levelVal !== '') {
@@ -73,7 +64,6 @@ $(document).ready(function () {
             $('#badge-level-activity').attr('style', 'display: none !important;');
         }
 
-        // Badge Role
         let roleVal = $('#roleuser').val();
         let roleText = $('#roleuser option:selected').text().trim();
         if (roleVal && roleVal !== '') {
@@ -85,11 +75,9 @@ $(document).ready(function () {
         }
     }
 
-    // Handle Klik Tombol Reset Data
     $('#btn-report-reset').on('click', function (e) {
         e.preventDefault();
 
-        // Reset nilai Form
         var today = new Date().toISOString().split('T')[0];
         $('.custom-date-input-with-icon').val(today);
         $('#leveluser').val(null).trigger('change.select2');
@@ -98,13 +86,10 @@ $(document).ready(function () {
 
         updateBadges();
 
-        // Reload Tabel
         renderTableShimmer();
         table.ajax.reload(null, true);
     });
 
-    // 5. Button Search Handler (Trigger Utama Badge & Data)
->>>>>>> 87c33fc (update outline stroke)
     $('#btnSearchActivity').on('click', function () {
         let length = parseInt($('#lengthData').val(), 10) || 10;
 
@@ -114,15 +99,10 @@ $(document).ready(function () {
         table.ajax.reload(null, true);
     });
 
-<<<<<<< HEAD
-    // 5. Inisialisasi DataTables dengan Ukuran Kolom Terkunci
-=======
-    // 6. Inisialisasi DataTables
->>>>>>> 87c33fc (update outline stroke)
     var table = $('#activitynow').DataTable({
         scrollX: true,
         scrollCollapse: true,
-        autoWidth: false, // Wajib false agar menggunakan width dari JS
+        autoWidth: false,
         responsive: false,
         processing: false,
         serverSide: true,
