@@ -369,6 +369,7 @@ if ($itpVisible && $tpCode !== null) {
                 <p class="text-secondary mb-4 px-2" style="font-size: 14px;">Data user telah berhasil diperbarui</p>
 
                 <button type="button" id="btnSelesaiEdit"
+                    data-redirect-url="<?= $this->baseUrl('user'); ?>"
                     class="btn w-100 py-2.5 fw-bold text-white rounded-3 shadow-sm"
                     style="background-color: #3b82f6; border: none; font-size: 14px; height: 44px;">
                     Oke
@@ -378,133 +379,6 @@ if ($itpVisible && $tpCode !== null) {
     </div>
 </div>
 
-<script type="text/javascript">
-    document.addEventListener("DOMContentLoaded", function() {
-        // Level yang mewajibkan pilihan IT Provider (ID 2 = Mitra Acquirer)
-        const ITP_LEVEL_ID = '2';
 
-        const ctxItp = document.getElementById('ctx-itp');
-        const inputItp = document.getElementById('input-itp');
-        const labelItp = document.getElementById('label-itp');
-        const itpError = document.getElementById('itp-error');
-        const btnItp = document.getElementById('btn-itp');
 
-        function toggleItp(levelValue) {
-            if (levelValue === ITP_LEVEL_ID) {
-                ctxItp.classList.remove('d-none');
-            } else {
-                ctxItp.classList.add('d-none');
-                inputItp.value = '';
-                labelItp.textContent = 'Pilih IT provider';
-                labelItp.style.setProperty('color', '#B8B9BB', 'important');
-                hideItpError();
-            }
-        }
-
-        function showItpError() {
-            itpError.classList.remove('d-none');
-            btnItp.classList.add('border-danger');
-        }
-
-        function hideItpError() {
-            itpError.classList.add('d-none');
-            btnItp.classList.remove('border-danger');
-        }
-
-        const dropdownItems = document.querySelectorAll(".dropdown-menu a");
-
-        dropdownItems.forEach(item => {
-            item.addEventListener("click", function(e) {
-                e.preventDefault();
-
-                const value = this.getAttribute("data-value");
-                const text = this.textContent;
-
-                const dropdownContainer = this.closest(".col-md-6");
-                const buttonLabel = dropdownContainer.querySelector("button span");
-
-                buttonLabel.textContent = text;
-
-                if (dropdownContainer.id === "ctx-status") {
-                    document.getElementById("input-status").value = value;
-                } else if (dropdownContainer.id === "ctx-level") {
-                    document.getElementById("input-level").value = value;
-                    toggleItp(value);
-                } else if (dropdownContainer.id === "ctx-role") {
-                    document.getElementById("input-role").value = value;
-                } else if (dropdownContainer.id === "ctx-itp") {
-                    inputItp.value = value;
-                    labelItp.style.setProperty('color', '#12161C', 'important');
-                    hideItpError();
-                }
-            });
-        });
-
-        var modalKonfirmasi = new bootstrap.Modal(document.getElementById('modalKonfirmasiEdit'));
-        var modalLoading = new bootstrap.Modal(document.getElementById('modalLoadingEdit'));
-        var modalSukses = new bootstrap.Modal(document.getElementById('modalSuksesEdit'));
-
-        document.getElementById('formEditUser').addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const levelVal = document.getElementById('input-level').value;
-            const roleVal = document.getElementById('input-role').value;
-
-            if (levelVal === "" || roleVal === "") {
-                alert("Mohon lengkapi pilihan Level User dan Role terlebih dahulu.");
-                return false;
-            }
-
-            if (levelVal === ITP_LEVEL_ID && inputItp.value === '') {
-                showItpError();
-                ctxItp.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center'
-                });
-                return false;
-            }
-
-            modalKonfirmasi.show();
-        });
-
-        document.getElementById('btnProsesUpdate').addEventListener('click', function() {
-            modalKonfirmasi.hide();
-            modalLoading.show();
-
-            const form = document.getElementById('formEditUser');
-            const formData = new FormData(form);
-
-            fetch(form.action, {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.text().then(text => {
-                            throw new Error(text)
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    modalLoading.hide();
-
-                    if (data.success || data.code == 200) {
-                        modalSukses.show();
-                    } else {
-                        alert("Gagal memperbarui data: " + data.msg);
-                    }
-                })
-                .catch(error => {
-                    modalLoading.hide();
-                    console.error("Error Detail:", error.message);
-                    alert("Terjadi kesalahan sistem:\n" + error.message.substring(0, 200));
-                });
-        });
-
-        document.getElementById('btnSelesaiEdit').addEventListener('click', function() {
-            modalSukses.hide();
-            window.location.href = "<?= $this->baseUrl('user'); ?>";
-        });
-    });
-</script>
+<script src="<?= $this->baseUrl('assets/js/user/user-edit.js'); ?>"></script>

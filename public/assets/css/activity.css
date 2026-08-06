@@ -270,3 +270,18 @@ table.dataTable thead th,
 .btn-action-detail:hover i {
     filter: brightness(0) invert(1) !important;
 }
+
+.card-dashboard{
+    border:1px solid #E5E7EB;
+    border-radius:24px;
+    background:#FFFFFF;
+    box-shadow:none;
+}
+
+#collapseArrow{
+    transition: .25s ease;
+}
+
+#collapseArrow.collapsed{
+    transform: rotate(180deg);
+}

@@ -1,12 +1,30 @@
 $(document).ready(function () {
 
-    // 1. Matikan Popup Alert Warning DataTables
     $.fn.dataTable.ext.errMode = 'throw';
 
-    // 2. Helper Shimmer Loading (Skeleton 6 Baris Capsule)
+
+    const activityContent = document.getElementById('activityContent');
+    const collapseArrow = document.getElementById('collapseArrow');
+
+    if (activityContent && collapseArrow) {
+
+        activityContent.addEventListener('hide.bs.collapse', function () {
+            collapseArrow.classList.add('collapsed');
+        });
+
+        activityContent.addEventListener('show.bs.collapse', function () {
+            collapseArrow.classList.remove('collapsed');
+        });
+
+    }
+
     function renderTableShimmer() {
         var shimmerRows = '';
-        for (var i = 0; i < 6; i++) {
+        var currentLimit = parseInt($('#lengthData').val(), 10) || 10;
+
+        var totalShimmer = Math.min(currentLimit, 10);
+
+        for (var i = 0; i < totalShimmer; i++) {
             shimmerRows += `
                 <tr style="height: 64px;">
                     <td class="text-center"><span class="skeleton-box sk-w-30"></span></td>
@@ -29,11 +47,11 @@ $(document).ready(function () {
 
     // 4. Button Search Handler
     $('#btnSearchActivity').on('click', function () {
-        let length = parseInt($('#lengthData').val(), 10);
+        let length = parseInt($('#lengthData').val(), 10) || 10;
 
         renderTableShimmer();
         table.page.len(length);
-        $('#activitynow').DataTable().ajax.reload(null, true);
+        table.ajax.reload(null, true);
     });
 
     // 5. Inisialisasi DataTables dengan Ukuran Kolom Terkunci
@@ -47,7 +65,7 @@ $(document).ready(function () {
         searching: false,
         ordering: true,
         lengthChange: false,
-        pageLength: 10,
+        pageLength: parseInt($('#lengthData').val(), 10) || 10,
         destroy: true,
 
         language: {
@@ -70,6 +88,7 @@ $(document).ready(function () {
                 d.leveluser = $('#leveluser').val();
                 d.roleuser = $('#roleuser').val();
                 d.keyword = $('#keyword').val();
+                d.length = $('#lengthData').val();
             }
         },
 
@@ -80,11 +99,10 @@ $(document).ready(function () {
             } else {
                 $('.dataTables_bottom').show();
             }
-            // Force re-align header dan body setiap selesai render
+
             api.columns.adjust();
         },
 
-        // Diberikan width spesifik pada setiap kolom agar LURUS SEJAJAR 100%
         columns: [
             {
                 data: null,
@@ -136,10 +154,8 @@ $(document).ready(function () {
                 width: '160px',
                 className: 'c-12',
                 render: function (data, type, row) {
-                    const role = data;
-                    const roleName = role.charAt(0).toUpperCase() + role.slice(1);
-
-                    return roleName;
+                    if (!data) return '-';
+                    return data.charAt(0).toUpperCase() + data.slice(1);
                 }
             },
             {
@@ -148,10 +164,8 @@ $(document).ready(function () {
                 width: '160px',
                 className: 'c-12',
                 render: function (data, type, row) {
-                    const menu = data;
-                    const menuName = menu.charAt(0).toUpperCase() + menu.slice(1);
-
-                    return menuName;
+                    if (!data) return '-';
+                    return data.charAt(0).toUpperCase() + data.slice(1);
                 }
             },
             {
@@ -163,18 +177,22 @@ $(document).ready(function () {
             {
                 data: 'deskripsi',
                 defaultContent: '-',
-                width: '300px',
-                className: 'c-12',
+                width: '410px',
+                className: 'c-12 col-deskripsi',
             }
         ]
     });
 
-    // Sesuaikan kembali kolom ketika ukuran jendela browser berubah
+    $('#lengthData').on('change', function () {
+        var newLength = parseInt($(this).val(), 10) || 10;
+        renderTableShimmer();
+        table.page.len(newLength).draw();
+    });
+
     $(window).on('resize', function () {
         table.columns.adjust();
     });
 
-    // Disable enter keyword search
     $('#keyword').on('keydown', function (e) {
         if (e.key === 'Enter') {
             e.preventDefault();

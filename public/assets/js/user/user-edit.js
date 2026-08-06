@@ -1,151 +1,265 @@
-document.addEventListener("DOMContentLoaded", function () {
-    // Level ID 2 = Mitra Acquirer (IT Provider)
-    const ITP_LEVEL_ID = '2';
+document.addEventListener("DOMContentLoaded", () => {
 
-    const ctxItp = document.getElementById('ctx-itp');
-    const inputItp = document.getElementById('input-itp');
-    const labelItp = document.getElementById('label-itp');
-    const itpError = document.getElementById('itp-error');
-    const btnItp = document.getElementById('btn-itp');
+    const ITP_LEVEL_ID = "2";
+
+    const ctxItp = document.getElementById("ctx-itp");
+    const inputItp = document.getElementById("input-itp");
+    const labelItp = document.getElementById("label-itp");
+    const btnItp = document.getElementById("btn-itp");
+    const itpError = document.getElementById("itp-error");
+
+    const form = document.getElementById("formEditUser");
+
+    const modalKonfirmasi = createModal("modalKonfirmasiEdit");
+    const modalLoading = createModal("modalLoadingEdit");
+    const modalSukses = createModal("modalSuksesEdit");
+
+    initDropdown();
+    initFormSubmit();
+    initProcessButton();
+    initSuccessButton();
+
+    function createModal(id) {
+        const element = document.getElementById(id);
+        return element ? new bootstrap.Modal(element) : null;
+    }
 
     function toggleItp(levelValue) {
+
         if (!ctxItp) return;
 
         if (levelValue === ITP_LEVEL_ID) {
-            ctxItp.classList.remove('d-none');
+
+            ctxItp.classList.remove("d-none");
+
         } else {
-            ctxItp.classList.add('d-none');
-            if (inputItp) inputItp.value = '';
+
+            ctxItp.classList.add("d-none");
+
+            if (inputItp) inputItp.value = "";
+
             if (labelItp) {
-                labelItp.textContent = 'Pilih IT provider';
-                labelItp.style.setProperty('color', '#B8B9BB', 'important');
+                labelItp.textContent = "Pilih IT provider";
+                labelItp.style.setProperty("color", "#B8B9BB", "important");
             }
+
             hideItpError();
+
         }
+
     }
 
     function showItpError() {
-        if (itpError) itpError.classList.remove('d-none');
-        if (btnItp) btnItp.classList.add('border-danger');
+
+        itpError?.classList.remove("d-none");
+        btnItp?.classList.add("border-danger");
+
     }
 
     function hideItpError() {
-        if (itpError) itpError.classList.add('d-none');
-        if (btnItp) btnItp.classList.remove('border-danger');
+
+        itpError?.classList.add("d-none");
+        btnItp?.classList.remove("border-danger");
+
     }
 
-    const dropdownItems = document.querySelectorAll(".dropdown-menu a");
+    function initDropdown() {
 
-    dropdownItems.forEach(item => {
-        item.addEventListener("click", function (e) {
+        const dropdownItems = document.querySelectorAll(".dropdown-menu a");
+
+        dropdownItems.forEach(item => {
+
+            item.addEventListener("click", function (e) {
+
+                e.preventDefault();
+
+                const value = this.dataset.value;
+                const text = this.textContent.trim();
+
+                const container = this.closest(".col-md-6");
+
+                if (!container) return;
+
+                const label = container.querySelector("button span");
+
+                if (label) {
+                    label.textContent = text;
+                }
+
+                switch (container.id) {
+
+                    case "ctx-status":
+                        setValue("input-status", value);
+                        break;
+
+                    case "ctx-level":
+                        setValue("input-level", value);
+                        toggleItp(value);
+                        break;
+
+                    case "ctx-role":
+                        setValue("input-role", value);
+                        break;
+
+                    case "ctx-itp":
+
+                        if (inputItp) inputItp.value = value;
+
+                        if (labelItp) {
+                            labelItp.style.setProperty(
+                                "color",
+                                "#12161C",
+                                "important"
+                            );
+                        }
+
+                        hideItpError();
+
+                        break;
+
+                }
+
+            });
+
+        });
+
+    }
+
+    function setValue(id, value) {
+
+        const input = document.getElementById(id);
+
+        if (input) {
+            input.value = value;
+        }
+
+    }
+
+    function validateForm() {
+
+        const level =
+            document.getElementById("input-level")?.value || "";
+
+        const role =
+            document.getElementById("input-role")?.value || "";
+
+        if (!level || !role) {
+
+            alert("Mohon lengkapi pilihan Level User dan Role terlebih dahulu.");
+
+            return false;
+
+        }
+
+        if (
+            level === ITP_LEVEL_ID &&
+            inputItp &&
+            inputItp.value === ""
+        ) {
+
+            showItpError();
+
+            ctxItp?.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+
+            return false;
+
+        }
+
+        return true;
+
+    }
+
+    function initFormSubmit() {
+
+        if (!form) return;
+
+        form.addEventListener("submit", e => {
+
             e.preventDefault();
 
-            const value = this.getAttribute("data-value");
-            const text = this.textContent;
+            if (!validateForm()) return;
 
-            const dropdownContainer = this.closest(".col-md-6");
-            if (!dropdownContainer) return;
+            modalKonfirmasi?.show();
 
-            const buttonLabel = dropdownContainer.querySelector("button span");
-            if (buttonLabel) buttonLabel.textContent = text;
-
-            if (dropdownContainer.id === "ctx-status") {
-                const inputStatus = document.getElementById("input-status");
-                if (inputStatus) inputStatus.value = value;
-            } else if (dropdownContainer.id === "ctx-level") {
-                const inputLevel = document.getElementById("input-level");
-                if (inputLevel) inputLevel.value = value;
-                toggleItp(value);
-            } else if (dropdownContainer.id === "ctx-role") {
-                const inputRole = document.getElementById("input-role");
-                if (inputRole) inputRole.value = value;
-            } else if (dropdownContainer.id === "ctx-itp") {
-                if (inputItp) inputItp.value = value;
-                if (labelItp) labelItp.style.setProperty('color', '#12161C', 'important');
-                hideItpError();
-            }
         });
-    });
 
-    // Modal Initializations
-    const elModalKonfirmasi = document.getElementById('modalKonfirmasiEdit');
-    const elModalLoading = document.getElementById('modalLoadingEdit');
-    const elModalSukses = document.getElementById('modalSuksesEdit');
-
-    const modalKonfirmasi = elModalKonfirmasi ? new bootstrap.Modal(elModalKonfirmasi) : null;
-    const modalLoading = elModalLoading ? new bootstrap.Modal(elModalLoading) : null;
-    const modalSukses = elModalSukses ? new bootstrap.Modal(elModalSukses) : null;
-
-    const formEditUser = document.getElementById('formEditUser');
-    if (formEditUser) {
-        formEditUser.addEventListener('submit', function (event) {
-            event.preventDefault();
-
-            const levelVal = document.getElementById('input-level')?.value || "";
-            const roleVal = document.getElementById('input-role')?.value || "";
-
-            if (levelVal === "" || roleVal === "") {
-                alert("Mohon lengkapi pilihan Level User dan Role terlebih dahulu.");
-                return false;
-            }
-
-            if (levelVal === ITP_LEVEL_ID && inputItp && inputItp.value === '') {
-                showItpError();
-                if (ctxItp) ctxItp.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                return false;
-            }
-
-            if (modalKonfirmasi) modalKonfirmasi.show();
-        });
     }
 
-    const btnProsesUpdate = document.getElementById('btnProsesUpdate');
-    if (btnProsesUpdate) {
-        btnProsesUpdate.addEventListener('click', function () {
-            if (modalKonfirmasi) modalKonfirmasi.hide();
-            if (modalLoading) modalLoading.show();
+    function initProcessButton() {
 
-            const form = document.getElementById('formEditUser');
-            if (!form) return;
+        const button = document.getElementById("btnProsesUpdate");
 
-            const formData = new FormData(form);
+        if (!button) return;
 
-            fetch(form.action, {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.text().then(text => {
-                            throw new Error(text);
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (modalLoading) modalLoading.hide();
+        button.addEventListener("click", async () => {
 
-                    if (data.success || data.code == 200) {
-                        if (modalSukses) modalSukses.show();
-                    } else {
-                        alert("Gagal memperbarui data: " + data.msg);
-                    }
-                })
-                .catch(error => {
-                    if (modalLoading) modalLoading.hide();
-                    console.error("Error Detail:", error.message);
-                    alert("Terjadi kesalahan sistem:\n" + error.message.substring(0, 200));
+            modalKonfirmasi?.hide();
+            modalLoading?.show();
+
+            try {
+
+                const response = await fetch(form.action, {
+                    method: "POST",
+                    body: new FormData(form)
                 });
+
+                if (!response.ok) {
+
+                    throw new Error(await response.text());
+
+                }
+
+                const data = await response.json();
+
+                modalLoading?.hide();
+
+                if (data.success || data.code == 200) {
+
+                    modalSukses?.show();
+
+                } else {
+
+                    alert("Gagal memperbarui data : " + data.msg);
+
+                }
+
+            } catch (err) {
+
+                modalLoading?.hide();
+
+                console.error(err);
+
+                alert(
+                    "Terjadi kesalahan sistem.\n\n" +
+                    err.message.substring(0, 200)
+                );
+
+            }
+
         });
+
     }
 
-    const btnSelesaiEdit = document.getElementById('btnSelesaiEdit');
-    if (btnSelesaiEdit) {
-        btnSelesaiEdit.addEventListener('click', function () {
-            if (modalSukses) modalSukses.hide();
+    function initSuccessButton() {
 
-            const redirectUrl = this.getAttribute('data-redirect-url') || "<?= $this->baseUrl('user'); ?>";
-            window.location.href = redirectUrl;
+        const button = document.getElementById("btnSelesaiEdit");
+
+        if (!button) return;
+
+        button.addEventListener("click", () => {
+
+            modalSukses?.hide();
+
+            const url =
+                button.dataset.redirectUrl || "/";
+
+            window.location.href = url;
+
         });
+
     }
+
 });

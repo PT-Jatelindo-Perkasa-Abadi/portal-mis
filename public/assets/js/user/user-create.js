@@ -7,7 +7,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let isActionSuccess = false;
 
-    // Level yang mewajibkan pilihan IT Provider
     const ITP_LEVEL_ID = '2';
 
     const ctxItp = document.getElementById('ctx-itp');
@@ -24,7 +23,6 @@ document.addEventListener("DOMContentLoaded", function () {
         if (levelValue === ITP_LEVEL_ID) {
             ctxItp.classList.remove('d-none');
         } else {
-            // Sembunyikan + reset pilihan agar tidak terkirim nilai lama
             ctxItp.classList.add('d-none');
             if (inputItp) inputItp.value = '';
             if (labelItp) {
@@ -45,7 +43,6 @@ document.addEventListener("DOMContentLoaded", function () {
         if (btnItp) btnItp.classList.remove('border-danger');
     }
 
-    // Handle Pilihan Dropdown Menu
     const dropdownItems = document.querySelectorAll(".dropdown-menu a");
     dropdownItems.forEach(item => {
         item.addEventListener("click", function (e) {
@@ -78,14 +75,12 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // Intercept Submit Form untuk Memunculkan Modal Konfirmasi
     if (formTambahUser) {
         formTambahUser.addEventListener('submit', function (event) {
             event.preventDefault();
 
             const inputLevel = document.getElementById('input-level');
 
-            // IT Provider wajib dipilih jika level-nya IT Provider
             if (inputLevel && inputLevel.value === ITP_LEVEL_ID && inputItp && inputItp.value === '') {
                 showItpError();
                 if (ctxItp) ctxItp.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -96,7 +91,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Eksekusi Submit Saat Tombol Proses di Modal Konfirmasi di-Klik
     const btnProsesSubmit = document.getElementById('btnProsesSubmit');
     if (btnProsesSubmit) {
         btnProsesSubmit.addEventListener('click', function () {
@@ -116,7 +110,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (modalStatus) modalStatus.show();
 
-            // Susun Data Form
             const formData = new FormData();
             formData.append('status', document.getElementById('input-status')?.value || '1');
             formData.append('level_user', document.getElementById('input-level')?.value || '1');
@@ -125,7 +118,6 @@ document.addEventListener("DOMContentLoaded", function () {
             formData.append('email', document.getElementById('email')?.value || '');
             formData.append('fullName', document.getElementById('fullName')?.value || '');
 
-            // Ambil URL & Assets dari data-attribute form
             const saveUrl = formTambahUser?.getAttribute('action') || '';
             const imgSuccess = formTambahUser?.getAttribute('data-img-success') || '';
             const imgFailed = formTambahUser?.getAttribute('data-img-failed') || '';
@@ -190,7 +182,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Handle Aksi Tombol Oke pada Modal Status
     const btnStatusOke = document.getElementById('btnStatusOke');
     if (btnStatusOke) {
         btnStatusOke.addEventListener('click', function () {
