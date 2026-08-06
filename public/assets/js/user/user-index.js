@@ -10,11 +10,21 @@ function hideLoadingShimmer() {
 
 document.addEventListener("DOMContentLoaded", function () {
 
+    // ROTASI IKON
+    const userListContent = document.getElementById('userListContent');
+    const collapseArrow = document.getElementById('collapseArrow');
+
+    if (userListContent && collapseArrow) {
+        userListContent.addEventListener('hide.bs.collapse', function () {
+            collapseArrow.classList.add('collapsed');
+        });
+
+        userListContent.addEventListener('show.bs.collapse', function () {
+            collapseArrow.classList.remove('collapsed');
+        });
+    }
+
     const form = document.getElementById('filterUserForm');
-    const searchInput = document.querySelector('input[name="search"]');
-    const inputLevel = document.getElementById("input-level");
-    const inputRole = document.getElementById("input-role");
-    const inputStatus = document.getElementById("input-status");
 
     if (form) {
         form.addEventListener('submit', function () {
@@ -22,109 +32,79 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // 🎯 1. KETIKA USER MENGETIK DI SEARCH BOX -> AUTOMATIC RESET DROPDOWN
-    if (searchInput) {
-        searchInput.addEventListener("input", function () {
-            if (this.value.trim() !== "") {
-                // Reset nilai hidden input
-                if (inputLevel) inputLevel.value = "";
-                if (inputRole) inputRole.value = "";
-                if (inputStatus) inputStatus.value = "";
-
-                // Reset Tampilan Button Label Dropdown
-                const labelLevel = document.getElementById("label-level");
-                const labelRole = document.getElementById("label-role");
-                const labelStatus = document.getElementById("label-status");
-
-                if (labelLevel) {
-                    labelLevel.textContent = "Pilih Level User";
-                    labelLevel.style.setProperty('color', '#B8B9BB', 'important');
-                    labelLevel.style.fontWeight = "500";
-                }
-                if (labelRole) {
-                    labelRole.textContent = "Pilih Role";
-                    labelRole.style.setProperty('color', '#B8B9BB', 'important');
-                    labelRole.style.fontWeight = "500";
-                }
-                if (labelStatus) {
-                    labelStatus.textContent = "Pilih Status";
-                    labelStatus.style.setProperty('color', '#B8B9BB', 'important');
-                    labelStatus.style.fontWeight = "500";
-                }
-
-                // Bersihkan active state & checkmark dari item dropdown
-                document.querySelectorAll('.custom-dropdown-item').forEach(el => {
-                    el.classList.remove('active');
-                    const icon = el.querySelector('svg.bi-check-lg');
-                    if (icon) icon.remove();
-                });
-            }
-        });
-    }
-
-    // 🎯 2. KETIKA USER MEMILIH OPTION DROPDOWN -> AUTOMATIC CLEAR SEARCH BOX
     const filterItems = document.querySelectorAll(".dropdown-menu a:not(.limit-item)");
 
     filterItems.forEach(item => {
+
         item.addEventListener("click", function (e) {
+
             e.preventDefault();
 
-            // Kosongkan isi search box agar filter tidak saling bentrok
-            if (searchInput) {
-                searchInput.value = "";
-            }
-
-            const value = this.getAttribute("data-value");
-            const text = this.querySelector("span") ? this.querySelector("span").textContent.trim() : this.textContent.trim();
+            const value = this.dataset.value;
+            const text = this.querySelector("span")
+                ? this.querySelector("span").textContent.trim()
+                : this.textContent.trim();
 
             const dropdownContainer = this.closest(".dropdown");
-            const buttonLabel = dropdownContainer?.querySelector("button span");
+            const buttonLabel = dropdownContainer.querySelector("button span");
 
-            if (value !== "" && buttonLabel) {
+            if (value !== "") {
                 buttonLabel.style.setProperty('color', '#12161C', 'important');
                 buttonLabel.style.fontWeight = "600";
                 buttonLabel.textContent = text;
             }
 
-            // Hapus ikon centang lama di konteks dropdown terkait
-            dropdownContainer?.querySelectorAll('.custom-dropdown-item').forEach(el => {
-                el.classList.remove('active');
-                const icon = el.querySelector('svg.bi-check-lg');
-                if (icon) icon.remove();
+            dropdownContainer.querySelectorAll(".custom-dropdown-item").forEach(el => {
+                el.classList.remove("active");
+                el.querySelector("svg.bi-check-lg")?.remove();
             });
 
-            this.classList.add('active');
-            this.insertAdjacentHTML('beforeend', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#198754" class="bi bi-check-lg" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/></svg>');
+            this.classList.add("active");
 
-            if (dropdownContainer?.id === "ctx-level") {
-                if (inputLevel) inputLevel.value = value;
-            } else if (dropdownContainer?.id === "ctx-role") {
-                if (inputRole) inputRole.value = value;
-            } else if (dropdownContainer?.id === "ctx-status") {
-                if (inputStatus) inputStatus.value = value;
+            this.insertAdjacentHTML(
+                "beforeend",
+                '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#198754" class="bi bi-check-lg" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/></svg>'
+            );
+
+            switch (dropdownContainer.id) {
+                case "ctx-level":
+                    document.getElementById("input-level").value = value;
+                    break;
+
+                case "ctx-role":
+                    document.getElementById("input-role").value = value;
+                    break;
+
+                case "ctx-status":
+                    document.getElementById("input-status").value = value;
+                    break;
             }
+
         });
+
     });
 
-    // 🎯 3. LIMIT ENTRIES DROPDOWN
-    const limitItems = document.querySelectorAll(".dropdown-menu a.limit-item");
+    const limitItems = document.querySelectorAll(".limit-item");
+
     limitItems.forEach(item => {
+
         item.addEventListener("click", function (e) {
+
             e.preventDefault();
-            const value = this.getAttribute("data-value");
 
-            const labelLimit = document.getElementById("label-limit");
-            const inputLimit = document.getElementById("input-limit");
+            const value = this.dataset.value;
 
-            if (labelLimit) labelLimit.textContent = value;
-            if (inputLimit) inputLimit.value = value;
+            document.getElementById("label-limit").textContent = value;
+            document.getElementById("input-limit").value = value;
 
             showLoadingShimmer();
-            this.closest("form")?.submit();
+
+            this.closest("form").submit();
+
         });
+
     });
 
-    setTimeout(function () {
-        hideLoadingShimmer();
-    }, 300);
+    setTimeout(hideLoadingShimmer, 300);
+
 });
