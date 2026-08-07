@@ -18,12 +18,13 @@
 <!-- FORM DENGAN ATTRIBUTE DATA UNTUK DIBACA JS -->
 <form id="formTambahUser" method="POST" action="<?= $this->baseUrl('user/index/save'); ?>"
     data-redirect-url="<?= $this->baseUrl('user/index/index'); ?>"
-    data-img-success="<?= $this->baseUrl('assets/img/img-create.svg'); ?>"
+    data-img-success="<?= $this->baseUrl('assets/img/img-create-new-user.svg'); ?>"
     data-img-failed="<?= $this->baseUrl('assets/img/img-confirm-failed.svg'); ?>">
 
-    <input type="hidden" name="status" id="input-status" value="1">
-    <input type="hidden" name="level_user" id="input-level" value="1">
-    <input type="hidden" name="role" id="input-role" value="1">
+    <!-- INPUT HIDDEN DIAWALI DENGAN VALUE KOSONG AGAR VALIDASI JS BERJALAN -->
+    <input type="hidden" name="status" id="input-status" value="">
+    <input type="hidden" name="level_user" id="input-level" value="">
+    <input type="hidden" name="role" id="input-role" value="">
     <input type="hidden" name="itp_code" id="input-itp" value="">
 
     <div class="card border border-light-subtle shadow-sm rounded-4 bg-white text-dark overflow-hidden"
@@ -132,54 +133,58 @@
                             </svg>
                         </button>
                         <ul class="dropdown-menu w-100 shadow-sm border-light-subtle rounded-3">
-                            <?php foreach ($this->listLevel as $level): ?>
-                                <?php
-                                $displayLvlName = $level['level_name'];
-                                if (strcasecmp($displayLvlName, 'Admin MIS') === 0 || strcasecmp($displayLvlName, 'MIS') === 0) {
-                                    $displayLvlName = 'ASP';
-                                } elseif (strcasecmp($displayLvlName, 'IT Provider') === 0) {
-                                    $displayLvlName = 'Mitra Acquirer';
-                                }
-                                ?>
-                                <li>
-                                    <a class="dropdown-item py-2 text-dark fw-medium" href="#"
-                                        data-value="<?= $level['id']; ?>">
-                                        <?= $displayLvlName; ?>
-                                    </a>
-                                </li>
-                            <?php endforeach; ?>
+                            <?php if (!empty($this->listLevel) && is_array($this->listLevel)): ?>
+                                <?php foreach ($this->listLevel as $level): ?>
+                                    <?php
+                                    $displayLvlName = $level['level_name'];
+                                    if (strcasecmp($displayLvlName, 'Admin MIS') === 0 || strcasecmp($displayLvlName, 'MIS') === 0) {
+                                        $displayLvlName = 'ASP';
+                                    } elseif (strcasecmp($displayLvlName, 'IT Provider') === 0) {
+                                        $displayLvlName = 'Mitra Acquirer';
+                                    }
+                                    ?>
+                                    <li>
+                                        <a class="dropdown-item py-2 text-dark fw-medium" href="#"
+                                            data-value="<?= $level['id']; ?>">
+                                            <?= $displayLvlName; ?>
+                                        </a>
+                                    </li>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </ul>
                     </div>
                 </div>
 
                 <!-- IT PROVIDER (MUNCUL HANYA APABILA LEVEL MITRA ACQUIRER DIPILIH) -->
                 <div class="col-md-6 d-none" id="ctx-itp">
-                    <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">IT Provider <span
+                    <label class="form-label fw-bold text-secondary mb-2" style="font-size: 14px;">Nama Mitra Acquirer <span
                             class="text-danger">*</span></label>
                     <div class="dropdown">
                         <button id="btn-itp"
                             class="btn border border-light-subtle py-3 px-3 rounded-3 w-100 d-flex justify-content-between align-items-center"
                             type="button" data-bs-toggle="dropdown" aria-expanded="false"
                             style="background-color: #ffffff; font-size: 14px; height: 48px;">
-                            <span id="label-itp" style="color: #B8B9BB;">Pilih IT provider</span>
+                            <span id="label-itp" style="color: #B8B9BB;">Pilih mitra acquirer</span>
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none"
                                 viewBox="0 0 24 24" stroke="#4A5568" stroke-width="2.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                             </svg>
                         </button>
                         <ul class="dropdown-menu w-100 shadow-sm border-light-subtle rounded-3">
-                            <?php foreach ($this->listItp as $itp): ?>
-                                <li>
-                                    <a class="dropdown-item py-2 text-dark fw-medium" href="#"
-                                        data-value="<?= $itp['code']; ?>">
-                                        <?= $itp['name']; ?>
-                                    </a>
-                                </li>
-                            <?php endforeach; ?>
+                            <?php if (!empty($this->listItp) && is_array($this->listItp)): ?>
+                                <?php foreach ($this->listItp as $itp): ?>
+                                    <li>
+                                        <a class="dropdown-item py-2 text-dark fw-medium" href="#"
+                                            data-value="<?= $itp['code']; ?>">
+                                            <?= $itp['name']; ?>
+                                        </a>
+                                    </li>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </ul>
                     </div>
                     <div id="itp-error" class="text-danger d-none mt-1" style="font-size: 13px;">
-                        IT Provider wajib dipilih untuk level ini
+                        Mitra Acquirer wajib dipilih untuk level ini
                     </div>
                 </div>
             </div>
@@ -280,5 +285,4 @@
     </div>
 </div>
 
-<!-- PEMANGGILAN SCRIPT EXTERNAL USER CREATE -->
 <script src="<?= $this->baseUrl('assets/js/user/user-create.js'); ?>"></script>

@@ -9,7 +9,7 @@
                 <div class="d-flex flex-column flex-fill">
                     <h1 class="profile-name"><?= $this->user['fullName']; ?></h1>
                     <span class="profile-role">
-                        <?= $this->user['role']; ?>
+                        <?= ucwords($this->user['role']); ?>
                     </span>
                 </div>
                 <span class="badge badge-profile profile-active">Aktif</span>
@@ -17,6 +17,23 @@
         </div>
         <div class="card-body">
             <div class="d-flex flex-column gap-4">
+
+                <!-- KONDISI KHUSUS NAMA MITRA ACQUIRER -->
+                <?php
+                $lvl = strtolower(trim($this->user['level'] ?? ''));
+                if ($lvl === 'it provider' || $lvl === 'mitra acquirer'):
+                ?>
+                    <div class="card shadow-none border p-4 mb-0">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="fs-7 text-neutral-70">Nama Mitra Acquirer</span>
+                            <span class="fs-7 text-neutral-100 fw-bold">
+                                <?= !empty($this->user['mitraName']) ? $this->user['mitraName'] : '-'; ?>
+                            </span>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+                <!-- INFORMASI AKUN -->
                 <div class="card card-accordion shadow-none" id="accountInformation">
                     <div class="card-header" data-bs-toggle="collapse" data-bs-target="#collapseInformation"
                         aria-expanded="true" aria-controls="collapseInformation">
@@ -53,18 +70,25 @@
                                                 <?= $this->user['email']; ?>
                                             </span>
                                         </div>
-                                        <div
-                                            class="d-flex align-items-center justify-content-between py-3 border-bottom">
+                                        <div class="d-flex align-items-center justify-content-between py-3 border-bottom">
                                             <span class="fs-7 text-neutral-70">Level User</span>
                                             <span class="fs-7 text-neutral-100">
-                                                <?= $this->user['level']; ?>
+                                                <?php
+                                                if ($lvl === 'admin mis' || $lvl === 'mis' || $lvl === 'asp') {
+                                                    echo 'ASP';
+                                                } else if ($lvl === 'it provider' || $lvl === 'mitra acquirer') {
+                                                    echo 'Mitra Acquirer';
+                                                } else {
+                                                    echo $this->user['level'];
+                                                }
+                                                ?>
                                             </span>
                                         </div>
                                         <div
                                             class="d-flex align-items-center justify-content-between py-3 border-bottom">
                                             <span class="fs-7 text-neutral-70">Role</span>
                                             <span class="fs-7 text-neutral-100">
-                                                <?= $this->user['role']; ?>
+                                                <?= ucwords($this->user['role']); ?>
                                             </span>
                                         </div>
                                     </div>
@@ -73,6 +97,8 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- PENGATURAN -->
                 <div class="card card-accordion shadow-none" id="cardChangePassword">
                     <div id="collapseChangePassword" class="accordion-collapse collapse show"
                         data-bs-parent="#cardChangePassword">
@@ -92,11 +118,13 @@
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
 </div>
 
+<!-- MODAL UBAH KATA SANDI -->
 <div class="modal fade" id="modalChangePassword" data-bs-backdrop="static" data-bs-keyboard="false"
     data-bs-focus="false" tabindex="-1" aria-labelledby="modalChangePasswordLabel">
     <div class="modal-dialog modal-dialog-centered">
@@ -168,7 +196,7 @@
                                     <span class="term-item">Harus menyertakan setidaknya satu karakter khusus.</span>
                                 </div>
                             </div>
-                            <div class="term-password-err mt-2" style="display: none;" id="term-password-3"> 
+                            <div class="term-password-err mt-2" style="display: none;" id="term-password-3">
                                 <div class="d-flex align-items-center gap-2" data-rule="length">
                                     <span class="ic icon-checklist-invalid"></span>
                                     <span class="term-item">Kata Sandi tidak sama dengan Kata Sandi Baru</span>
@@ -178,10 +206,10 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <input id="sess" name="sess" class="form-control password-validate" type="hidden" value="<?= $this->user['session_token']; ?>"/>
-                    <input id="email" name="email" class="form-control password-validate" type="hidden" value="<?= $this->user['email']; ?>"/>
-                    <input id="ip" name="ip" class="form-control password-validate" type="hidden" value="<?= App_Log_Context::getIp(); ?>"/>
-                    <input id="useragent" name="useragent" class="form-control password-validate" type="hidden" value="<?= App_Log_Context::getUserAgent(); ?>"/>
+                    <input id="sess" name="sess" class="form-control password-validate" type="hidden" value="<?= $this->user['session_token']; ?>" />
+                    <input id="email" name="email" class="form-control password-validate" type="hidden" value="<?= $this->user['email']; ?>" />
+                    <input id="ip" name="ip" class="form-control password-validate" type="hidden" value="<?= App_Log_Context::getIp(); ?>" />
+                    <input id="useragent" name="useragent" class="form-control password-validate" type="hidden" value="<?= App_Log_Context::getUserAgent(); ?>" />
                     <button type="button" class="btn btn-primary w-100" id="ChngPass">
                         Perbarui Kata Sandi
                     </button>
@@ -193,16 +221,10 @@
 
 <div id="loadingScreen">
     <div class="loading-box">
-
         <div class="spinner"></div>
-
-        <div class="loading-text">
-            Loading
-        </div>
-
+        <div class="loading-text">Loading</div>
     </div>
 </div>
-
 
 <div id="modalSuccess" class="modal fade" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -212,7 +234,7 @@
                     <img src="<?= $this->baseUrl('assets/img/img-new-password.svg'); ?>" alt="image new password" />
                     <div class="d-flex flex-column align-items-center gap-2">
                         <h3 class="text-neutral-100 fs-5 fw-bold mb-0">
-                            Kata Sandi Berhasil Diperbarui 
+                            Kata Sandi Berhasil Diperbarui
                         </h3>
                         <p class="text-neutral-70 text-sm text-center">
                             Demi keamanan, silakan masuk kembali menggunakan kata sandi yang baru
@@ -229,8 +251,6 @@
     </div>
 </div>
 
-
-
 <div class="modal fade" id="errorModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -241,9 +261,7 @@
                         <h3 class="text-neutral-100 fs-5 fw-bold mb-0">
                             Kata Sandi Gagal Diperbarui
                         </h3>
-                        <p class="text-neutral-70 text-sm text-center text-response">
-               
-                        </p>
+                        <p class="text-neutral-70 text-sm text-center text-response"></p>
                     </div>
                 </div>
             </div>
@@ -255,6 +273,3 @@
         </div>
     </div>
 </div>
-
-
-

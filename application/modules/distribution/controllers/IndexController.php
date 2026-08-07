@@ -6,15 +6,21 @@ class Distribution_IndexController extends Zend_Controller_Action
     {
         $this->view->isError = false;
 
-        // $this->view->currentUser = App_Service_Session::get('user');
-        // $activeTab = $this->_getParam('type', 'it-provider');
-
         $currentUser = App_Service_Session::get('user');
         $this->view->currentUser = $currentUser;
 
-        $currentParam = $currentUser['level'] == 'IT Provider' ? 'mitra' : 'it-provider';
-        $activeTab = $this->_getParam('type', $currentParam);
+        // Normalisasi parameter type (Dukungan URL Baru & URL Lama)
+        $userLevel = strtolower(trim($currentUser['level'] ?? ''));
+        $isItpUser = ($userLevel === 'it provider' || $userLevel === 'mitra acquirer');
 
+        $defaultParam = $isItpUser ? 'sub-mitra-acquirer' : 'mitra-acquirer';
+        $rawTypeParam = $this->_getParam('type', $defaultParam);
+
+        if ($rawTypeParam === 'it-provider' || $rawTypeParam === 'mitra-acquirer') {
+            $activeTab = 'mitra-acquirer';
+        } else {
+            $activeTab = 'sub-mitra-acquirer';
+        }
 
         date_default_timezone_set('Asia/Jakarta');
         $today = date('Y-m-d');
@@ -41,10 +47,10 @@ class Distribution_IndexController extends Zend_Controller_Action
         $this->view->isError = !$result['success'];
         $listData = $result['data'];
 
-        // 🎯 MODIFIKASI 1: Hilangkan kondisi ($activeTab === 'mitra') agar opsi master mitra selalu ada di dropdown
+        // 2. Master list mitra acquirer untuk dropdown
         $this->view->listMitraAcquirer = $modelAps->getMasterMitraList();
 
-        // 3. Filter data secara lokal di PHP berdasarkan kata kunci search DAN mitra yang dipilih
+        // 3. Filter data secara lokal di PHP
         $listData = $modelAps->filterSearchData($listData, $filterSearch, $filterMitra);
 
         // 4. Fitur Export Excel
@@ -57,13 +63,11 @@ class Distribution_IndexController extends Zend_Controller_Action
             exit;
         }
 
-        // 5. Olah Chart & Summary dari $listData yang SUDAH DIFILTER
+        // 5. Olah Chart & Summary
         $chartSummary = $modelAps->processChartAndSummary($listData);
 
-        // 🎯 MODIFIKASI 2: Tambahkan flag pengecekan apakah user sedang melakukan filter
         $isUserFiltering = !empty($filterSearch) || !empty($filterService) || !empty($filterMitra);
 
-        // 🎯 MODIFIKASI 3: Kirim variabel $isUserFiltering ke view
         $this->view->isUserFiltering = $isUserFiltering;
         $this->view->activeTab       = $activeTab;
         $this->view->summary         = $chartSummary['summary'];

@@ -1,17 +1,11 @@
 <?php
 class Profile_IndexController extends App_Controller_Base
 {
-    public function init()
-    {
-       
-
-    }
+    public function init() {}
 
     public function indexAction()
     {
-
-         $user = App_Service_Session::get('user');
-
+        $this->view->user = App_Service_Session::get('user');
     }
 
     public function changepassAction()
@@ -21,14 +15,13 @@ class Profile_IndexController extends App_Controller_Base
 
         $data = $this->_request->getPost();
 
-        if($data)
-        {
-                $payloadcp = [
+        if ($data) {
+            $payloadcp = [
                 $data['sess'],
                 $data['email'],
-                hash('sha256',$data['currentPassword']), 
-                hash('sha256',$data['newPassword']),             
-                $data['ip'], 
+                hash('sha256', $data['currentPassword']),
+                hash('sha256', $data['newPassword']),
+                $data['ip'],
                 $data['useragent']
             ];
 
@@ -37,9 +30,6 @@ class Profile_IndexController extends App_Controller_Base
             $cp = $api->request('POST', '/service/proxy/service/alias/change-password', $payloadcp);
 
             echo json_encode($cp);
-
         }
-
-
     }
 }

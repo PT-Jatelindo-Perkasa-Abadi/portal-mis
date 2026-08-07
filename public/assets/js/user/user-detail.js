@@ -66,13 +66,13 @@ document.addEventListener("DOMContentLoaded", function () {
                         if (data.success || data.code == 200) {
                             isActionSuccess = true;
                             if (statusImgEl) statusImgEl.src = imgSuccess;
-                            if (statusTitleEl) statusTitleEl.textContent = 'Reset Berhasil';
-                            if (statusMsgEl) statusMsgEl.textContent = 'Kata sandi baru berhasil dikirim ke email user.';
+                            if (statusTitleEl) statusTitleEl.textContent = 'Kata Sandi Berhasil Direset';
+                            if (statusMsgEl) statusMsgEl.textContent = 'Kata sandi akun user telah berhasil direset.';
                         } else {
                             isActionSuccess = false;
                             if (statusImgEl) statusImgEl.src = imgError;
-                            if (statusTitleEl) statusTitleEl.textContent = 'Reset Gagal';
-                            if (statusMsgEl) statusMsgEl.textContent = data.msg ? data.msg : "Gagal menyetel ulang kata sandi.";
+                            if (statusTitleEl) statusTitleEl.textContent = 'Kata Sandi Gagal Direset';
+                            if (statusMsgEl) statusMsgEl.textContent = data.msg ? data.msg : "Terjadi kesalahan saat melakukan reset kata sandi user";
                         }
 
                         if (responseArea) {
