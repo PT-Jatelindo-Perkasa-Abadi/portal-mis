@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const modalKonfirmasi = createModal("modalKonfirmasiEdit");
     const modalLoading = createModal("modalLoadingEdit");
     const modalSukses = createModal("modalSuksesEdit");
+    const modalGagal = createModal("modalGagalEdit");
 
     initDropdown();
     initFormSubmit();
@@ -25,15 +26,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function toggleItp(levelValue) {
-
         if (!ctxItp) return;
 
         if (levelValue === ITP_LEVEL_ID) {
-
             ctxItp.classList.remove("d-none");
-
         } else {
-
             ctxItp.classList.add("d-none");
 
             if (inputItp) inputItp.value = "";
@@ -44,33 +41,24 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             hideItpError();
-
         }
-
     }
 
     function showItpError() {
-
         itpError?.classList.remove("d-none");
         btnItp?.classList.add("border-danger");
-
     }
 
     function hideItpError() {
-
         itpError?.classList.add("d-none");
         btnItp?.classList.remove("border-danger");
-
     }
 
     function initDropdown() {
-
         const dropdownItems = document.querySelectorAll(".dropdown-menu a");
 
         dropdownItems.forEach(item => {
-
             item.addEventListener("click", function (e) {
-
                 e.preventDefault();
 
                 const value = this.dataset.value;
@@ -87,7 +75,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
                 switch (container.id) {
-
                     case "ctx-status":
                         setValue("input-status", value);
                         break;
@@ -102,7 +89,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         break;
 
                     case "ctx-itp":
-
                         if (inputItp) inputItp.value = value;
 
                         if (labelItp) {
@@ -114,152 +100,107 @@ document.addEventListener("DOMContentLoaded", () => {
                         }
 
                         hideItpError();
-
                         break;
-
                 }
-
             });
-
         });
-
     }
 
     function setValue(id, value) {
-
         const input = document.getElementById(id);
-
         if (input) {
             input.value = value;
         }
-
     }
 
     function validateForm() {
-
-        const level =
-            document.getElementById("input-level")?.value || "";
-
-        const role =
-            document.getElementById("input-role")?.value || "";
+        const level = document.getElementById("input-level")?.value || "";
+        const role = document.getElementById("input-role")?.value || "";
 
         if (!level || !role) {
-
-            alert("Mohon lengkapi pilihan Level User dan Role terlebih dahulu.");
-
+            const errorText = document.getElementById("textGagalEdit");
+            if (errorText) {
+                errorText.textContent = "Mohon lengkapi pilihan Level User dan Role terlebih dahulu.";
+            }
+            modalGagal?.show();
             return false;
-
         }
 
-        if (
-            level === ITP_LEVEL_ID &&
-            inputItp &&
-            inputItp.value === ""
-        ) {
-
+        if (level === ITP_LEVEL_ID && inputItp && inputItp.value === "") {
             showItpError();
-
             ctxItp?.scrollIntoView({
                 behavior: "smooth",
                 block: "center"
             });
-
             return false;
-
         }
 
         return true;
-
     }
 
     function initFormSubmit() {
-
         if (!form) return;
 
         form.addEventListener("submit", e => {
-
             e.preventDefault();
-
             if (!validateForm()) return;
-
             modalKonfirmasi?.show();
-
         });
-
     }
 
     function initProcessButton() {
-
         const button = document.getElementById("btnProsesUpdate");
-
         if (!button) return;
 
         button.addEventListener("click", async () => {
-
             modalKonfirmasi?.hide();
             modalLoading?.show();
 
             try {
-
                 const response = await fetch(form.action, {
                     method: "POST",
                     body: new FormData(form)
                 });
 
                 if (!response.ok) {
-
-                    throw new Error(await response.text());
-
+                    throw new Error("Gagal terhubung ke server.");
                 }
 
                 const data = await response.json();
-
                 modalLoading?.hide();
 
                 if (data.success || data.code == 200) {
-
                     modalSukses?.show();
-
                 } else {
-
-                    alert("Gagal memperbarui data : " + data.msg);
-
+                    const errorText = document.getElementById("textGagalEdit");
+                    if (errorText) {
+                        errorText.textContent = data.msg || data.message || "Terjadi kesalahan saat memperbarui data user";
+                    }
+                    modalGagal?.show();
                 }
 
             } catch (err) {
-
                 modalLoading?.hide();
-
                 console.error(err);
 
-                alert(
-                    "Terjadi kesalahan sistem.\n\n" +
-                    err.message.substring(0, 200)
-                );
-
+                const errorText = document.getElementById("textGagalEdit");
+                if (errorText) {
+                    errorText.textContent = "Terjadi kesalahan sistem, silakan coba lagi nanti.";
+                }
+                modalGagal?.show();
             }
-
         });
-
     }
 
     function initSuccessButton() {
-
         const button = document.getElementById("btnSelesaiEdit");
-
         if (!button) return;
 
         button.addEventListener("click", () => {
-
             modalSukses?.hide();
-
-            const url =
-                button.dataset.redirectUrl || "/";
-
+            const url = button.dataset.redirectUrl || "/";
             window.location.href = url;
-
         });
-
     }
 
 });

@@ -47,7 +47,7 @@ if (!empty($activeDate)) {
     $badgeDateLabel = date('d/m/Y');
 }
 
-// 🎯 LOGIKA BADGE LAYANAN SINKRON DENGAN SEARCH
+// LOGIKA BADGE LAYANAN SINKRON DENGAN SEARCH
 $activeService = !empty($this->filters['service']) ? strtolower($this->filters['service']) : '';
 $searchText    = isset($this->filters['search']) ? strtolower(trim($this->filters['search'])) : '';
 
@@ -80,14 +80,12 @@ $isApiError = isset($this->isError) && $this->isError === true;
 ?>
 
 <style>
-    /* Kunci layar utama agar halaman tidak bisa digeser/di-scroll ke kanan/kiri */
     html,
     body {
         max-width: 100% !important;
         overflow-x: hidden !important;
     }
 
-    /* Memastikan area scrollbar horizontal hanya terjadi di dalam kontainer tabel */
     .table-responsive {
         overflow-x: auto !important;
         -webkit-overflow-scrolling: touch;
@@ -207,7 +205,6 @@ $isApiError = isset($this->isError) && $this->isError === true;
         z-index: 5;
     }
 
-    /* --- SHIMMER ANIMATION EFFECT --- */
     .shimmer-placeholder {
         background: linear-gradient(90deg, #E7E8E8 25%, #F4F5F6 50%, #E7E8E8 75%);
         background-size: 200% 100%;
@@ -226,7 +223,6 @@ $isApiError = isset($this->isError) && $this->isError === true;
         }
     }
 
-    /* --- TOAST ERROR ATAS FIGMA --- */
     .toast-error-banner {
         position: fixed;
         top: 20px;
@@ -245,7 +241,6 @@ $isApiError = isset($this->isError) && $this->isError === true;
         font-weight: 500;
     }
 
-    /* --- CHART BOX ERROR OVERLAY FIGMA --- */
     .chart-error-box {
         position: absolute;
         top: 0;
@@ -306,32 +301,32 @@ $isApiError = isset($this->isError) && $this->isError === true;
     $showItProviderTab = ($this->isAllowed('distribution:index', 'itp-tab') || $this->isAllowed('distribution:index', 'it-provider'));
     ?>
 
-    <!-- TAB MENU -->
+    <!-- TAB MENU (URL BERSIH & SEDERHANA) -->
     <div class="w-100 mb-4 border-bottom" style="border-color: #E7E8E8 !important; height: 48px;">
         <div class="d-flex align-items-end gap-4" style="height: 100%;">
 
             <?php if ($showItProviderTab): ?>
                 <div class="d-flex flex-column align-items-center justify-content-end" style="height: 100%; position: relative;">
-                    <a href="<?= $this->baseUrl('distribution/index/index/type/it-provider'); ?>"
+                    <a href="<?= $this->baseUrl('distribution?type=mitra-acquirer'); ?>"
                         onclick="showLoadingShimmer()"
                         class="text-decoration-none pb-2 px-1 fw-semibold"
-                        style="font-size: 16px; color: <?= ($this->activeTab === 'it-provider') ? '#3A7BF6' : '#595C60'; ?>; text-align: center;">
+                        style="font-size: 16px; color: <?= ($this->activeTab === 'mitra-acquirer') ? '#3A7BF6' : '#595C60'; ?>; text-align: center;">
                         Mitra Acquirer
                     </a>
-                    <?php if ($this->activeTab === 'it-provider'): ?>
+                    <?php if ($this->activeTab === 'mitra-acquirer'): ?>
                         <div style="width: 100%; height: 4px; background: #3A7BF6; border-top-left-radius: 4px; border-top-right-radius: 4px; margin-bottom: -1px;"></div>
                     <?php endif; ?>
                 </div>
             <?php endif; ?>
 
             <div class="d-flex flex-column align-items-center justify-content-end" style="height: 100%; position: relative;">
-                <a href="<?= $showItProviderTab ? $this->baseUrl('distribution/index/index/type/mitra') : 'javascript:void(0);'; ?>"
+                <a href="<?= $showItProviderTab ? $this->baseUrl('distribution?type=sub-mitra-acquirer') : 'javascript:void(0);'; ?>"
                     <?= $showItProviderTab ? 'onclick="showLoadingShimmer()"' : 'style="cursor: default;"'; ?>
                     class="text-decoration-none pb-2 px-1 fw-semibold"
-                    style="font-size: 16px; color: <?= ($this->activeTab === 'mitra') ? '#3A7BF6' : '#595C60'; ?>; text-align: center; <?= !$showItProviderTab ? 'cursor: default !important;' : ''; ?>">
+                    style="font-size: 16px; color: <?= ($this->activeTab === 'sub-mitra-acquirer') ? '#3A7BF6' : '#595C60'; ?>; text-align: center; <?= !$showItProviderTab ? 'cursor: default !important;' : ''; ?>">
                     Sub Mitra Acquirer
                 </a>
-                <?php if ($this->activeTab === 'mitra'): ?>
+                <?php if ($this->activeTab === 'sub-mitra-acquirer'): ?>
                     <div style="width: 100%; height: 4px; background: #3A7BF6; border-top-left-radius: 4px; border-top-right-radius: 4px; margin-bottom: -1px;"></div>
                 <?php endif; ?>
             </div>
@@ -355,12 +350,10 @@ $isApiError = isset($this->isError) && $this->isError === true;
                     <input type="text" name="search" value="<?= $this->escape($this->filters['search'] ?? ''); ?>" class="form-control border-0 bg-transparent p-0 text-dark placeholder-muted" placeholder="Cari" style="font-size: 14px; box-shadow: none;">
                 </div>
 
-                <?php if ($this->currentUser['level'] !== 'IT Provider' && $this->activeTab === 'mitra'): ?>
+                <?php if ($this->currentUser['level'] !== 'IT Provider' && $this->currentUser['level'] !== 'Mitra Acquirer' && $this->activeTab === 'sub-mitra-acquirer'): ?>
                     <div style="width: 200px;">
                         <select class="form-select select2" id="listmitra" name="mitra_code">
-                            <!-- Option kosong wajib untuk placeholder Select2 -->
                             <option value=""></option>
-
                             <?php if (!empty($this->listMitraAcquirer)): ?>
                                 <?php foreach ($this->listMitraAcquirer as $mitra): ?>
                                     <option value="<?= $this->escape($mitra['code']); ?>"
@@ -455,28 +448,32 @@ $isApiError = isset($this->isError) && $this->isError === true;
             <!-- BADGES FILTERS STATUS -->
             <div class="d-flex align-items-center gap-3">
                 <!-- Tombol Download Data -->
-                <a href="<?= $this->baseUrl('distribution/index/index/type/' . $this->activeTab . '?' . ($_SERVER['QUERY_STRING'] ?? '') . '&download=true'); ?>"
+                <?php
+                $queryParams = array_filter(array_merge($this->filters, ['type' => $this->activeTab, 'download' => 'true']));
+                $downloadUrl  = $this->baseUrl('distribution?' . http_build_query($queryParams));
+                ?>
+                <a href="<?= $downloadUrl; ?>"
                     class="text-decoration-none bg-white rounded-3 d-flex align-items-center px-2 py-1 gap-1"
                     style="outline: 1px #E7E8E8 solid; outline-offset: -1px; cursor: pointer; height: 36px;">
                     <img src="<?= $this->baseUrl('assets/img/Ic_download.svg'); ?>" alt="Download Icon" style="width: 22px; height: 22px; object-fit: contain;">
                     <span class="fw-semibold" style="color: #12161C; font-size: 14px;">Download Data</span>
                 </a>
 
-                <!-- 2. Badge Tanggal -->
+                <!-- Badge Tanggal -->
                 <?php if (!empty($badgeDateLabel)): ?>
                     <div id="badge-date" class="rounded-3 d-flex align-items-center justify-content-center px-3" style="height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600;">
                         Tanggal <?= $this->escape($badgeDateLabel); ?>
                     </div>
                 <?php endif; ?>
 
-                <!-- 3. Badge Layanan -->
+                <!-- Badge Layanan -->
                 <?php if (!empty($badgeServiceLabel)): ?>
                     <div id="badge-service" class="rounded-3 d-flex align-items-center justify-content-center px-3" style="height: 36px; background: #EBF2FE; color: #12161C; font-size: 14px; font-weight: 600;">
                         <?= $badgeServiceLabel; ?>
                     </div>
                 <?php endif; ?>
 
-                <!-- 4. BADGE MITRA (DENGAN CONVERT KODE KE NAMA MITRA) -->
+                <!-- BADGE MITRA -->
                 <?php
                 $selectedMitraCode = !empty($this->filters['mitra_code'])
                     ? $this->filters['mitra_code']
@@ -501,16 +498,14 @@ $isApiError = isset($this->isError) && $this->isError === true;
                     </div>
                 <?php endif; ?>
 
-                <!-- 5. Tombol Reset Data -->
-                <?php
-                $hasActiveFilter = $isUserFiltering || !empty($selectedMitraCode);
-                ?>
+                <!-- Tombol Reset Data -->
+                <?php $hasActiveFilter = $isUserFiltering || !empty($selectedMitraCode); ?>
                 <?php if ($hasActiveFilter): ?>
-                    <a href="<?= $this->baseUrl('distribution/index/index/type/' . $this->activeTab); ?>" onclick="showLoadingShimmer()" class="text-decoration-none fw-semibold" style="color: #595C60; font-size: 14px;">Reset Data</a>
+                    <a href="<?= $this->baseUrl('distribution?type=' . $this->activeTab); ?>" onclick="showLoadingShimmer()" class="text-decoration-none fw-semibold" style="color: #595C60; font-size: 14px;">Reset Data</a>
                 <?php endif; ?>
             </div>
 
-            <!-- A. SHIMMER CONTAINER FOR CHART -->
+            <!-- SHIMMER CHART CONTAINER -->
             <div id="shimmer-chart-container" class="w-100 p-4 rounded-3 bg-white" style="outline: 1px #E7E8E8 solid; outline-offset: -1px; border-radius: 12px;">
                 <div class="shimmer-placeholder mb-4" style="width: 250px; height: 20px;"></div>
                 <div class="row g-3 mb-4">
@@ -543,7 +538,7 @@ $isApiError = isset($this->isError) && $this->isError === true;
                 class="w-100 p-4 rounded-3 bg-white d-none"
                 style="outline: 1px #E7E8E8 solid; outline-offset: -1px; border-radius: 12px; position: relative;">
 
-                <h6 class="fw-bold mb-4" style="color: #12161C; font-size: 16px;">Grafik Lembar Transaksi Top 10 <?= ($this->activeTab === 'mitra') ? 'Sub Mitra Acquirer' : 'Mitra Acquirer'; ?></h6>
+                <h6 class="fw-bold mb-4" style="color: #12161C; font-size: 16px;">Grafik Lembar Transaksi Top 10 <?= ($this->activeTab === 'sub-mitra-acquirer') ? 'Sub Mitra Acquirer' : 'Mitra Acquirer'; ?></h6>
 
                 <div class="row g-3 mb-4">
                     <div class="col-md-4">
@@ -575,7 +570,6 @@ $isApiError = isset($this->isError) && $this->isError === true;
                     </div>
                 </div>
 
-                <!-- WADAH CANVAS ATAU BOX ERROR OVERLAY GRAFIK -->
                 <div style="position: relative; height: 241px; width: 100%;">
                     <?php if ($isApiError): ?>
                         <div class="chart-error-box">
@@ -592,6 +586,7 @@ $isApiError = isset($this->isError) && $this->isError === true;
                 </div>
             </div>
 
+            <!-- DATA TABLE -->
             <div class="table-responsive w-100 rounded-3">
                 <table class="table align-middle table-hover mb-0 w-100" style="border-collapse: collapse;">
                     <thead>
@@ -599,10 +594,10 @@ $isApiError = isset($this->isError) && $this->isError === true;
                             <th class="ps-4 text-center fw-bold" style="color: #595C60; font-size: 14px; width: 60px;">No</th>
 
                             <th class="fw-bold text-start" style="color: #595C60; font-size: 14px; min-width: 160px;">
-                                <?= ($this->activeTab === 'mitra') ? 'Nama Sub Mitra Acquirer' : 'Kode Mitra Acquirer'; ?>
+                                <?= ($this->activeTab === 'sub-mitra-acquirer') ? 'Nama Sub Mitra Acquirer' : 'Kode Mitra Acquirer'; ?>
                             </th>
 
-                            <?php if ($this->currentUser['level'] != 'IT Provider'): ?>
+                            <?php if ($this->currentUser['level'] != 'IT Provider' && $this->currentUser['level'] != 'Mitra Acquirer'): ?>
                                 <th class="fw-bold text-start" style="color: #595C60; font-size: 14px; min-width: 200px;">Nama Mitra Acquirer</th>
                             <?php endif; ?>
 
@@ -614,7 +609,7 @@ $isApiError = isset($this->isError) && $this->isError === true;
                         </tr>
                     </thead>
 
-                    <!-- A. SHIMMER TABLE BODY -->
+                    <!-- SHIMMER TABLE BODY -->
                     <tbody id="shimmer-table-body">
                         <?php for ($i = 0; $i < 7; $i++): ?>
                             <tr style="height: 64px; border-bottom: 1px #E7E8E8 solid;">
@@ -624,7 +619,7 @@ $isApiError = isset($this->isError) && $this->isError === true;
                                 <td>
                                     <div class="shimmer-placeholder" style="width: 120px; height: 16px;"></div>
                                 </td>
-                                <?php if ($this->currentUser['level'] != 'IT Provider'): ?>
+                                <?php if ($this->currentUser['level'] != 'IT Provider' && $this->currentUser['level'] != 'Mitra Acquirer'): ?>
                                     <td>
                                         <div class="shimmer-placeholder" style="width: 160px; height: 16px;"></div>
                                     </td>
@@ -648,7 +643,7 @@ $isApiError = isset($this->isError) && $this->isError === true;
                         <?php endfor; ?>
                     </tbody>
 
-                    <!-- B. REAL DATA TABLE BODY -->
+                    <!-- REAL DATA TABLE BODY -->
                     <tbody id="real-table-body" class="d-none">
                         <?php if (!empty($this->listData)): $no = 1;
                             foreach ($this->listData as $row): ?>
@@ -657,7 +652,7 @@ $isApiError = isset($this->isError) && $this->isError === true;
 
                                     <td class="text-start" style="color: #12161C; font-size: 14px; font-weight: 400;"><?= isset($row['kode']) ? $row['kode'] : ''; ?></td>
 
-                                    <?php if ($this->currentUser['level'] != 'IT Provider') : ?>
+                                    <?php if ($this->currentUser['level'] != 'IT Provider' && $this->currentUser['level'] != 'Mitra Acquirer') : ?>
                                         <td class="text-start" style="color: #12161C; font-size: 14px; font-weight: 400;"><?= isset($row['nama']) ? $row['nama'] : ''; ?></td>
                                     <?php endif; ?>
 
@@ -695,7 +690,7 @@ $isApiError = isset($this->isError) && $this->isError === true;
                             <?php endforeach;
                         else: ?>
                             <tr>
-                                <td colspan="<?= ($this->currentUser['level'] != 'IT Provider') ? 8 : 7; ?>" class="text-center py-5">
+                                <td colspan="<?= ($this->currentUser['level'] != 'IT Provider' && $this->currentUser['level'] != 'Mitra Acquirer') ? 8 : 7; ?>" class="text-center py-5">
                                     <div class="d-flex flex-column align-items-center justify-content-center py-4">
                                         <img src="<?= $this->baseUrl('assets/img/img-data-empty.svg'); ?>" alt="Data Kosong" style="width: 280px; height: auto; object-fit: contain;" class="mb-3">
                                         <h5 class="fw-bold mb-1" style="color: #12161C; font-size: 16px;">
@@ -716,6 +711,5 @@ $isApiError = isset($this->isError) && $this->isError === true;
     </div>
 </div>
 
-<!-- LOAD SCRIPT EXTERNAL CHART.JS & DISTRIBUTION.JS -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="<?= $this->baseUrl('assets/js/distribution.js'); ?>"></script>

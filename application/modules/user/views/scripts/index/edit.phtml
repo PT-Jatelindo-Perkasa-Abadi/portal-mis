@@ -280,7 +280,7 @@ if ($itpVisible && $tpCode !== null) {
         <div class="modal-content border-0 rounded-4 shadow p-4 bg-white text-dark">
             <div class="modal-body text-center p-0">
                 <div class="mb-4">
-                    <img src="<?= $this->baseUrl('assets/img/img-create.svg'); ?>" alt="Konfirmasi Perubahan"
+                    <img src="<?= $this->baseUrl('assets/img/img-confirm-edit.svg'); ?>" alt="Konfirmasi Perubahan"
                         style="width: 220px; height: auto;">
                 </div>
                 <h4 class="fw-bold text-dark mb-2" style="font-size: 20px;">Simpan Perubahan?</h4>
@@ -362,7 +362,7 @@ if ($itpVisible && $tpCode !== null) {
         <div class="modal-content border-0 rounded-4 shadow p-4 bg-white text-dark">
             <div class="modal-body text-center p-0">
                 <div class="mb-4">
-                    <img src="<?= $this->baseUrl('assets/img/img-create.svg'); ?>" alt="Sukses Perubahan"
+                    <img src="<?= $this->baseUrl('assets/img/img-succes-edit.svg'); ?>" alt="Sukses Perubahan"
                         style="width: 220px; height: auto;">
                 </div>
                 <h4 class="fw-bold text-dark mb-2" style="font-size: 20px;">Berhasil Diperbarui</h4>
@@ -371,6 +371,30 @@ if ($itpVisible && $tpCode !== null) {
                 <button type="button" id="btnSelesaiEdit"
                     data-redirect-url="<?= $this->baseUrl('user'); ?>"
                     class="btn w-100 py-2.5 fw-bold text-white rounded-3 shadow-sm"
+                    style="background-color: #3b82f6; border: none; font-size: 14px; height: 44px;">
+                    Oke
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalGagalEdit" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+        <div class="modal-content border-0 rounded-4 shadow p-4 bg-white text-dark">
+            <div class="modal-body text-center p-0">
+                <div class="mb-4">
+                    <img src="<?= $this->baseUrl('assets/img/img-failed-edit.svg'); ?>" alt="Gagal Perubahan"
+                        style="width: 220px; height: auto;">
+                </div>
+                <h4 class="fw-bold text-dark mb-2" style="font-size: 20px;">Gagal Diperbarui</h4>
+                <p class="text-secondary mb-4 px-2" id="textGagalEdit" style="font-size: 14px;">
+                    Terjadi kesalahan saat memperbarui data user
+                </p>
+
+                <button type="button" class="btn w-100 py-2.5 fw-bold text-white rounded-3 shadow-sm"
+                    data-bs-dismiss="modal"
                     style="background-color: #3b82f6; border: none; font-size: 14px; height: 44px;">
                     Oke
                 </button>

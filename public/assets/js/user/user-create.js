@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
             ctxItp.classList.add('d-none');
             if (inputItp) inputItp.value = '';
             if (labelItp) {
-                labelItp.textContent = 'Pilih IT provider';
+                labelItp.textContent = 'Pilih mitra acquirer';
                 labelItp.style.setProperty('color', '#B8B9BB', 'important');
             }
             hideItpError();
@@ -53,6 +53,13 @@ document.addEventListener("DOMContentLoaded", function () {
             if (!dropdownContainer) return;
 
             const buttonLabel = dropdownContainer.querySelector("button span");
+            const dropdownButton = dropdownContainer.querySelector("button");
+
+            // Hapus penanda border merah saat user memilih item dropdown
+            if (dropdownButton) {
+                dropdownButton.classList.remove('border-danger');
+            }
+
             if (buttonLabel) {
                 buttonLabel.textContent = text;
                 buttonLabel.style.setProperty('color', '#12161C', 'important');
@@ -75,15 +82,88 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
+    // FUNGSI VALIDASI FORM LENGKAP
+    function validateFormTambahUser() {
+        let isValid = true;
+        let firstErrorElement = null;
+
+        const inputStatus = document.getElementById('input-status');
+        const inputLevel = document.getElementById('input-level');
+        const inputRole = document.getElementById('input-role');
+        const inputName = document.getElementById('fullName');
+        const inputEmail = document.getElementById('email');
+
+        // 1. Validasi Status User
+        const btnStatus = document.querySelector('#ctx-status button');
+        if (!inputStatus || !inputStatus.value) {
+            if (btnStatus) btnStatus.classList.add('border-danger');
+            if (!firstErrorElement) firstErrorElement = btnStatus;
+            isValid = false;
+        } else {
+            if (btnStatus) btnStatus.classList.remove('border-danger');
+        }
+
+        // 2. Validasi Nama
+        if (!inputName || !inputName.value.trim()) {
+            if (inputName) inputName.classList.add('border-danger');
+            if (!firstErrorElement) firstErrorElement = inputName;
+            isValid = false;
+        } else {
+            if (inputName) inputName.classList.remove('border-danger');
+        }
+
+        // 3. Validasi Email
+        if (!inputEmail || !inputEmail.value.trim()) {
+            if (inputEmail) inputEmail.classList.add('border-danger');
+            if (!firstErrorElement) firstErrorElement = inputEmail;
+            isValid = false;
+        } else {
+            if (inputEmail) inputEmail.classList.remove('border-danger');
+        }
+
+        // 4. Validasi Level User
+        const btnLevel = document.querySelector('#ctx-level button');
+        if (!inputLevel || !inputLevel.value) {
+            if (btnLevel) btnLevel.classList.add('border-danger');
+            if (!firstErrorElement) firstErrorElement = btnLevel;
+            isValid = false;
+        } else {
+            if (btnLevel) btnLevel.classList.remove('border-danger');
+        }
+
+        // 5. Validasi Role
+        const btnRole = document.querySelector('#ctx-role button');
+        if (!inputRole || !inputRole.value) {
+            if (btnRole) btnRole.classList.add('border-danger');
+            if (!firstErrorElement) firstErrorElement = btnRole;
+            isValid = false;
+        } else {
+            if (btnRole) btnRole.classList.remove('border-danger');
+        }
+
+        // 6. Validasi IT Provider (Khusus jika Level = Mitra Acquirer / IT Provider '2')
+        if (inputLevel && inputLevel.value === ITP_LEVEL_ID && inputItp && inputItp.value === '') {
+            showItpError();
+            if (!firstErrorElement) firstErrorElement = btnItp;
+            isValid = false;
+        } else {
+            hideItpError();
+        }
+
+        // Auto scroll ke field pertama yang bermasalah/kosong
+        if (!isValid && firstErrorElement) {
+            firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        return isValid;
+    }
+
     if (formTambahUser) {
         formTambahUser.addEventListener('submit', function (event) {
             event.preventDefault();
 
-            const inputLevel = document.getElementById('input-level');
-
-            if (inputLevel && inputLevel.value === ITP_LEVEL_ID && inputItp && inputItp.value === '') {
-                showItpError();
-                if (ctxItp) ctxItp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // Jalankan validasi seluruh field
+            if (!validateFormTambahUser()) {
                 return;
             }
 
@@ -111,9 +191,9 @@ document.addEventListener("DOMContentLoaded", function () {
             if (modalStatus) modalStatus.show();
 
             const formData = new FormData();
-            formData.append('status', document.getElementById('input-status')?.value || '1');
-            formData.append('level_user', document.getElementById('input-level')?.value || '1');
-            formData.append('role', document.getElementById('input-role')?.value || '1');
+            formData.append('status', document.getElementById('input-status')?.value || '');
+            formData.append('level_user', document.getElementById('input-level')?.value || '');
+            formData.append('role', document.getElementById('input-role')?.value || '');
             formData.append('itp_code', inputItp?.value || '');
             formData.append('email', document.getElementById('email')?.value || '');
             formData.append('fullName', document.getElementById('fullName')?.value || '');

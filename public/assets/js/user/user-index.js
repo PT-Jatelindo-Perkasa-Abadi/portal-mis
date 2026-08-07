@@ -10,7 +10,6 @@ function hideLoadingShimmer() {
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    // ROTASI IKON
     const userListContent = document.getElementById('userListContent');
     const collapseArrow = document.getElementById('collapseArrow');
 

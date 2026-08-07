@@ -9,9 +9,6 @@ class Distribution_Model_Aps
         $this->_api = new App_Service_Api();
     }
 
-    /**
-     * Mengekstrak daftar unik Mitra Acquirer dari $listData untuk dropdown filter
-     */
     public function getMitraAcquirerListFromData($listData)
     {
         if (empty($listData) || !is_array($listData)) {
@@ -37,9 +34,6 @@ class Distribution_Model_Aps
         return array_values($uniqueMitra);
     }
 
-    /**
-     * Mengambil data distribusi dari API berdasarkan parameter filter
-     */
     public function getDistributionData($activeTab, $filterDate, $filterService, $filterSort, $mitraCode = '')
     {
         $this->_api->authorization();
@@ -64,9 +58,10 @@ class Distribution_Model_Aps
             $orderBy = "total_fee";
         }
 
-        // 🎯 MODIFIKASI: Kirim string kosong "" di parameter ke-4 agar API selalu mengembalikan seluruh data transaksi
         $payload = [$filterDate, $productCode, $orderBy, ""];
-        $apiUrl  = ($activeTab === 'mitra')
+
+        // Peta endpoint API proxy backend berdasarkan activeTab baru maupun legacy
+        $apiUrl = ($activeTab === 'sub-mitra-acquirer' || $activeTab === 'mitra')
             ? '/service/proxy/service/alias/get-distribution-mitra'
             : '/service/proxy/service/alias/get-distribution-itp';
 
@@ -89,9 +84,6 @@ class Distribution_Model_Aps
         }
     }
 
-    /**
-     * 🎯 MODIFIKASI: Melakukan pencarian kata kunci DAN filter Mitra Acquirer secara lokal di PHP
-     */
     public function filterSearchData($listData, $filterSearch = '', $filterMitra = '')
     {
         if (!is_array($listData) || empty($listData)) {
@@ -108,12 +100,10 @@ class Distribution_Model_Aps
             $kodeData  = isset($value["kode"]) ? strtolower($value["kode"]) : '';
             $namaData  = isset($value["nama"]) ? strtolower($value["nama"]) : '';
 
-            // 🎯 Ambil nama mitra dari berbagai kemungkinan field pada data Sub Mitra
             $namaMitra = isset($value["nama_mitra"])
                 ? strtolower($value["nama_mitra"])
                 : (isset($value["mitra"]) ? strtolower($value["mitra"]) : '');
 
-            // 1. Filter Mitra Acquirer (cek di nama data DAN nama mitra)
             if (!empty($filterMitra)) {
                 $mitraLower = strtolower(trim($filterMitra));
                 $matchMitra = (
@@ -123,11 +113,10 @@ class Distribution_Model_Aps
                 );
 
                 if (!$matchMitra) {
-                    continue; // Lewati baris ini jika nama mitra tidak cocok
+                    continue;
                 }
             }
 
-            // 2. Filter Search Input (Kata Kunci)
             if (!empty($filterSearch)) {
                 $searchKeyword = strtolower(trim($filterSearch));
                 $layananRaw    = isset($value["layanan"]) ? trim($value["layanan"]) : '';
@@ -160,9 +149,6 @@ class Distribution_Model_Aps
         return $filteredList;
     }
 
-    /**
-     * Master List Mitra Acquirer (Selalu tampil di dropdown)
-     */
     public function getMasterMitraList()
     {
         return [
@@ -174,9 +160,6 @@ class Distribution_Model_Aps
         ];
     }
 
-    /**
-     * Memproses data untuk Chart dan Summary
-     */
     public function processChartAndSummary($listData)
     {
         $summary = ['prepaid' => 0, 'postpaid' => 0, 'non_taglist' => 0];
@@ -188,15 +171,12 @@ class Distribution_Model_Aps
 
         if (is_array($listData) && !empty($listData)) {
             foreach ($listData as $value) {
-                // 1. Ambil Nama Tampilan (Sub Mitra atau Mitra) secara fleksibel
                 $namaDisplay = !empty($value["nama"])
                     ? $value["nama"]
                     : (!empty($value["nama_mitra"]) ? $value["nama_mitra"] : ($value["kode"] ?? 'Lainnya'));
 
-                // 2. Buat Key Unik untuk Grouping berdasarkan Nama (Bukan hanya Kode)
                 $groupKey = strtolower(trim($namaDisplay));
 
-                // 3. Inisialisasi jika grup nama belum ada
                 if (!isset($groupedData[$groupKey])) {
                     $groupedData[$groupKey] = [
                         'nama'       => $namaDisplay,
@@ -209,7 +189,6 @@ class Distribution_Model_Aps
                 $nilaiLembar = intval($value['lembar'] ?? ($value['jumlah'] ?? 0));
                 $layanan     = strtolower(trim($value['layanan'] ?? ''));
 
-                // 4. Akumulasi (Gunakan += agar data dijumlahkan, bukan ditimpa)
                 if ($layanan === 'prepaid') {
                     $groupedData[$groupKey]['prepaid'] += $nilaiLembar;
                     $summary['prepaid'] += $nilaiLembar;
@@ -222,7 +201,6 @@ class Distribution_Model_Aps
                 }
             }
 
-            // 5. Susun ke array format Chart JS
             foreach ($groupedData as $item) {
                 $chartLabels[]         = $item['nama'];
                 $chartDataPrepaid[]    = $item['prepaid'];
@@ -242,16 +220,12 @@ class Distribution_Model_Aps
         ];
     }
 
-    /**
-     * Memproses Export Excel
-     */
     public function exportExcel($listData, $activeTab, $filterDate)
     {
         set_include_path(get_include_path() . PATH_SEPARATOR . APPLICATION_PATH . '/../library');
         require_once '../library/Spreadsheet/Excel/Writer.php';
 
-        // Penentuan label berdasarkan tab aktif
-        $isSubMitra = ($activeTab === 'submitra' || $activeTab === 'mitra');
+        $isSubMitra = ($activeTab === 'sub-mitra-acquirer' || $activeTab === 'submitra' || $activeTab === 'mitra');
 
         $fileSuffix  = $isSubMitra ? 'Sub_Mitra_Acquirer' : 'Mitra_Acquirer';
         $labelHeader = $isSubMitra ? 'SUB MITRA ACQUIRER' : 'MITRA ACQUIRER';
@@ -303,7 +277,6 @@ class Distribution_Model_Aps
         $format_total_text->setAlign('center');
         $format_total_text->setBorder(1);
 
-        // Penyesuaian lebar kolom agar teks header baru muat
         $worksheet->setColumn(0, 0, 8);
         $worksheet->setColumn(1, 1, 22);
         $worksheet->setColumn(2, 2, 35);
