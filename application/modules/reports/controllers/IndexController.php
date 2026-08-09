@@ -115,7 +115,7 @@ class Reports_IndexController extends App_Controller_Base
         /*
         * Generate Excel
         */
-        $this->_Model->generateExcelMitra($params, $data);
+        $this->_Model->generateExcelMitra($params, $summary, $data);
 
         exit;
     }
