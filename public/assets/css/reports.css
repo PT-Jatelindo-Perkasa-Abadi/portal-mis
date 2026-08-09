@@ -9,7 +9,6 @@
     /* Dropdown */
     .select2-dropdown {
         border: none;
-        border-radius: 16px;
         overflow: hidden;
         box-shadow: 0 8px 24px rgba(0,0,0,.12);
         padding: 8px;
@@ -22,7 +21,7 @@
     .select2-results__option {
         position: relative;
         padding: 16px 20px;
-        border-radius: 12px;
+        border-radius: 8px;
         font-size: 14px;
         color: #111827;
     }
@@ -134,7 +133,7 @@
         justify-content:center;
         font-size:26px;
         color:#2f6fed;
-        background: #edf4ff url("../img/Logo-trx.png") no-repeat center center;
+        background: url("../img/img-total-disbursement.svg") no-repeat center center;
     }
 
     .summary-icon-tagihan{
@@ -147,7 +146,7 @@
         justify-content:center;
         font-size:26px;
         color:#2f6fed;
-        background: #edf4ff url("../img/Logo-tagihan.png") no-repeat center center;
+        background: url("../img/img-total-transaction.svg") no-repeat center center;
     }
 
     .summary-icon-admin{
@@ -160,7 +159,7 @@
         justify-content:center;
         font-size:26px;
         color:#2f6fed;
-        background: #edf4ff url("../img/Logo-admin.png") no-repeat center center;
+        background: url("../img/img-fee-transaction.svg") no-repeat center center;
     }
 
     .summary-icon-nominal{
@@ -173,7 +172,7 @@
         justify-content:center;
         font-size:26px;
         color:#2f6fed;
-        background: #edf4ff url("../img/Logo-nominal.png") no-repeat center center;
+        background: url("../img/img-total-amount.svg") no-repeat center center;
     }
 
 
@@ -359,5 +358,6 @@
 
 
 
-
-
+#reports .skeleton-cell {
+    width: auto;
+}
