@@ -117,7 +117,7 @@ class Reports_Model_Aps
         return $response;
     }
 
-    public function generateExcelMitra($params, $data)
+    public function generateExcelMitra($params, $summary, $data)
     {
         require_once '../library/Spreadsheet/Excel/Writer.php';
 
