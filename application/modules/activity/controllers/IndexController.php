@@ -7,6 +7,9 @@ class Activity_IndexController extends App_Controller_Base
         //ini_set('display_errors', 1);
       	//ini_set('display_startup_errors', 1);
       	//error_reporting(E_ALL);
+        $this->view->headLink()->appendStylesheet(
+            $this->view->baseUrl('/assets/css/activity.css')
+        );
     }
 
     public function indexAction()
