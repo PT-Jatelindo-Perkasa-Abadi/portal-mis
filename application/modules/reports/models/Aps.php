@@ -16,14 +16,15 @@ class Reports_Model_Aps
         try {
             $this->_api->authorization();
 
-            $draw           = $params['draw'];
-            $start          = $params['start'];
-            $length         = $params['length'];
+            $draw           = (int)$params['draw'];
+            $start          = (int)$params['start'];
+            $length         = (int)$params['length'];
             $tanggal        = $params['tanggal'];
-            $itProvider     = $params['it_provider'];
-            $layanan        = $params['layanan'];
-            $keyword        = $params['keyword'];
-            $mitra          = $params['mitra'];
+            $itProvider     = trim($params['it_provider']);
+            $layanan        = trim($params['layanan']);
+            $keyword        = trim($params['keyword']);
+            $mitra          = trim($params['mitra']);
+            $order          = $params['order'];
 
             if ($mitra == "") {
                 $columns = array(
@@ -70,7 +71,15 @@ class Reports_Model_Aps
             }
 
             if ($layanan != "ALL") {
-                $whereLayanan = "";
+                if ($layanan == 'POSTPAID') {
+                    $whereLayanan = '501';
+                } else if ($layanan == 'PREPAID') {
+                    $whereLayanan = '502';
+                } else if ($layanan == 'NON_TAGLIST') {
+                    $whereLayanan = '504';
+                }
+            } else {
+                $layanan = "";
             }
 
             if ($keyword != "") {
@@ -88,16 +97,15 @@ class Reports_Model_Aps
             $payloadtotalnowITP  	= [$whereTanggal,$whereLayanan,$itProvider,$mitra,$keyword,'nama',$length,$start];
             $responsetotalnowITP 	= $this->_api->request('POST', $apiUrltotalnowITP, $payloadtotalnowITP);
 
+            $apiUrltotalnowITPTotal  	= '/service/proxy/service/alias/totalcount-trx-now-itp';
+            $payloadtotalnowITPTotal  	= [$whereTanggal,$whereLayanan,$itProvider,$mitra,$keyword,'nama','',''];
+            $responsetotalnowITPTotal 	= $this->_api->request('POST', $apiUrltotalnowITPTotal, $payloadtotalnowITPTotal);
+
             $response = [
                 "draw" => $draw,
-                "recordsTotal" => count($responsetotalnowITP['msg']),
-                "recordsFiltered" => count($responsetotalnowITP['msg']),
-                "data" => $responsetotalnowITP['msg'],
-                "filterParams" => [
-                    "tanggal" => $tanggal,
-                    "itProvider" => !empty($itProvider) ? $itProvider : "ALL",
-                    "layanan" => !empty($layanan) ? $layanan : "ALL"
-                ]
+                "recordsTotal" => count($responsetotalnowITPTotal['msg']),
+                "recordsFiltered" => count($responsetotalnowITPTotal['msg']),
+                "data" => $responsetotalnowITP['msg']
             ];
         } catch (Exception $e) {
             $response = [
@@ -105,14 +113,101 @@ class Reports_Model_Aps
                 "recordsTotal" => 0,
                 "recordsFiltered" => 0,
                 "data" => array(),
-                "filterParams" => [
-                    "tanggal" => $tanggal,
-                    "itProvider" => !empty($itProvider) ? $itProvider : "ALL",
-                    "layanan" => !empty($layanan) ? $layanan : "ALL"
-                ],
                 "message" => $e->getMessage()
             ];
         }
+
+        return $response;
+    }
+
+    public function getTransactionMitraTotal($params)
+    {
+        $response = [];
+
+        $this->_api->authorization();
+
+        $draw           = (int)$params['draw'];
+        $start          = (int)$params['start'];
+        $length         = (int)$params['length'];
+        $tanggal        = $params['tanggal'];
+        $itProvider     = trim($params['it_provider']);
+        $layanan        = trim($params['layanan']);
+        $keyword        = trim($params['keyword']);
+        $mitra          = trim($params['mitra']);
+        $order          = $params['order'];
+
+        if ($mitra == "") {
+            $columns = array(
+                0 => 'no',
+                1 => 'it-provider',
+                2 => 'layanan',
+                3 => 'lembar',
+                4 => 'tagihan',
+                5 => 'admin',
+                6 => 'total'
+            );
+        } else {
+            $columns = array(
+                0 => 'no',
+                1 => 'mitra',
+                2 => 'it-provider',
+                3 => 'layanan',
+                4 => 'lembar',
+                5 => 'tagihan',
+                6 => 'admin',
+                7 => 'total'
+            );
+        }
+
+        $orderIndex = $params['order'][0]['column'];
+        $orderDir   = strtoupper($params['order'][0]['dir']);
+
+        $orderBy = isset($columns[$orderIndex])
+            ? $columns[$orderIndex]
+            : 'technical_provider_code';
+
+        if (!in_array($orderDir, array('ASC', 'DESC'))) {
+            $orderDir = 'ASC';
+        }
+
+
+        $whereTanggal  = $tanggal;
+        $whereProvider = "";
+        $whereLayanan  = "";
+        $whereSearch   = "";
+
+        if ($itProvider != "") {
+            $whereProvider = " and technical_provider_code = '{$itProvider}'";
+        }
+
+        if ($layanan != "ALL") {
+            if ($layanan == 'POSTPAID') {
+                $whereLayanan = '501';
+            } else if ($layanan == 'PREPAID') {
+                $whereLayanan = '502';
+            } else if ($layanan == 'NON_TAGLIST') {
+                $whereLayanan = '504';
+            }
+        } else {
+            $layanan = "";
+        }
+
+        if ($keyword != "") {
+            $keyword = strtolower($keyword);
+            $keywords = "%{$keyword}%";
+
+            $whereSearch = "
+            (
+                lower(nama_technical_provider) LIKE '%{$keyword}%'
+                OR lower(product) LIKE '%{$keyword}%'
+            )";
+        }
+
+        $apiUrltotalnowITPTotal  	= '/service/proxy/service/alias/totalcount-trx-now-itp';
+        $payloadtotalnowITPTotal    = [$whereTanggal,$whereLayanan,$itProvider,$mitra,$keyword,'nama','',''];
+        $responsetotalnowITPTotal   = $this->_api->request('POST', $apiUrltotalnowITPTotal, $payloadtotalnowITPTotal);
+
+        $response = $responsetotalnowITPTotal['msg'];
 
         return $response;
     }
@@ -122,7 +217,8 @@ class Reports_Model_Aps
         require_once '../library/Spreadsheet/Excel/Writer.php';
 
         $workbook = new Spreadsheet_Excel_Writer();
-        $filename = 'Laporan_Transaksi_Mitra_Acquirer_' . $params['tanggal'] . '.xls';
+        $fileSuffix = $params['isSubMitra'] == '0' ? 'Mitra_Acquirer' : 'Sub_Mitra_Acquirer';
+        $filename = 'Laporan_Transaksi_' . $fileSuffix . '_' . $params['tanggal'] . '.xls';
         $workbook->send($filename);
 
         /*
@@ -197,24 +293,21 @@ class Reports_Model_Aps
         * Table Header
         */
         $startRow = 12;
-        $headers = [
-            'No',
-            'Mitra',
-            'Mitra Acquirer',
-            'Layanan',
-            'Lembar',
-            'Tagihan (Rp)',
-            'Admin Mitra Acquirer (Rp)',
-            'Total (Rp)'
-        ];
+        $headers = [];
+
+        if ($params['isSubMitra'] == '1') {
+            $headers = ['No', 'Sub Mitra', 'Mitra Acquirer', 'Layanan', 'Lembar', 'Tagihan (Rp)', 'Admin Mitra Acquirer (Rp)', 'Total (Rp)'];
+            $columns = ['nama_mitra', 'nama_technical_provider', 'product', 'lembar', 'sum_total_tagihan', 'sum_total_fee', 'sum_total_nomial'];
+        } else if ($params['isSubMitra' == '2']) {
+            $headers = ['No', 'Sub Mitra', 'Layanan', 'Lembar', 'Tagihan (Rp)', 'Admin Mitra Acquirer (Rp)', 'Total (Rp)'];
+            $columns = ['nama_mitra', 'product', 'lembar', 'sum_total_tagihan', 'sum_total_fee', 'sum_total_nomial'];
+        } else {
+            $headers = ['No', 'Mitra Acquirer', 'Layanan', 'Lembar', 'Tagihan (Rp)', 'Admin Mitra Acquirer (Rp)', 'Total (Rp)'];
+            $columns = ['nama_technical_provider', 'product', 'lembar', 'sum_total_tagihan', 'sum_total_fee', 'sum_total_nomial'];
+        }
 
         foreach ($headers as $column => $header) {
-            $worksheet->write(
-                $startRow,
-                $column,
-                $header,
-                $headerFormat
-            );
+            $worksheet->write($startRow, $column, $header, $headerFormat);
         }
 
         /*
@@ -222,15 +315,18 @@ class Reports_Model_Aps
         */
         $rowNumber = $startRow + 1;
         foreach ($data as $index => $row) {
-            $worksheet->write($rowNumber, 0, $index + 1, $centerFormat);
-            $worksheet->write($rowNumber, 1, $row['nama_mitra'], $textFormat);
-            $worksheet->write($rowNumber, 2, $row['nama_technical_provider'], $textFormat);
-            $worksheet->write($rowNumber, 3, $row['product'], $textFormat);
-            $worksheet->writeNumber($rowNumber, 4, (float) $row['lembar'], $numberFormat);
-            $worksheet->writeNumber($rowNumber, 5, (float) $row['sum_total_tagihan'], $currencyFormat);
-            $worksheet->writeNumber($rowNumber, 6, (float) $row['sum_total_fee'], $currencyFormat);
-            $worksheet->writeNumber($rowNumber, 7, (float) $row['sum_total_nomial'], $currencyFormat);
-
+            $worksheet->write( $rowNumber, 0, $index + 1, $centerFormat );
+            foreach ($columns as $column => $field) {
+                $value = $row[$field];
+                $columnSummary = ['lembar', 'sum_total_tagihan', 'sum_total_fee', 'sum_total_nomial'];
+                // Kolom numerik
+                if (in_array($field, $columnSummary)) {
+                    $format = $field === 'lembar' ? $numberFormat : $currencyFormat;
+                    $worksheet->writeNumber($rowNumber, $column + 1, (float) $value, $format);
+                } else {
+                    $worksheet->write($rowNumber, $column + 1, $value, $textFormat);
+                }
+            }
             $rowNumber++;
         }
 
