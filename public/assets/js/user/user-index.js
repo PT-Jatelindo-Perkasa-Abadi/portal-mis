@@ -31,6 +31,29 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    // 🎯 EVENT LISTENER KLIK HEADER UNTUK SORTING MANUAL
+    const sortableHeaders = document.querySelectorAll('.sortable-header');
+
+    sortableHeaders.forEach(header => {
+        header.addEventListener('click', function () {
+            const sortField = this.dataset.sort;
+            const inputSort = document.getElementById('input-sort');
+            const inputDir = document.getElementById('input-dir');
+
+            if (!inputSort || !inputDir) return;
+
+            if (inputSort.value === sortField) {
+                inputDir.value = inputDir.value === 'asc' ? 'desc' : 'asc';
+            } else {
+                inputSort.value = sortField;
+                inputDir.value = 'asc';
+            }
+
+            showLoadingShimmer();
+            document.getElementById('filterUserForm')?.submit();
+        });
+    });
+
     const filterItems = document.querySelectorAll(".dropdown-menu a:not(.limit-item)");
 
     filterItems.forEach(item => {

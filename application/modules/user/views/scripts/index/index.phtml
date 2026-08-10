@@ -1,4 +1,28 @@
 <?php // index.phtml 
+$currentSort = $_GET['sort'] ?? '';
+$currentDir  = strtolower($_GET['dir'] ?? 'asc');
+
+function renderSortIcon($field, $currentSort, $currentDir, $baseUrl)
+{
+    // Default: kedua panah abu-abu
+    $iconName = 'ic-sort-default.svg';
+
+    if ($currentSort === $field) {
+        if ($currentDir === 'desc') {
+            // Panah bawah biru
+            $iconName = 'ic-sort-down.svg';
+        } else {
+            // Panah atas biru
+            $iconName = 'ic-sort-up.svg';
+        }
+    }
+
+    return '<img src="' . $baseUrl . 'assets/img/' . $iconName . '" 
+                 alt="Sort" 
+                 style="width: 24px; height: 24px; object-fit: contain; flex-shrink: 0;" />';
+}
+
+$baseUrl = $this->baseUrl('/');
 ?>
 
 <!-- STYLE CSS SHIMMER LOADING -->
@@ -51,6 +75,10 @@
     .icon-toggle-collapse.collapsed {
         transform: rotate(180deg);
     }
+
+    .sortable-header:hover {
+        background-color: #F8F9FA !important;
+    }
 </style>
 
 <!-- MAIN CONTAINER WARNA LIGHT PRESISI FIGMA -->
@@ -83,7 +111,7 @@
     <!-- MAIN CARD BOX DATA LIST -->
     <div class="card border-0 mb-5 bg-white shadow-sm" style="border-radius: 12px; outline: 1px #E7E8E8 solid; outline-offset: -1px; overflow: hidden;">
 
-        <!-- 🎯 TITLE: LIST DATA (Diberi Trigger Buka Tutup) -->
+        <!-- TITLE: LIST DATA -->
         <div class="d-flex justify-content-between align-items-center px-4 py-3 bg-white"
             data-bs-toggle="collapse"
             data-bs-target="#userListContent"
@@ -98,7 +126,7 @@
             </div>
         </div>
 
-        <!-- 🎯 KONTEN CARD YANG BISA DIBUKA/DITUTUP -->
+        <!-- KONTEN CARD YANG BISA DIBUKA/DITUTUP -->
         <div class="collapse show" id="userListContent">
 
             <!-- FORM SEARCH & MULTI-DROPDOWN FILTER -->
@@ -107,6 +135,10 @@
                     <input type="hidden" name="level" id="input-level" value="<?= (isset($_GET['level']) && $_GET['level'] !== '') ? $this->escape($_GET['level']) : ''; ?>">
                     <input type="hidden" name="role" id="input-role" value="<?= (isset($_GET['role']) && $_GET['role'] !== '') ? $this->escape($_GET['role']) : ''; ?>">
                     <input type="hidden" name="status" id="input-status" value="<?= (isset($_GET['status']) && $_GET['status'] !== '') ? $this->escape($_GET['status']) : ''; ?>">
+
+                    <!-- Hidden Input Sorting -->
+                    <input type="hidden" name="sort" id="input-sort" value="<?= isset($_GET['sort']) ? $this->escape($_GET['sort']) : ''; ?>">
+                    <input type="hidden" name="dir" id="input-dir" value="<?= isset($_GET['dir']) ? $this->escape($_GET['dir']) : 'asc'; ?>">
 
                     <!-- Dropdown Limit Angka Entries -->
                     <div class="dropdown" id="ctx-limit">
@@ -323,7 +355,6 @@
                 $reqRole    = $_GET['role'] ?? '';
                 $reqStatus  = $_GET['status'] ?? '';
 
-                // Flag Cek Apakah User Sedang Menggunakan Filter Kustom
                 $isUserFiltering = ($searchText !== '') || ($reqLevel !== '') || ($reqRole !== '') || ($reqStatus !== '');
                 ?>
 
@@ -343,7 +374,6 @@
                     }
                 }
 
-                // Convert Tampilan Nama Level
                 if (strcasecmp($badgeLevelText, 'Admin MIS') === 0 || strcasecmp($badgeLevelText, 'MIS') === 0) {
                     $badgeLevelText = 'ASP';
                 } elseif (strcasecmp($badgeLevelText, 'IT Provider') === 0) {
@@ -392,48 +422,95 @@
                 <?php endif; ?>
             </div>
 
-            <!-- TABLE LAYOUT GRID PRESISI -->
+            <!-- TABLE LAYOUT GRID PRESISI FIGMA -->
             <div class="table-responsive border-0 w-100">
                 <table class="table align-middle table-hover mb-0 w-100 text-dark" style="border: none; table-layout: fixed;">
                     <thead>
                         <tr class="fw-bold border-bottom" style="border-color: #E7E8E8 !important; font-size: 14px; color: #595C60; background: #fff;">
-                            <th class="py-3 ps-4" style="width: 6.5%;">No</th>
-                            <th class="py-3 text-center" style="width: 12%;">ID User</th>
-                            <th class="py-3" style="width: 17%;">Nama</th>
-                            <th class="py-3" style="width: 24%;">Email</th>
-                            <th class="py-3" style="width: 14%;">Level User</th>
-                            <th class="py-3" style="width: 14%;">Role</th>
-                            <th class="py-3" style="width: 12.5%;">Status</th>
-                            <th class="py-3 pe-4" style="width: 17%;">Action</th>
+                            <th class="py-3 ps-4 sortable-header" data-sort="no" style="width: 6.5%; cursor: pointer;">
+                                <div class="d-flex align-items-center justify-content-between pe-2">
+                                    <span>No</span>
+                                    <?= renderSortIcon('no', $currentSort, $currentDir, $baseUrl); ?>
+                                </div>
+                            </th>
+
+                            <th class="py-3 px-3 sortable-header" data-sort="id_user" style="width: 12%; cursor: pointer;">
+                                <div class="d-flex align-items-center justify-content-between pe-2">
+                                    <span>ID User</span>
+                                    <?= renderSortIcon('id_user', $currentSort, $currentDir, $baseUrl); ?>
+                                </div>
+                            </th>
+
+                            <th class="py-3 px-3 sortable-header" data-sort="fullName" style="width: 17%; cursor: pointer;">
+                                <div class="d-flex align-items-center justify-content-between pe-2">
+                                    <span>Nama</span>
+                                    <?= renderSortIcon('fullName', $currentSort, $currentDir, $baseUrl); ?>
+                                </div>
+                            </th>
+
+                            <th class="py-3 px-3 sortable-header" data-sort="email" style="width: 24%; cursor: pointer;">
+                                <div class="d-flex align-items-center justify-content-between pe-2">
+                                    <span>Email</span>
+                                    <?= renderSortIcon('email', $currentSort, $currentDir, $baseUrl); ?>
+                                </div>
+                            </th>
+
+                            <th class="py-3 px-3 sortable-header" data-sort="level_user" style="width: 14%; cursor: pointer;">
+                                <div class="d-flex align-items-center justify-content-between pe-2">
+                                    <span>Level User</span>
+                                    <?= renderSortIcon('level_user', $currentSort, $currentDir, $baseUrl); ?>
+                                </div>
+                            </th>
+
+                            <th class="py-3 px-3 sortable-header" data-sort="role" style="width: 14%; cursor: pointer;">
+                                <div class="d-flex align-items-center justify-content-between pe-2">
+                                    <span>Role</span>
+                                    <?= renderSortIcon('role', $currentSort, $currentDir, $baseUrl); ?>
+                                </div>
+                            </th>
+
+                            <th class="py-3 px-3 sortable-header" data-sort="status" style="width: 12.5%; cursor: pointer;">
+                                <div class="d-flex align-items-center justify-content-between pe-2">
+                                    <span>Status</span>
+                                    <?= renderSortIcon('status', $currentSort, $currentDir, $baseUrl); ?>
+                                </div>
+                            </th>
+
+                            <th class="py-3 pe-4 sortable-header" data-sort="action" style="width: 17%; cursor: pointer;">
+                                <div class="d-flex align-items-center justify-content-between pe-2">
+                                    <span>Action</span>
+                                    <?= renderSortIcon('action', $currentSort, $currentDir, $baseUrl); ?>
+                                </div>
+                            </th>
                         </tr>
                     </thead>
 
-                    <!-- SHIMMER TABLE BODY (Tampil Bawaan) -->
+                    <!-- SHIMMER TABLE BODY -->
                     <tbody id="shimmer-table-body">
                         <?php for ($i = 0; $i < 6; $i++): ?>
                             <tr class="border-bottom" style="border-color: #E7E8E8 !important; height: 64px; background: #fff;">
-                                <td class="ps-4">
+                                <td class="py-3 ps-4">
                                     <div class="shimmer-placeholder" style="width: 20px; height: 16px;"></div>
                                 </td>
-                                <td class="text-center">
+                                <td class="py-3 px-3">
                                     <div class="shimmer-placeholder" style="width: 60px; height: 16px;"></div>
                                 </td>
-                                <td>
+                                <td class="py-3 px-3">
                                     <div class="shimmer-placeholder" style="width: 110px; height: 16px;"></div>
                                 </td>
-                                <td>
+                                <td class="py-3 px-3">
                                     <div class="shimmer-placeholder" style="width: 160px; height: 16px;"></div>
                                 </td>
-                                <td>
+                                <td class="py-3 px-3">
                                     <div class="shimmer-placeholder" style="width: 90px; height: 16px;"></div>
                                 </td>
-                                <td>
+                                <td class="py-3 px-3">
                                     <div class="shimmer-placeholder" style="width: 80px; height: 16px;"></div>
                                 </td>
-                                <td>
+                                <td class="py-3 px-3">
                                     <div class="shimmer-placeholder" style="width: 70px; height: 26px; border-radius: 8px;"></div>
                                 </td>
-                                <td class="pe-4">
+                                <td class="py-3 pe-4">
                                     <div class="d-flex gap-2">
                                         <div class="shimmer-placeholder" style="width: 68px; height: 36px; border-radius: 8px;"></div>
                                         <div class="shimmer-placeholder" style="width: 68px; height: 36px; border-radius: 8px;"></div>
@@ -463,12 +540,12 @@
                                 ?>
                                 <tr class="text-dark border-bottom" style="border-color: #E7E8E8 !important; font-size: 14px; background: #fff;">
                                     <td class="py-3 ps-4" style="color: #12161C; font-weight: 400;"><?= $no++; ?></td>
-                                    <td class="text-center" style="color: #12161C; font-weight: 400;"><?= isset($user['id_user']) ? $user['id_user'] : '-'; ?></td>
-                                    <td class="text-truncate pe-2" style="max-width: 160px; color: #12161C; font-weight: 400;"><?= $user['fullName'] ?? '-'; ?></td>
-                                    <td class="text-truncate pe-2" style="max-width: 220px; color: #12161C; font-weight: 400;"><?= $user['email'] ?? '-'; ?></td>
-                                    <td style="color: #12161C; font-weight: 400;"><?= $rowLevelName; ?></td>
-                                    <td style="color: #12161C; font-weight: 400;"><?= $user['role'] ?? '-'; ?></td>
-                                    <td>
+                                    <td class="py-3 px-3" style="color: #12161C; font-weight: 400;"><?= isset($user['id_user']) ? $user['id_user'] : '-'; ?></td>
+                                    <td class="py-3 px-3 text-truncate" style="max-width: 160px; color: #12161C; font-weight: 400;"><?= $user['fullName'] ?? '-'; ?></td>
+                                    <td class="py-3 px-3 text-truncate" style="max-width: 220px; color: #12161C; font-weight: 400;"><?= $user['email'] ?? '-'; ?></td>
+                                    <td class="py-3 px-3" style="color: #12161C; font-weight: 400;"><?= $rowLevelName; ?></td>
+                                    <td class="py-3 px-3" style="color: #12161C; font-weight: 400;"><?= $user['role'] ?? '-'; ?></td>
+                                    <td class="py-3 px-3">
                                         <?php
                                         $statusText = 'Non-Aktif';
                                         $badgeStyle = 'background: #FDEFEF; color: #EB5757;';
@@ -485,7 +562,7 @@
                                             <?= $statusText; ?>
                                         </div>
                                     </td>
-                                    <td class="pe-4">
+                                    <td class="py-3 pe-4">
                                         <div class="d-flex gap-2">
                                             <!-- Tombol Edit -->
                                             <a href="<?= $this->baseUrl('user/index/edit/id/' . ($user['id_user'] ?? '')); ?>"
@@ -510,7 +587,7 @@
                             <tr>
                                 <td colspan="8" class="text-center py-5">
                                     <div class="d-flex flex-column align-items-center justify-content-center py-4">
-                                        <img src="<?= $this->baseUrl('assets/img/img-create.svg'); ?>"
+                                        <img src="<?= $this->baseUrl('assets/img/img-data-empty.svg'); ?>"
                                             alt="Data Kosong"
                                             style="width: 280px; height: auto; object-fit: contain;"
                                             class="mb-3">
