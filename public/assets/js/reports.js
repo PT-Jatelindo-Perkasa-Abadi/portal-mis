@@ -74,7 +74,6 @@ $(function () {
         }
     });
 
-
     $('#btnSearchMitra').on('click', function () {
         let length = parseInt($('#lengthData').val(), 10);
 
@@ -114,67 +113,39 @@ $(function () {
         }
     });
 
-    function downloadExcel() {
-        tanggal = $('#filterDateMitra').val();
-        it_provider = $('#listitp').val();
-        layanan = $('#layanan').val();
-        keyword = $('#keyword').val();
-        productCode = "";
+    $('#btnSearchRoleMitra').on('click', function () {
+        let length = parseInt($('#lengthData').val(), 10);
 
-        if (layanan === 'PREPAID') {
-            productCode = "502";
-        } else if (layanan === 'POSTPAID') {
-            productCode = "501";
-        } else if (layanan === 'NON-TAGLIST') {
-            productCode = "504";
+        $('#rolemitranow').DataTable().page.len(length);
+        $('#rolemitranow').DataTable().ajax.reload(null, true);
+
+        let tgl = $('#filterDateItpMitra').val();
+        let layanan = $('#layanan').find(':selected').text();
+        let keyword = $('#keyword').val();
+        let mitra = $('#listmitra').find(':selected').text();
+
+        if (tgl != "") {
+            $('#badge-date-report-mitra').text('Tanggal ' + tgl);
         }
 
-        window.location = '/reports/index/download';
-    }
-
-    function downloadExcelMitra(){
-        tanggal = $('.custom-date-input-with-icon').val();
-        it_provider = $('#listitp').val();
-        layanan = $('#layanan').val();
-        keyword = $('#keyword').val();
-        mitra = $('#listmitra').val();
-        productCode = "";
-
-        if (layanan === 'PREPAID') {
-            productCode = "502";
-        } else if (layanan === 'POSTPAID') {
-            productCode = "501";
-        } else if (layanan === 'NON-TAGLIST') {
-            productCode = "504";
+        if (mitra != "") {
+            $('#badge-p-report-mitra').show();
+            $('#badge-p-report-mitra').text(mitra);
         }
 
-        window.location =
-            '/reports/index/downloadmitra/tanggal/'+tanggal+'/it_provider/'+it_provider+'/mitra/'+mitra+'/layanan/'+productCode+'/keyword/'+keyword;
-    }
-
-    function downloadExcelItpMitra(){
-        tanggal = $('.custom-date-input-with-icon').val();
-        it_provider = $('#itpcode').val();
-        layanan = $('#layanan').val();
-        keyword = $('#keyword').val();
-        mitra = $('#listmitra').val();
-        productCode = "";
-
-        if (layanan === 'PREPAID') {
-            productCode = "502";
-        } else if (layanan === 'POSTPAID') {
-            productCode = "501";
-        } else if (layanan === 'NON-TAGLIST') {
-            productCode = "504";
+        if (layanan != "") {
+            $('#badge-service-report-mitra').show();
+            $('#badge-service-report-mitra').text(layanan);
         }
 
-        window.location =
-            '/reports/index/downloaditpmitra/tanggal/'+tanggal+'/it_provider/'+it_provider+'/mitra/'+mitra+'/layanan/'+productCode+'/keyword/'+keyword;
-    }
+        if (keyword != "") {
+            $('#badge-search-report-mitra').show();
+            $('#badge-search-report-mitra').text(keyword);
+        } else {
+            $('#badge-search-report-mitra').hide();
+        }
+    });
 
-    // $('#btnDownload').click(function(){
-    //     downloadExcel();
-    // });
     $('#btnDownload').on('click', function () {
         let table = $('#itpnow').DataTable();
         let start = table.page.info().start;
@@ -190,6 +161,7 @@ $(function () {
             it_provider: $('#listitp').val(),
             layanan: $('#layanan').val(),
             mitra: "",
+            isSubMitra: 0,
             start,
             length
         };
@@ -212,12 +184,80 @@ $(function () {
         form.remove();
     });
 
-    $('#btnDownloadmitra').click(function(){
-        downloadExcelMitra();
+    $('#btnDownloadmitra').on('click', function () {
+        let table = $('#mitranow').DataTable();
+        let start = table.page.info().start;
+        let length = table.page.info().length;
+        let params = {
+            tanggal: $('#filterDateSubMitra')
+                .val()
+                .replaceAll('/', '-')
+                .split('-')
+                .reverse()
+                .join('-'),
+            keyword: $('#keyword').val(),
+            it_provider: $('#listitp').val(),
+            layanan: $('#layanan').val(),
+            mitra: $('#listmitra').val(),
+            isSubMitra: 1,
+            start,
+            length
+        };
+
+        let form = $('<form>', {
+            method: 'POST',
+            action: '/reports/index/download'
+        });
+
+        $.each(params, function (key, value) {
+            $('<input>', {
+                type: 'hidden',
+                name: key,
+                value: value == null ? '' : value
+            }).appendTo(form);
+        });
+
+        $('body').append(form);
+        form.submit();
+        form.remove();
     });
 
-    $('#btnDownloadItpmitra').click(function(){
-        downloadExcelItpMitra();
+    $('#btnDownloadItpmitra').on('click', function () {
+        let table = $('#rolemitranow').DataTable();
+        let start = table.page.info().start;
+        let length = table.page.info().length;
+        let params = {
+            tanggal: $('#filterDateItpMitra')
+                .val()
+                .replaceAll('/', '-')
+                .split('-')
+                .reverse()
+                .join('-'),
+            keyword: $('#keyword').val(),
+            it_provider: "",
+            layanan: $('#layanan').val(),
+            mitra: $('#listmitra').val(),
+            isSubMitra: 2,
+            start,
+            length
+        };
+
+        let form = $('<form>', {
+            method: 'POST',
+            action: '/reports/index/downloaditpmitra'
+        });
+
+        $.each(params, function (key, value) {
+            $('<input>', {
+                type: 'hidden',
+                name: key,
+                value: value == null ? '' : value
+            }).appendTo(form);
+        });
+
+        $('body').append(form);
+        form.submit();
+        form.remove();
     });
 
     $('.custom-tabs .nav-link').on('click', function(e) {
@@ -227,7 +267,6 @@ $(function () {
         $(this).addClass('active');
 
         let url = $(this).data('url');
-
         window.location.href = url;
     });
 
@@ -525,7 +564,7 @@ $(document).ready(function() {
             url: '/reports/index/listtransaksi',
             type: 'POST',
             data: function (d) {
-                d.tanggal     = $('#filterDateSubMitra')
+                d.tanggal     = $('#filterDateItpMitra')
                     .val()
                     .replaceAll('/', '-')
                     .split('-')
@@ -571,7 +610,10 @@ $(document).ready(function() {
             },
             {
                 data: 'product',
-                defaultContent: '-'
+                defaultContent: '-',
+                render: function(data) {
+                    return `<div class="dt-status status-neutral fw-medium py-1">${data.toLowerCase()}</div>`;
+                }
             },
             {
                 data: 'lembar',
@@ -596,40 +638,5 @@ $(document).ready(function() {
                 }
             }
         ]
-    });
-
-
-    $('#btnSearchRoleMitra').on('click', function () {
-        let length = parseInt($('#lengthData').val(), 10);
-
-        $('#rolemitranow').DataTable().page.len(length);
-        $('#rolemitranow').DataTable().ajax.reload(null, true);
-
-        let tgl = $('#filterDateSubMitra').val();
-        let itpprovicer = $('#itpcode').val();
-        let layanan = $('#layanan').find(':selected').text();
-        let keyword = $('#keyword').val();
-        let mitra = $('#listmitra').find(':selected').text();
-
-        if (tgl != "") {
-            $('#badge-date-report-mitra').text('Tanggal ' + tgl);
-        }
-
-        if (mitra != "") {
-            $('#badge-p-report-mitra').show();
-            $('#badge-p-report-mitra').text(mitra);
-        }
-
-        if (layanan != "") {
-            $('#badge-service-report-mitra').show();
-            $('#badge-service-report-mitra').text(layanan);
-        }
-
-        if (keyword != "") {
-            $('#badge-search-report-mitra').show();
-            $('#badge-search-report-mitra').text(keyword);
-        } else {
-            $('#badge-search-report-mitra').hide();
-        }
     });
 });
