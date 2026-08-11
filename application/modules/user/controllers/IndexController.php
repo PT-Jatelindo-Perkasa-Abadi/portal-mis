@@ -195,7 +195,7 @@ class User_IndexController extends App_Controller_Base
                 $userDetail['status'] = 'Non-Aktif';
             }
         }
-        
+
 
         if ($userDetail !== null) {
             $userSession = new Zend_Session_Namespace('UserDetailCache');
@@ -426,13 +426,20 @@ class User_IndexController extends App_Controller_Base
             $itpCode   = trim((string) $this->_getParam('itp_code', ''));
             $statusRaw = $this->_getParam('status', '1');
 
-            $isActive = ($statusRaw === '1') ? 1 : 0;
-
             $ipAddress = $this->_request->getServer('REMOTE_ADDR', '127.0.0.1');
             if ($ipAddress === '::1') {
                 $ipAddress = '127.0.0.1';
             }
             $userAgent = "google chrome";
+
+            // 🎯 PEMETAAN VALUE STATUS UNTUK BACKEND
+            if ($statusRaw === 'block') {
+                $isActive = 2; // Kode khusus untuk Blokir
+            } elseif ($statusRaw === '0') {
+                $isActive = 0; // Kode untuk Non-Aktif
+            } else {
+                $isActive = 1; // Kode untuk Aktif
+            }
 
             $payload = [
                 $idUser,
@@ -440,7 +447,7 @@ class User_IndexController extends App_Controller_Base
                 $fullName,
                 $roleValue,
                 $levelUser,
-                $isActive,
+                $isActive, // Mengirim 1 (Aktif), 0 (Non-Aktif), atau 2 (Blokir)
                 (int) $this->currentUserId(),
                 $this->currentUser()['session_token'],
                 $ipAddress,
