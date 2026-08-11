@@ -5,7 +5,24 @@ class Profile_IndexController extends App_Controller_Base
 
     public function indexAction()
     {
-        $this->view->user = App_Service_Session::get('user');
+        $userData = App_Service_Session::get('user');
+
+        if ($this->getRequest()->isXmlHttpRequest()) {
+            $service = $this->api();
+            $response = $service->request(
+                'POST',
+                '/service/proxy/service/alias/get-itp-name',
+                [$userData['tp_code'], $this->currentUser()['session_token']]
+            );
+
+            if (isset($response['code']) && $response['code'] == 200 && isset($response['msg'][0])) {
+                return $this->jsonSuccess($response['msg']);
+            }
+
+            return $this->jsonError('Failed to fetch data.');
+        }
+
+        $this->view->user = $userData;
     }
 
     public function changepassAction()
