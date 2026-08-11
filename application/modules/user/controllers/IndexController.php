@@ -418,20 +418,19 @@ class User_IndexController extends App_Controller_Base
             $api = new App_Service_Api();
             $api->authorization();
 
-            $idUser    = (int) $this->_getParam('id_user', 0);
-            $fullName  = (string) $this->_getParam('fullName', '');
+            $idUser    = (int) $this->_getParam('id_user', $this->_getParam('id', 0));
+            $fullName  = (string) $this->_getParam('fullName', $this->_getParam('full_name', ''));
             $email     = (string) $this->_getParam('email', '');
-            $levelUser = (int) $this->_getParam('level_user', 1);
-            $roleValue = (int) $this->_getParam('role', 1);
-            $itpCode   = trim((string) $this->_getParam('itp_code', ''));
+
+            $roleParam = $this->_getParam('role', $this->_getParam('role_id', $this->_getParam('role_value', null)));
+            $roleValue = ($roleParam !== null && $roleParam !== '') ? (int) $roleParam : 1;
+
+            $levelParam = $this->_getParam('level_user', $this->_getParam('level_id', $this->_getParam('levelUser', null)));
+            $levelUser  = ($levelParam !== null && $levelParam !== '') ? (int) $levelParam : 1;
+
+            $itpCode   = trim((string) $this->_getParam('itp_code', $this->_getParam('tp_code', '')));
+
             $statusRaw = $this->_getParam('status', '1');
-
-            $ipAddress = $this->_request->getServer('REMOTE_ADDR', '127.0.0.1');
-            if ($ipAddress === '::1') {
-                $ipAddress = '127.0.0.1';
-            }
-            $userAgent = "google chrome";
-
             if ($statusRaw === 'block') {
                 $isActive = 2;
             } elseif ($statusRaw === '0') {
@@ -440,13 +439,28 @@ class User_IndexController extends App_Controller_Base
                 $isActive = 1;
             }
 
+            $ipAddress = $this->_request->getServer('REMOTE_ADDR', '127.0.0.1');
+            if ($ipAddress === '::1') {
+                $ipAddress = '127.0.0.1';
+            }
+            $userAgent = $this->_request->getServer('HTTP_USER_AGENT', 'google chrome');
+
+            if ($idUser <= 0) {
+                $this->_helper->json([
+                    'success' => false,
+                    'code'    => 400,
+                    'msg'     => 'ID User tidak valid.'
+                ]);
+                exit;
+            }
+
             $payload = [
                 $idUser,
                 $email,
                 $fullName,
                 $roleValue,
                 $levelUser,
-                $isActive, // Mengirim 1 (Aktif), 0 (Non-Aktif), atau 2 (Blokir)
+                $isActive,
                 (int) $this->currentUserId(),
                 $this->currentUser()['session_token'],
                 $ipAddress,
@@ -465,25 +479,30 @@ class User_IndexController extends App_Controller_Base
                 if (isset($response['msg'][0]['ERROR'])) {
                     $this->_helper->json([
                         'success' => false,
-                        'code' => 400,
-                        'msg' => $response['msg'][0]['ERROR']
+                        'code'    => 400,
+                        'msg'     => $response['msg'][0]['ERROR']
                     ]);
                     exit;
                 }
 
-                $successMessage = isset($response['msg'][0]['message']) ? $response['msg'][0]['message'] : 'Data user berhasil diperbarui.';
+                $successMessage = isset($response['msg'][0]['message'])
+                    ? $response['msg'][0]['message']
+                    : 'Data user berhasil diperbarui.';
+
                 $this->_helper->json([
                     'success' => true,
-                    'code' => 200,
-                    'msg' => $successMessage
+                    'code'    => 200,
+                    'msg'     => $successMessage
                 ]);
                 exit;
             } else {
-                $backendRawMsg = isset($response['msg']) ? json_encode($response['msg']) : 'Gagal memproses perubahan data di server backend.';
+                $rawMsg = isset($response['msg']) ? $response['msg'] : 'Gagal memproses perubahan data di server backend.';
+                $backendRawMsg = is_array($rawMsg) ? json_encode($rawMsg) : $rawMsg;
+
                 $this->_helper->json([
                     'success' => false,
-                    'code' => isset($response['code']) ? $response['code'] : 500,
-                    'msg' => $backendRawMsg
+                    'code'    => isset($response['code']) ? $response['code'] : 500,
+                    'msg'     => $backendRawMsg
                 ]);
                 exit;
             }

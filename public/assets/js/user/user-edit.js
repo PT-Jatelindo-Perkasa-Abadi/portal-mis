@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (inputItp) inputItp.value = "";
 
             if (labelItp) {
-                labelItp.textContent = "Pilih IT provider";
+                labelItp.textContent = "Pilih mitra acquirer";
                 labelItp.style.setProperty("color", "#B8B9BB", "important");
             }
 
