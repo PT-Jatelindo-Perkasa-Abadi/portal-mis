@@ -4,15 +4,12 @@ $currentDir  = strtolower($_GET['dir'] ?? 'asc');
 
 function renderSortIcon($field, $currentSort, $currentDir, $baseUrl)
 {
-    // Default: kedua panah abu-abu
     $iconName = 'ic-sort-default.svg';
 
     if ($currentSort === $field) {
         if ($currentDir === 'desc') {
-            // Panah bawah biru
             $iconName = 'ic-sort-down.svg';
         } else {
-            // Panah atas biru
             $iconName = 'ic-sort-up.svg';
         }
     }
@@ -25,7 +22,6 @@ function renderSortIcon($field, $currentSort, $currentDir, $baseUrl)
 $baseUrl = $this->baseUrl('/');
 ?>
 
-<!-- STYLE CSS SHIMMER LOADING -->
 <style>
     .shimmer-placeholder {
         background: linear-gradient(90deg, #E7E8E8 25%, #F4F5F6 50%, #E7E8E8 75%);
@@ -67,7 +63,6 @@ $baseUrl = $this->baseUrl('/');
         background-color: #F8F9FA !important;
     }
 
-    /* Transition untuk Icon Panah Chevron */
     .icon-toggle-collapse {
         transition: transform 0.2s ease-in-out;
     }
@@ -79,19 +74,22 @@ $baseUrl = $this->baseUrl('/');
     .sortable-header:hover {
         background-color: #F8F9FA !important;
     }
+
+    .card-dashboard {
+    border: 1px solid #E7E8E8 !important;
+    box-shadow: none !important;
+    border-radius: 12px !important;
+}
 </style>
 
-<!-- MAIN CONTAINER WARNA LIGHT PRESISI FIGMA -->
 <div class="container-fluid px-2 pt-4 min-vh-100 bg-light text-dark" style="font-family: 'Sora', sans-serif;">
 
-    <!-- JUDUL HALAMAN -->
     <div class="row mb-1">
         <div class="col-12">
             <h2 class="fw-bold text-dark mb-0" style="font-size: 24px; font-weight: 700; color: #12161C;">Kelola User</h2>
         </div>
     </div>
 
-    <!-- TABS NAVIGATION WITH STROKE LINE -->
     <div class="d-flex justify-content-between align-items-end mb-4" style="height: 48px;">
         <div class="d-flex flex-column align-items-start justify-content-end flex-grow-1 border-bottom" style="border-color: #E7E8E8 !important; height: 100%; position: relative;">
             <a href="#" class="text-decoration-none pb-2 ps-0" style="color: #3A7BF6; font-size: 16px; font-weight: 600; text-align: left;">User</a>
@@ -108,10 +106,9 @@ $baseUrl = $this->baseUrl('/');
         </div>
     </div>
 
-    <!-- MAIN CARD BOX DATA LIST -->
-    <div class="card border-0 mb-5 bg-white shadow-sm" style="border-radius: 12px; outline: 1px #E7E8E8 solid; outline-offset: -1px; overflow: hidden;">
+    <!-- <div class="card card-dashboard rounded-4 overflow-hidden"> -->
+    <div class="card card-dashboard border-0 mb-5 bg-white shadow-sm" style="border-radius: 12px; outline: 1px #E7E8E8 solid; outline-offset: -1px; overflow: hidden;">
 
-        <!-- TITLE: LIST DATA -->
         <div class="d-flex justify-content-between align-items-center px-4 py-3 bg-white"
             data-bs-toggle="collapse"
             data-bs-target="#userListContent"
@@ -126,21 +123,17 @@ $baseUrl = $this->baseUrl('/');
             </div>
         </div>
 
-        <!-- KONTEN CARD YANG BISA DIBUKA/DITUTUP -->
         <div class="collapse show" id="userListContent">
 
-            <!-- FORM SEARCH & MULTI-DROPDOWN FILTER -->
             <div class="px-4 pb-0 bg-white" style="margin-bottom: 24px;">
                 <form id="filterUserForm" method="GET" action="" class="d-flex flex-wrap align-items-center gap-3 w-100 mx-0 mt-2">
                     <input type="hidden" name="level" id="input-level" value="<?= (isset($_GET['level']) && $_GET['level'] !== '') ? $this->escape($_GET['level']) : ''; ?>">
                     <input type="hidden" name="role" id="input-role" value="<?= (isset($_GET['role']) && $_GET['role'] !== '') ? $this->escape($_GET['role']) : ''; ?>">
                     <input type="hidden" name="status" id="input-status" value="<?= (isset($_GET['status']) && $_GET['status'] !== '') ? $this->escape($_GET['status']) : ''; ?>">
 
-                    <!-- Hidden Input Sorting -->
                     <input type="hidden" name="sort" id="input-sort" value="<?= isset($_GET['sort']) ? $this->escape($_GET['sort']) : ''; ?>">
                     <input type="hidden" name="dir" id="input-dir" value="<?= isset($_GET['dir']) ? $this->escape($_GET['dir']) : 'asc'; ?>">
 
-                    <!-- Dropdown Limit Angka Entries -->
                     <div class="dropdown" id="ctx-limit">
                         <?php $currentLimit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10; ?>
                         <button class="btn btn-white text-dark fw-semibold bg-white rounded-3 d-flex justify-content-between align-items-center px-3" type="button" data-bs-toggle="dropdown"
@@ -158,7 +151,6 @@ $baseUrl = $this->baseUrl('/');
                         <input type="hidden" name="limit" id="input-limit" value="<?= $currentLimit; ?>">
                     </div>
 
-                    <!-- Input Textbox Cari -->
                     <div class="flex-grow-1" style="min-width: 200px;">
                         <div class="input-group rounded-3" style="border: 1px solid #E7E8E8; height: 48px; overflow: hidden;">
                             <span class="input-group-text bg-white border-0 text-secondary pe-1 ps-3">
@@ -171,7 +163,6 @@ $baseUrl = $this->baseUrl('/');
                         </div>
                     </div>
 
-                    <!-- Dropdown Level User -->
                     <div class="dropdown" id="ctx-level" style="width: 200px;">
                         <?php
                         $reqLevel = $_GET['level'] ?? '';
@@ -232,7 +223,6 @@ $baseUrl = $this->baseUrl('/');
                         </ul>
                     </div>
 
-                    <!-- Dropdown Role -->
                     <div class="dropdown" id="ctx-role" style="width: 200px;">
                         <?php
                         $reqRole = $_GET['role'] ?? '';
@@ -539,12 +529,12 @@ $baseUrl = $this->baseUrl('/');
                                 }
                                 ?>
                                 <tr class="text-dark border-bottom" style="border-color: #E7E8E8 !important; font-size: 14px; background: #fff;">
-                                    <td class="py-3 ps-4" style="color: #12161C; font-weight: 400;"><?= $no++; ?></td>
+                                    <td class="py-3 text-center" style="color: #12161C; font-weight: 400;"><?= $no++; ?></td>
                                     <td class="py-3 px-3" style="color: #12161C; font-weight: 400;"><?= isset($user['id_user']) ? $user['id_user'] : '-'; ?></td>
                                     <td class="py-3 px-3 text-truncate" style="max-width: 160px; color: #12161C; font-weight: 400;"><?= $user['fullName'] ?? '-'; ?></td>
                                     <td class="py-3 px-3 text-truncate" style="max-width: 220px; color: #12161C; font-weight: 400;"><?= $user['email'] ?? '-'; ?></td>
                                     <td class="py-3 px-3" style="color: #12161C; font-weight: 400;"><?= $rowLevelName; ?></td>
-                                    <td class="py-3 px-3" style="color: #12161C; font-weight: 400;"><?= $user['role'] ?? '-'; ?></td>
+                                    <td class="py-3 px-3" style="color: #12161C; font-weight: 400;"><?= isset($user['role']) ? ucfirst($user['role']) : '-'; ?></td>
                                     <td class="py-3 px-3">
                                         <?php
                                         $statusText = 'Non-Aktif';
