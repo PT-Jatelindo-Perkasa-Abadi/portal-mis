@@ -7,6 +7,9 @@ $(document).ready(function() {
             success: function (response) {
                 const { nama_technical_provider } = response.data[0];
                 $('#mitraSection #mitraName').text(nama_technical_provider ?? "-");
+            },
+            error: function() {
+                $('#mitraSection #mitraName').text("-");
             }
         });
     }
