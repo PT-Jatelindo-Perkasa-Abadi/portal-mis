@@ -9,7 +9,6 @@ class Distribution_IndexController extends Zend_Controller_Action
         $currentUser = App_Service_Session::get('user');
         $this->view->currentUser = $currentUser;
 
-        // Normalisasi parameter type (Dukungan URL Baru & URL Lama)
         $userLevel = strtolower(trim($currentUser['level'] ?? ''));
         $isItpUser = ($userLevel === 'it provider' || $userLevel === 'mitra acquirer');
 
