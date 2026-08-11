@@ -23,14 +23,18 @@
                 $lvl = strtolower(trim($this->user['level'] ?? ''));
                 if ($lvl === 'it provider' || $lvl === 'mitra acquirer'):
                 ?>
-                    <div class="card shadow-none border p-4 mb-0">
-                        <div class="d-flex align-items-center justify-content-between">
+                <div id="mitraSection" class="card shadow-none border p-4 mb-0">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex">
                             <span class="fs-7 text-neutral-70">Nama Mitra Acquirer</span>
-                            <span class="fs-7 text-neutral-100 fw-bold">
-                                <?= !empty($this->user['mitraName']) ? $this->user['mitraName'] : '-'; ?>
-                            </span>
+                        </div>
+                        <div class="d-flex justify-content-end w-20">
+                            <div id="mitraName" class="flex-fill fs-7 text-neutral-100 text-end fw-medium">
+                                <div class="skeleton-cell w-100"></div>
+                            </div>
                         </div>
                     </div>
+                </div>
                 <?php endif; ?>
 
                 <!-- INFORMASI AKUN -->
@@ -70,7 +74,8 @@
                                                 <?= $this->user['email']; ?>
                                             </span>
                                         </div>
-                                        <div class="d-flex align-items-center justify-content-between py-3 border-bottom">
+                                        <div
+                                            class="d-flex align-items-center justify-content-between py-3 border-bottom">
                                             <span class="fs-7 text-neutral-70">Level User</span>
                                             <span class="fs-7 text-neutral-100">
                                                 <?php
@@ -84,8 +89,7 @@
                                                 ?>
                                             </span>
                                         </div>
-                                        <div
-                                            class="d-flex align-items-center justify-content-between py-3 border-bottom">
+                                        <div class="d-flex align-items-center justify-content-between py-3">
                                             <span class="fs-7 text-neutral-70">Role</span>
                                             <span class="fs-7 text-neutral-100">
                                                 <?= ucwords($this->user['role']); ?>
@@ -139,7 +143,8 @@
                 <div class="modal-body">
                     <div class="form-content">
                         <div class="form-group">
-                            <label for="currentPassword" class="form-label">Kata Sandi Saat Ini <span class="merahSandi">*</span></label>
+                            <label for="currentPassword" class="form-label">Kata Sandi Saat Ini <span
+                                    class="merahSandi">*</span></label>
                             <div class="input-append append-right">
                                 <input id="currentPassword" name="currentPassword" class="form-control" type="password"
                                     minlength="8" placeholder="Enter current password" required />
@@ -147,7 +152,8 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="newPassword" class="form-label">Kata Sandi Baru <span class="merahSandi">*</span></label>
+                            <label for="newPassword" class="form-label">Kata Sandi Baru <span
+                                    class="merahSandi">*</span></label>
                             <div class="input-append append-right">
                                 <input id="newPassword" name="newPassword" class="form-control password-validate"
                                     type="password" minlength="8" placeholder="Enter new password" required />
@@ -170,12 +176,14 @@
                             <div class="term-password-err mt-2" style="display: none;" id="term-password-2">
                                 <div class="d-flex align-items-center gap-2" data-rule="length">
                                     <span class="ic icon-checklist-invalid"></span>
-                                    <span class="term-item">Kata Sandi baru tidak boleh sama dengan Kata Sandi lama</span>
+                                    <span class="term-item">Kata Sandi baru tidak boleh sama dengan Kata Sandi
+                                        lama</span>
                                 </div>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="confirmPassword" class="form-label">Konfirmasi Kata Sandi Baru <span class="merahSandi">*</span></label>
+                            <label for="confirmPassword" class="form-label">Konfirmasi Kata Sandi Baru <span
+                                    class="merahSandi">*</span></label>
                             <div class="input-append append-right">
                                 <input id="confirmPassword" name="confirmPassword"
                                     class="form-control password-validate" type="password" minlength="8"
@@ -206,10 +214,14 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <input id="sess" name="sess" class="form-control password-validate" type="hidden" value="<?= $this->user['session_token']; ?>" />
-                    <input id="email" name="email" class="form-control password-validate" type="hidden" value="<?= $this->user['email']; ?>" />
-                    <input id="ip" name="ip" class="form-control password-validate" type="hidden" value="<?= App_Log_Context::getIp(); ?>" />
-                    <input id="useragent" name="useragent" class="form-control password-validate" type="hidden" value="<?= App_Log_Context::getUserAgent(); ?>" />
+                    <input id="sess" name="sess" class="form-control password-validate" type="hidden"
+                        value="<?= $this->user['session_token']; ?>" />
+                    <input id="email" name="email" class="form-control password-validate" type="hidden"
+                        value="<?= $this->user['email']; ?>" />
+                    <input id="ip" name="ip" class="form-control password-validate" type="hidden"
+                        value="<?= App_Log_Context::getIp(); ?>" />
+                    <input id="useragent" name="useragent" class="form-control password-validate" type="hidden"
+                        value="<?= App_Log_Context::getUserAgent(); ?>" />
                     <button type="button" class="btn btn-primary w-100" id="ChngPass">
                         Perbarui Kata Sandi
                     </button>
@@ -234,7 +246,7 @@
                     <img src="<?= $this->baseUrl('assets/img/img-new-password.svg'); ?>" alt="image new password" />
                     <div class="d-flex flex-column align-items-center gap-2">
                         <h3 class="text-neutral-100 fs-5 fw-bold mb-0">
-                            Kata Sandi Berhasil Diperbarui
+                            Kata Sandi Diperbarui
                         </h3>
                         <p class="text-neutral-70 text-sm text-center">
                             Demi keamanan, silakan masuk kembali menggunakan kata sandi yang baru
@@ -256,7 +268,8 @@
         <div class="modal-content">
             <div class="modal-body">
                 <div class="d-flex flex-column align-items-center pt-2 gap-4">
-                    <img src="<?= $this->baseUrl('assets/img/img-new-password.svg'); ?>" alt="image new password" />
+                    <img src="<?= $this->baseUrl('assets/img/img-failed-new-password.svg'); ?>"
+                        alt="image new password" />
                     <div class="d-flex flex-column align-items-center gap-2">
                         <h3 class="text-neutral-100 fs-5 fw-bold mb-0">
                             Kata Sandi Gagal Diperbarui
