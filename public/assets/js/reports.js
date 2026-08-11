@@ -1,17 +1,14 @@
 $(function () {
-
     function formatOption(state) {
-
         if (!state.id) {
             return state.text;
         }
 
-        var selected = $('#layanan').val();
-
-        var check = '';
+        let selected = $('#layanan').val();
+        let check = '';
 
         if (selected === state.id) {
-            check = '<span style="color:#22C55E;font-size:18px;">&#10003;</span>';
+            check = '<span class="icon-checked-option"></span>';
         }
 
         return $(
@@ -20,27 +17,16 @@ $(function () {
                 check +
             '</div>'
         );
-     
     }
 
 
     $('#layanan').select2({
         width: '100%',
-        minimumResultsForSearch: Infinity,
+        minimumResultsForSearch: -1,
         templateResult: formatOption,
-        escapeMarkup: function(markup){
+        escapeMarkup: function(markup) {
             return markup;
         }
-    });
-
-
-    $('#layanan').on('select2:open', function () {
-
-        $('.select2-dropdown').css({
-            width: '300px',
-            minWidth: '300px'
-        });
-
     });
 
     $('#listitp').select2({
@@ -49,209 +35,244 @@ $(function () {
         allowClear: true
     });
 
-    $('#listitp').on('select2:open', function () {
-        $('.select2-dropdown').css({
-            'width': '300px',
-            'min-width': '300px'
-        });
-
-        $('.select2-container--open .select2-search__field').css({
-            'width': '100%',
-            'minWidth': '250px',
-            'boxSizing': 'border-box'
-        });
-    });
-
     $('#listmitra').select2({
-        placeholder: "Pilih Sub Mitra Acquirera",
+        placeholder: "Pilih Sub Mitra Acquirer",
         width: '100%',
         allowClear: true
     });
 
-    $('#listmitra').on('select2:open', function () {
+    $('#btnSearch').on('click', function() {
+        let length = parseInt($('#lengthData').val(), 10);
 
-        $('.select2-dropdown').css({
-            width: '300px',
-            minWidth: '300px'
-        });
-
-    });
-
-    $('#btnSearch').on('click', function () {
-
+        $('#itpnow').DataTable().page.len(length);
         $('#itpnow').DataTable().ajax.reload(null, true);
-        var tgl = $('.custom-date-input-with-icon').val();
-        var it_provider = $('#listitp').find(':selected').text();
-        var layanan     = $('#layanan').find(':selected').text();
-        var keyword     = $('#keyword').val();
+
+        let tgl = $('#filterDateMitra').val();
+        let it_provider = $('#listitp').find(':selected').text();
+        let layanan = $('#layanan').find(':selected').text();
+        let keyword = $('#keyword').val();
 
         if (tgl != "") {
-            var arr = tgl.split('-');
-            var tanggalFormat = arr[2] + '/' + arr[1] + '/' + arr[0];
-            $('#badge-date-report').text('Tanggal ' + tanggalFormat);
+            $('#badge-date-report').text('Tanggal ' + tgl);
         }
 
-        if(it_provider != "")
-        {
+        if (it_provider != "") {
             $('#badge-itp-report').show();
-            $('#badge-itp-report').text(it_provider);
+            $('#badge-itp-report').text(it_provider?.trim());
         }
 
-        if(layanan != "")
-        {
+        if (layanan != "") {
             $('#badge-service-report').show();
-            $('#badge-service-report').text(layanan);
+            $('#badge-service-report').text(layanan?.trim());
         }
 
-        if(keyword != "")
-        {
+        if (keyword.length > 0) {
             $('#badge-search-report').show();
-            $('#badge-search-report').text(keyword);
+            $('#badge-search-report').text(keyword?.trim());
+        } else {
+            $('#badge-search-report').hide();
         }
-
     });
-
 
     $('#btnSearchMitra').on('click', function () {
+        let length = parseInt($('#lengthData').val(), 10);
 
+        $('#mitranow').DataTable().page.len(length);
         $('#mitranow').DataTable().ajax.reload(null, true);
-        var tgl = $('.custom-date-input-with-icon').val();
-        var it_provider = $('#listitp').find(':selected').text();
-        var layanan     = $('#layanan').find(':selected').text();
-        var keyword     = $('#keyword').val();
-        var mitra       = $('#listmitra').find(':selected').text();
+
+        let tgl = $('#filterDateSubMitra').val();
+        let it_provider = $('#listitp').find(':selected').text();
+        let layanan = $('#layanan').find(':selected').text();
+        let keyword = $('#keyword').val();
+        let mitra = $('#listmitra').find(':selected').text();
 
         if (tgl != "") {
-            var arr = tgl.split('-');
-            var tanggalFormat = arr[2] + '/' + arr[1] + '/' + arr[0];
-            $('#badge-date-report-mitra').text('Tanggal ' + tanggalFormat);
+            $('#badge-date-report-mitra').text('Tanggal ' + tgl);
         }
 
-        if(it_provider != "")
-        {
+        if (it_provider != "") {
             $('#badge-itp-report-mitra').show();
             $('#badge-itp-report-mitra').text(it_provider);
         }
 
-        if(mitra != "")
-        {
+        if (mitra != "") {
             $('#badge-p-report-mitra').show();
             $('#badge-p-report-mitra').text(mitra);
         }
 
-        if(layanan != "")
-        {
+        if (layanan != "") {
             $('#badge-service-report-mitra').show();
             $('#badge-service-report-mitra').text(layanan);
         }
 
-        if(keyword != "")
-        {
+        if (keyword != "") {
             $('#badge-search-report-mitra').show();
             $('#badge-search-report-mitra').text(keyword);
+        } else {
+            $('#badge-search-report-mitra').hide();
         }
-
     });
 
-    function downloadExcel(){
+    $('#btnSearchRoleMitra').on('click', function () {
+        let length = parseInt($('#lengthData').val(), 10);
 
-        tanggal     = $('.custom-date-input-with-icon').val();
-        it_provider = $('#listitp').val();
-        layanan     = $('#layanan').val();
-        keyword     = $('#keyword').val();
-        productCode = "";
+        $('#rolemitranow').DataTable().page.len(length);
+        $('#rolemitranow').DataTable().ajax.reload(null, true);
 
+        let tgl = $('#filterDateItpMitra').val();
+        let layanan = $('#layanan').find(':selected').text();
+        let keyword = $('#keyword').val();
+        let mitra = $('#listmitra').find(':selected').text();
 
-        if (layanan === 'PREPAID') {
-            productCode = "502";
-        } else if (layanan === 'POSTPAID') {
-            productCode = "501";
-        } else if (layanan === 'NON-TAGLIST') {
-            productCode = "504";
+        if (tgl != "") {
+            $('#badge-date-report-mitra').text('Tanggal ' + tgl);
         }
 
-        window.location =
-            '/reports/index/download/tanggal/'+tanggal+'/it_provider/'+it_provider+'/layanan/'+productCode+'/keyword/'+keyword;
-
-    }
-
-    function downloadExcelMitra(){
-
-        tanggal     = $('.custom-date-input-with-icon').val();
-        it_provider = $('#listitp').val();
-        layanan     = $('#layanan').val();
-        keyword     = $('#keyword').val();
-        mitra       = $('#listmitra').val();
-        productCode = "";
-
-
-        if (layanan === 'PREPAID') {
-            productCode = "502";
-        } else if (layanan === 'POSTPAID') {
-            productCode = "501";
-        } else if (layanan === 'NON-TAGLIST') {
-            productCode = "504";
+        if (mitra != "") {
+            $('#badge-p-report-mitra').show();
+            $('#badge-p-report-mitra').text(mitra);
         }
 
-        window.location =
-            '/reports/index/downloadmitra/tanggal/'+tanggal+'/it_provider/'+it_provider+'/mitra/'+mitra+'/layanan/'+productCode+'/keyword/'+keyword;
-
-    }
-
-    function downloadExcelItpMitra(){
-
-        tanggal     = $('.custom-date-input-with-icon').val();
-        it_provider = $('#itpcode').val();
-        layanan     = $('#layanan').val();
-        keyword     = $('#keyword').val();
-        mitra       = $('#listmitra').val();
-        productCode = "";
-
-
-        if (layanan === 'PREPAID') {
-            productCode = "502";
-        } else if (layanan === 'POSTPAID') {
-            productCode = "501";
-        } else if (layanan === 'NON-TAGLIST') {
-            productCode = "504";
+        if (layanan != "") {
+            $('#badge-service-report-mitra').show();
+            $('#badge-service-report-mitra').text(layanan);
         }
 
-        window.location =
-            '/reports/index/downloaditpmitra/tanggal/'+tanggal+'/it_provider/'+it_provider+'/mitra/'+mitra+'/layanan/'+productCode+'/keyword/'+keyword;
-
-    }
-
-    $('#btnDownload').click(function(){
-        downloadExcel();
+        if (keyword != "") {
+            $('#badge-search-report-mitra').show();
+            $('#badge-search-report-mitra').text(keyword);
+        } else {
+            $('#badge-search-report-mitra').hide();
+        }
     });
 
-    $('#btnDownloadmitra').click(function(){
-        downloadExcelMitra();
+    $('#btnDownload').on('click', function () {
+        let table = $('#itpnow').DataTable();
+        let start = table.page.info().start;
+        let length = table.page.info().length;
+        let params = {
+            tanggal: $('#filterDateMitra')
+                .val()
+                .replaceAll('/', '-')
+                .split('-')
+                .reverse()
+                .join('-'),
+            keyword: $('#keyword').val(),
+            it_provider: $('#listitp').val(),
+            layanan: $('#layanan').val(),
+            mitra: "",
+            isSubMitra: 0,
+            start,
+            length
+        };
+
+        let form = $('<form>', {
+            method: 'POST',
+            action: '/reports/index/download'
+        });
+
+        $.each(params, function (key, value) {
+            $('<input>', {
+                type: 'hidden',
+                name: key,
+                value: value == null ? '' : value
+            }).appendTo(form);
+        });
+
+        $('body').append(form);
+        form.submit();
+        form.remove();
     });
 
-    $('#btnDownloadItpmitra').click(function(){
-        downloadExcelItpMitra();
+    $('#btnDownloadmitra').on('click', function () {
+        let table = $('#mitranow').DataTable();
+        let start = table.page.info().start;
+        let length = table.page.info().length;
+        let params = {
+            tanggal: $('#filterDateSubMitra')
+                .val()
+                .replaceAll('/', '-')
+                .split('-')
+                .reverse()
+                .join('-'),
+            keyword: $('#keyword').val(),
+            it_provider: $('#listitp').val(),
+            layanan: $('#layanan').val(),
+            mitra: $('#listmitra').val(),
+            isSubMitra: 1,
+            start,
+            length
+        };
+
+        let form = $('<form>', {
+            method: 'POST',
+            action: '/reports/index/download'
+        });
+
+        $.each(params, function (key, value) {
+            $('<input>', {
+                type: 'hidden',
+                name: key,
+                value: value == null ? '' : value
+            }).appendTo(form);
+        });
+
+        $('body').append(form);
+        form.submit();
+        form.remove();
     });
 
+    $('#btnDownloadItpmitra').on('click', function () {
+        let table = $('#rolemitranow').DataTable();
+        let start = table.page.info().start;
+        let length = table.page.info().length;
+        let params = {
+            tanggal: $('#filterDateItpMitra')
+                .val()
+                .replaceAll('/', '-')
+                .split('-')
+                .reverse()
+                .join('-'),
+            keyword: $('#keyword').val(),
+            it_provider: "",
+            layanan: $('#layanan').val(),
+            mitra: $('#listmitra').val(),
+            isSubMitra: 2,
+            start,
+            length
+        };
 
-    $('.custom-tabs .nav-link').on('click', function (e) {
+        let form = $('<form>', {
+            method: 'POST',
+            action: '/reports/index/downloaditpmitra'
+        });
 
+        $.each(params, function (key, value) {
+            $('<input>', {
+                type: 'hidden',
+                name: key,
+                value: value == null ? '' : value
+            }).appendTo(form);
+        });
+
+        $('body').append(form);
+        form.submit();
+        form.remove();
+    });
+
+    $('.custom-tabs .nav-link').on('click', function(e) {
         e.preventDefault();
 
         $('.custom-tabs .nav-link').removeClass('active');
-
         $(this).addClass('active');
 
-        var url = $(this).data('url');
-
+        let url = $(this).data('url');
         window.location.href = url;
-
     });
 
     $('#btn-report-reset, #btn-reportmitra-reset').click(function(){
         location.reload();
     });
-
 
     $('#listitp').on('select2:clear', function (e) {
         $('#badge-itp-report').attr('style','display:none !important');
@@ -261,25 +282,30 @@ $(function () {
     $('#listmitra').on('select2:clear', function (e) {
         $('#badge-p-report-mitra').attr('style','display:none !important');
     });
-
-
 });
 
 
-$(document).ready(function () {
-
-
-    function formatRupiah(angka){
-
+$(document).ready(function() {
+    function formatRupiah(angka) {
         if(angka == null || angka == '')
             return '0';
 
         return Number(angka).toLocaleString('id-ID');
-
     }
 
-    $('#itpnow').DataTable({
+    $('#itpnow')
+        .on('preXhr.dt', function(e, settings) {
+            const table = $(this).DataTable();
 
+            table.columns.adjust();
+            SkeletonLoader.init('#itpnow', 6);
+            $('#reportTransactionMitra .summary-value').html("<div class='skeleton-cell w-100'></div>");
+        })
+        .on('xhr.dt', function() {
+            SkeletonLoader.destroy('#itpnow');
+        });
+
+    $('#itpnow').DataTable({
         processing: false,
         serverSide: true,
         searching: false,
@@ -287,39 +313,41 @@ $(document).ready(function () {
         lengthChange: false,
         pageLength: 10,
         destroy: true,
-
+        autoWidth: true,
         language: {
-            processing: "Memuat data...",
+            processing: "",
             lengthMenu: "Tampilkan _MENU_ data",
-            zeroRecords: "Data tidak ditemukan",
             info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
             infoEmpty: "Menampilkan 0 sampai 0 dari 0 data",
             infoFiltered: "(disaring dari _MAX_ total data)",
-            search: "Cari:",
-            emptyTable:"<div class='d-flex flex-column align-items-center justify-content-center py-4'><img src='../assets/img/img-data-empty.svg' alt='Data Kosong' style='width: 280px; height: auto; object-fit: contain;' class='mb-3'><h5 class='fw-bold mb-1' style='color: #12161C; font-size: 16px; font-family: sans-serif;'>Data Transaksi Masih Kosong</h5><p class='m-0' style='color: #595C60; font-size: 14px; font-weight: 400;'>Saat ini data laporan transaksi IT Provider belum tersedia </p></div>"
+            emptyTable:`
+                <div class='d-flex flex-column align-items-center justify-content-center py-4'>
+                    <img src='../assets/img/img-data-empty.svg' alt='Data Kosong' style='width: 280px; height: auto; object-fit: contain;' class='mb-3'>
+                    <h5 class='fw-bold mb-1' style='color: #12161C; font-size: 16px; font-family: sans-serif;'>Data Transaksi Masih Kosong</h5>
+                    <p class='m-0' style='color: #595C60; font-size: 14px; font-weight: 400;'>Saat ini data laporan transaksi Mitra Acquirer belum tersedia</p>
+                </div>`
         },
-
         ajax: {
             url: '/reports/index/listtransaksi',
             type: 'POST',
-
-            data: function (d) {
-
-                d.tanggal     = $('.custom-date-input-with-icon').val();
+            data: function(d) {
+                d.tanggal     = $('#filterDateMitra')
+                    .val()
+                    .replaceAll('/', '-')
+                    .split('-')
+                    .reverse()
+                    .join('-');
                 d.it_provider = $('#listitp').val();
                 d.layanan     = $('#layanan').val();
                 d.keyword     = $('#keyword').val();
-
             },
-            dataSrc: function (json) {
+            dataSrc: function(json) {
+                let lembar = 0;
+                let tagihan = 0;
+                let admin = 0;
+                let total = 0;
 
-                var lembar = 0;
-                var tagihan = 0;
-                var admin = 0;
-                var total = 0;
-
-                $.each(json.data,function(i,row){
-
+                $.each(json.data,function(i,row) {
                     lembar += parseInt(row.lembar || 0);
                     tagihan += parseFloat(row.sum_total_tagihan || 0);
                     admin += parseFloat(row.sum_total_fee || 0);
@@ -331,29 +359,9 @@ $(document).ready(function () {
                 $('#lblAdmin').text('Rp'+formatRupiah(admin));
                 $('#lblTotal').text('Rp'+formatRupiah(total));
 
-
                 return json.data;
-
             }
-
         },
-
-        drawCallback: function(){
-
-                var api = this.api();
-
-                if(api.page.info().recordsDisplay == 0){
-
-                    $('.dataTables_bottom').hide();
-
-                }else{
-
-                    $('.dataTables_bottom').show();
-                }
-
-        },
-
-
         columns: [
             {
                 data: null,
@@ -362,47 +370,56 @@ $(document).ready(function () {
                     return meta.settings._iDisplayStart + meta.row + 1;
                 }
             },
-             {
+            {
             data: 'nama_technical_provider',
                 defaultContent: '-'
             },
             {
                 data: 'product',
-                defaultContent: '-'
+                defaultContent: '-',
+                render: function(data) {
+                    return `<div class="dt-status status-neutral fw-medium py-1">${data.toLowerCase()}</div>`;
+                }
             },
             {
                 data: 'lembar',
-                className: 'text-end',
                 defaultContent: '0'
             },
             {
                 data: 'sum_total_tagihan',
-                className: 'text-end',
-                render: function(data){
+                render: function(data) {
                     return formatRupiah(data);
                 }
             },
             {
                 data: 'sum_total_fee',
-                className: 'text-end',
-                render: function(data){
+                render: function(data) {
                     return formatRupiah(data);
                 }
             },
             {
                 data: 'sum_total_nomial',
-                className: 'text-end',
                 render: function(data){
                     return formatRupiah(data);
                 }
             }
         ]
-
     });
 
 
-    $('#mitranow').DataTable({
+    $('#mitranow')
+        .on('preXhr.dt', function(e, settings) {
+            const table = $(this).DataTable();
 
+            table.columns.adjust();
+            SkeletonLoader.init('#mitranow', 6);
+            $('#reportTransactionSubMitra .summary-value').html("<div class='skeleton-cell w-100'></div>");
+        })
+        .on('xhr.dt', function() {
+            SkeletonLoader.destroy('#mitranow');
+        });
+
+    $('#mitranow').DataTable({
         processing: false,
         serverSide: true,
         searching: false,
@@ -410,40 +427,42 @@ $(document).ready(function () {
         lengthChange: false,
         pageLength: 10,
         destroy: true,
-
+        autoWidth: true,
         language: {
-            processing: "Memuat data...",
+            processing: "",
             lengthMenu: "Tampilkan _MENU_ data",
-            zeroRecords: "Data tidak ditemukan",
             info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
             infoEmpty: "Menampilkan 0 sampai 0 dari 0 data",
             infoFiltered: "(disaring dari _MAX_ total data)",
-            search: "Cari:",
-            emptyTable:"<div class='d-flex flex-column align-items-center justify-content-center py-4'><img src='../../assets/img/img-data-empty.svg' alt='Data Kosong' style='width: 280px; height: auto; object-fit: contain;' class='mb-3'><h5 class='fw-bold mb-1' style='color: #12161C; font-size: 16px; font-family: sans-serif;'>Data Transaksi Masih Kosong</h5><p class='m-0' style='color: #595C60; font-size: 14px; font-weight: 400;'>Saat ini data laporan transaksi Mitra belum tersedia </p></div>"
+            emptyTable:`
+            <div class='d-flex flex-column align-items-center justify-content-center py-4'>
+                <img src='../../assets/img/img-data-empty.svg' alt='Data Kosong' style='width: 280px; height: auto; object-fit: contain;' class='mb-3'>
+                <h5 class='fw-bold mb-1' style='color: #12161C; font-size: 16px; font-family: sans-serif;'>Data Transaksi Masih Kosong</h5>
+                <p class='m-0' style='color: #595C60; font-size: 14px; font-weight: 400;'>Saat ini data laporan transaksi Mitra belum tersedia </p>
+            </div>`
         },
-
         ajax: {
             url: '/reports/index/listtransaksi',
             type: 'POST',
-
             data: function (d) {
-
-                d.tanggal     = $('.custom-date-input-with-icon').val();
+                d.tanggal     = $('#filterDateSubMitra')
+                    .val()
+                    .replaceAll('/', '-')
+                    .split('-')
+                    .reverse()
+                    .join('-');
                 d.it_provider = $('#listitp').val();
                 d.layanan     = $('#layanan').val();
                 d.keyword     = $('#keyword').val();
                 d.mitra       = $('#listmitra').val();
-
             },
             dataSrc: function (json) {
-
-                var lembar = 0;
-                var tagihan = 0;
-                var admin = 0;
-                var total = 0;
+                let lembar = 0;
+                let tagihan = 0;
+                let admin = 0;
+                let total = 0;
 
                 $.each(json.data,function(i,row){
-
                     lembar += parseInt(row.lembar || 0);
                     tagihan += parseFloat(row.sum_total_tagihan || 0);
                     admin += parseFloat(row.sum_total_fee || 0);
@@ -455,29 +474,9 @@ $(document).ready(function () {
                 $('#lblAdminmitra').text('Rp'+formatRupiah(admin));
                 $('#lblTotalmitra').text('Rp'+formatRupiah(total));
 
-
                 return json.data;
-
             }
-
         },
-
-        drawCallback: function(){
-
-                var api = this.api();
-
-                if(api.page.info().recordsDisplay == 0){
-
-                    $('.dataTables_bottom').hide();
-
-                }else{
-
-                    $('.dataTables_bottom').show();
-                }
-
-        },
-
-
         columns: [
             {
                 data: null,
@@ -496,42 +495,50 @@ $(document).ready(function () {
             },
             {
                 data: 'product',
-                defaultContent: '-'
+                defaultContent: '-',
+                render: function(data) {
+                    return `<div class="dt-status status-neutral fw-medium py-1">${data.toLowerCase()}</div>`;
+                }
             },
             {
                 data: 'lembar',
-                className: 'text-end',
                 defaultContent: '0'
             },
             {
                 data: 'sum_total_tagihan',
-                className: 'text-end',
-                render: function(data){
+                render: function(data) {
                     return formatRupiah(data);
                 }
             },
             {
                 data: 'sum_total_fee',
-                className: 'text-end',
-                render: function(data){
+                render: function(data) {
                     return formatRupiah(data);
                 }
             },
             {
                 data: 'sum_total_nomial',
-                className: 'text-end',
-                render: function(data){
+                render: function(data) {
                     return formatRupiah(data);
                 }
             }
         ]
-
     });
 
 
-    
-    $('#rolemitranow').DataTable({
+    $('#rolemitranow')
+        .on('preXhr.dt', function(e, settings) {
+            const table = $(this).DataTable();
 
+            table.columns.adjust();
+            SkeletonLoader.init('#rolemitranow', 6);
+            $('#reportTransactionSubMitra .summary-value').html("<div class='skeleton-cell w-100'></div>");
+        })
+        .on('xhr.dt', function() {
+            SkeletonLoader.destroy('#rolemitranow');
+        });
+
+    $('#rolemitranow').DataTable({
         processing: false,
         serverSide: true,
         searching: false,
@@ -539,40 +546,42 @@ $(document).ready(function () {
         lengthChange: false,
         pageLength: 10,
         destroy: true,
-
+        autoWidth: true,
         language: {
-            processing: "Memuat data...",
+            processing: "",
             lengthMenu: "Tampilkan _MENU_ data",
-            zeroRecords: "Data tidak ditemukan",
             info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
             infoEmpty: "Menampilkan 0 sampai 0 dari 0 data",
             infoFiltered: "(disaring dari _MAX_ total data)",
-            search: "Cari:",
-            emptyTable:"<div class='d-flex flex-column align-items-center justify-content-center py-4'><img src='../../assets/img/img-data-empty.svg' alt='Data Kosong' style='width: 280px; height: auto; object-fit: contain;' class='mb-3'><h5 class='fw-bold mb-1' style='color: #12161C; font-size: 16px; font-family: sans-serif;'>Data Transaksi Masih Kosong</h5><p class='m-0' style='color: #595C60; font-size: 14px; font-weight: 400;'>Saat ini data laporan transaksi Mitra belum tersedia </p></div>"
+            emptyTable:`
+                <div class='d-flex flex-column align-items-center justify-content-center py-4'>
+                    <img src='../../assets/img/img-data-empty.svg' alt='Data Kosong' style='width: 280px; height: auto; object-fit: contain;' class='mb-3'>
+                    <h5 class='fw-bold mb-1' style='color: #12161C; font-size: 16px; font-family: sans-serif;'>Data Transaksi Masih Kosong</h5>
+                    <p class='m-0' style='color: #595C60; font-size: 14px; font-weight: 400;'>Saat ini data laporan transaksi Mitra belum tersedia </p>
+                </div>`
         },
-
         ajax: {
             url: '/reports/index/listtransaksi',
             type: 'POST',
-
             data: function (d) {
-
-                d.tanggal     = $('.custom-date-input-with-icon').val();
+                d.tanggal     = $('#filterDateItpMitra')
+                    .val()
+                    .replaceAll('/', '-')
+                    .split('-')
+                    .reverse()
+                    .join('-');
                 d.it_provider = $('#itpcode').val();
                 d.layanan     = $('#layanan').val();
                 d.keyword     = $('#keyword').val();
                 d.mitra       = $('#listmitra').val();
-
             },
-            dataSrc: function (json) {
+            dataSrc: function(json) {
+                let lembar = 0;
+                let tagihan = 0;
+                let admin = 0;
+                let total = 0;
 
-                var lembar = 0;
-                var tagihan = 0;
-                var admin = 0;
-                var total = 0;
-
-                $.each(json.data,function(i,row){
-
+                $.each(json.data,function(i,row) {
                     lembar += parseInt(row.lembar || 0);
                     tagihan += parseFloat(row.sum_total_tagihan || 0);
                     admin += parseFloat(row.sum_total_fee || 0);
@@ -584,29 +593,9 @@ $(document).ready(function () {
                 $('#lblAdminmitra').text('Rp'+formatRupiah(admin));
                 $('#lblTotalmitra').text('Rp'+formatRupiah(total));
 
-
                 return json.data;
-
             }
-
         },
-
-        drawCallback: function(){
-
-                var api = this.api();
-
-                if(api.page.info().recordsDisplay == 0){
-
-                    $('.dataTables_bottom').hide();
-
-                }else{
-
-                    $('.dataTables_bottom').show();
-                }
-
-        },
-
-
         columns: [
             {
                 data: null,
@@ -621,73 +610,33 @@ $(document).ready(function () {
             },
             {
                 data: 'product',
-                defaultContent: '-'
+                defaultContent: '-',
+                render: function(data) {
+                    return `<div class="dt-status status-neutral fw-medium py-1">${data.toLowerCase()}</div>`;
+                }
             },
             {
                 data: 'lembar',
-                className: 'text-end',
                 defaultContent: '0'
             },
             {
                 data: 'sum_total_tagihan',
-                className: 'text-end',
-                render: function(data){
+                render: function(data) {
                     return formatRupiah(data);
                 }
             },
             {
                 data: 'sum_total_fee',
-                className: 'text-end',
-                render: function(data){
+                render: function(data) {
                     return formatRupiah(data);
                 }
             },
             {
                 data: 'sum_total_nomial',
-                className: 'text-end',
-                render: function(data){
+                render: function(data) {
                     return formatRupiah(data);
                 }
             }
         ]
-
     });
-
-
-    $('#btnSearchRoleMitra').on('click', function () {
-
-        $('#rolemitranow').DataTable().ajax.reload(null, true);
-        var tgl = $('.custom-date-input-with-icon').val();
-        var itpprovicer = $('#itpcode').val();
-        var layanan     = $('#layanan').find(':selected').text();
-        var keyword     = $('#keyword').val();
-        var mitra       = $('#listmitra').find(':selected').text();
-
-        if (tgl != "") {
-            var arr = tgl.split('-');
-            var tanggalFormat = arr[2] + '/' + arr[1] + '/' + arr[0];
-            $('#badge-date-report-mitra').text('Tanggal ' + tanggalFormat);
-        }
-
-        if(mitra != "")
-        {
-            $('#badge-p-report-mitra').show();
-            $('#badge-p-report-mitra').text(mitra);
-        }
-
-        if(layanan != "")
-        {
-            $('#badge-service-report-mitra').show();
-            $('#badge-service-report-mitra').text(layanan);
-        }
-
-        if(keyword != "")
-        {
-            $('#badge-search-report-mitra').show();
-            $('#badge-search-report-mitra').text(keyword);
-        }
-
-    });
-
-
 });

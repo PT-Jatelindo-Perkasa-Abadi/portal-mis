@@ -918,6 +918,7 @@ $(function() {
             .data('loading', true)
             .removeClass('btn-primary')
             .addClass('btn-outline-danger')
+            .addClass('px-4')
             .text('Stop');
 
         $('.card-item-log').removeClass('success');
@@ -975,6 +976,7 @@ $(function() {
         $('#btnCheckConnection')
             .data('loading', false)
             .removeClass('btn-outline-danger')
+            .removeClass('px-4')
             .addClass('btn-primary')
             .text('Cek Koneksi');
     }
