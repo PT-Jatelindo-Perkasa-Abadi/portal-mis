@@ -1,0 +1,163 @@
+<div class="content-header">
+    <h1 class="header-title">Laporan Transaksi</h1>
+</div>
+<div class="content-body">
+    <!-- Tabs -->
+    <ul class="nav custom-tabs mb-4">
+        <li class="nav-item">
+            <a href="#" class="nav-link pt-1 active c-16 disabled">
+                Sub Mitra Acquirer
+            </a>
+        </li>
+    </ul>
+
+    <div class="card card-accordion shadow-none mb-4" id="reportTransactionSubMitra">
+        <div class="card-header" data-bs-toggle="collapse" data-bs-target="#collapseReportSubMitra" aria-expanded="true"
+            aria-controls="collapseReportSubMitra">
+            <div class="card-title">
+                <div class="d-flex flex-column">
+                    <h1 class="fs-6 font-bold mb-0">List Data</h1>
+                </div>
+            </div>
+        </div>
+        <div id="collapseReportSubMitra" class="accordion-collapse collapse show"
+            data-bs-parent="#reportTransactionSubMitra">
+            <div class="accordion-body">
+                <!-- Summary -->
+                <div class="row g-0 border rounded-4 mb-4 mx-4">
+                    <div class="col-lg-3">
+                        <div class="summary-item">
+                            <div class="summary-icon">
+                                <i class="bi bi-file-earmark-text"></i>
+                            </div>
+                            <div class="d-flex flex-column flex-fill gap-1">
+                                <div class="summary-title text-neutral-100">Total Lembar</div>
+                                <div class="summary-value c-16" id="lblLembarmitra"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="summary-item">
+                            <div class="summary-icon-tagihan"></div>
+                            <div class="d-flex flex-column flex-fill gap-1">
+                                <div class="summary-title text-neutral-100">Total Tagihan</div>
+                                <div class="summary-value c-16" id="lblTagihanmitra"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="summary-item">
+                            <div class="summary-icon-admin"></div>
+                            <div class="d-flex flex-column flex-fill gap-1">
+                                <div class="summary-title text-neutral-100">Total Admin Mitra Acquirer</div>
+                                <div class="summary-value c-16" id="lblAdminmitra"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="summary-item">
+                            <div class="summary-icon-nominal"></div>
+                            <div class="d-flex flex-column flex-fill gap-1">
+                                <div class="summary-title text-neutral-100">Total Nominal</div>
+                                <div class="summary-value c-16" id="lblTotalmitra"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Filter -->
+                <div class="d-flex flex-column gap-4 px-4 mb-4">
+                    <div class="d-flex gap-3">
+                        <form method="POST" action="" class="d-flex align-items-center gap-3 w-100 m-0">
+                            <div class="form-group">
+                                <select name="" id="lengthData" class="form-select">
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                </select>
+                            </div>
+                            <div class="form-group flex-fill">
+                                <div class="position-relative">
+                                    <div class="search-icon">
+                                        <span class="icon-search-append"></span>
+                                    </div>
+                                    <input id="keyword" type="text" class="form-control ps-5" placeholder="Cari"
+                                        autocomplete="off" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <select name="listmitra" id="listmitra" class="form-select select2"
+                                    data-allow-clear="false" data-placeholder="Pilih Sub Mitra Acquirer">
+                                    <option value=""></option>
+                                    <?php foreach ($this->listDataPartner as $key => $value) : ?>
+                                    <option value="<?= $value['partner_id']; ?>">
+                                        <?= trim($value['partner_name']); ?>
+                                    </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-append append-right">
+                                    <input id="filterDateItpMitra" type="text" name="date" class="form-control"
+                                        placeholder="Masukkan tanggal" data-toggle="datepicker"
+                                        data-auto-apply="true" />
+                                    <div class="append-icon icon-calendar"></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <select name="layanan" id="layanan" class="form-select select2" data-allow-clear="false"
+                                    data-placeholder="Pilih Layanan">
+                                    <option value=""></option>
+                                    <?php foreach ($this->layanan as $key => $value) : ?>
+                                    <option value="<?php echo $key; ?>"
+                                        <?php echo ($this->selectedLayanan == $value) ? 'selected="selected"' : ''; ?>>
+                                        <?php echo $value; ?>
+                                    </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <input type='hidden' id="itpcode" value="<?=$this->itpcode;?>">
+                                <button class="btn btn-outline-primary" id="btnSearchRoleMitra" type="button">
+                                    Search
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- Result Filter -->
+                <div class="d-flex flex-column gap-4 px-4 mb-4">
+                    <div class="filter-summary">
+                        <button id="btnDownloadItpmitra" class="btn btn-outline-base btn-download">
+                            <span class="icon-download"></span>
+                            Download Data
+                        </button>
+                        <span id="badge-date-report-mitra" class="badge bg-filter-value">
+                            Tanggal <?= date("d/m/Y"); ?>
+                        </span>
+                        <span id="badge-search-report-mitra" class="badge bg-filter-value" style="display: none"></span>
+                        <span id="badge-p-report-mitra" class="badge bg-filter-value" style="display: none"></span>
+                        <span id="badge-service-report-mitra" class="badge bg-filter-value">Semua Layanan</span>
+                        <button id="btn-report-reset" class="btn btn-light btn-reset">Reset Data</button>
+                    </div>
+                </div>
+                <!-- Table -->
+                <div class="table-responsive">
+                    <table id="rolemitranow" class="table nowrap mb-0">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama Sub Mitra Acquirer</th>
+                                <th>Layanan</th>
+                                <th>Lembar</th>
+                                <th>Tagihan (Rp)</th>
+                                <th>Admin Mitra Acquirer (Rp)</th>
+                                <th>Total (Rp)</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
