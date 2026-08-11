@@ -29,7 +29,8 @@ class Reports_IndexController extends App_Controller_Base
 
         /*** Khusus Level ITP ****/
         if ($listDataUser[0]["level_id"] == '2') {
-            $this->_redirect('/reports/index/itpreport');
+            // $this->_redirect('/reports/index/itpreport');
+            $this->_redirect('/reports/index/mitrareport');
             exit;
         }
 
@@ -166,6 +167,52 @@ class Reports_IndexController extends App_Controller_Base
 	}
 
 	public function itpreportAction()
+	{
+
+		$api = new App_Service_Api();
+        $_ = $api->authorization();
+
+		$layanan = $this->_getParam('layanan', 'ALL');
+        $this->view->selectedLayanan = $layanan;
+
+		$activeTab = $this->_getParam('type', 'it-provider');
+
+		$this->view->layanan = array(
+            'ALL'         => 'Semua Layanan',
+            'POSTPAID'    => 'Postpaid',
+            'PREPAID'     => 'Prepaid',
+            'NON_TAGLIST' => 'Non-Taglist'
+        );
+
+        $sess = App_Service_Session::get('user');
+
+        $payloadUser = [
+            $sess['id'],
+            $sess['session_token']
+        ];
+
+        $responseUser = $api->request('POST', '/service/proxy/service/alias/get-user-detail', $payloadUser);
+        $listDataUser = isset($responseUser["msg"]) ? $responseUser["msg"] : [];
+
+        $resjson = json_decode($listDataUser[0]["additional_info"],true);
+		$itpcode = strtolower($resjson["tp_code"]);
+
+		$this->view->itpcode = strtoupper($itpcode);
+
+        $apiUrl   = '/service/proxy/service/alias/get-partner-itp';
+        $payload  = [$itpcode];
+
+        $response = $api->request('POST', $apiUrl, $payload);
+        $this->view->listData = isset($response["msg"]) ? $response["msg"] : [];
+
+        $apiUrlPartner   = '/service/proxy/service/alias/get-all-partner';
+        $payloadPartner   = [];
+
+        $responsePartner  = $api->request('POST', $apiUrlPartner , $payloadPartner );
+        $this->view->listDataPartner  = isset($responsePartner ["msg"]) ? $responsePartner ["msg"] : [];
+	}
+
+    public function mitrareportAction()
 	{
 
 		$api = new App_Service_Api();
