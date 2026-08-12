@@ -203,11 +203,19 @@ class Reports_Model_Aps
             )";
         }
 
-        $apiUrltotalnowITPTotal  	= '/service/proxy/service/alias/totalcount-trx-now-itp';
-        $payloadtotalnowITPTotal    = [$whereTanggal,$whereLayanan,$itProvider,$mitra,$keyword,'nama','',''];
-        $responsetotalnowITPTotal   = $this->_api->request('POST', $apiUrltotalnowITPTotal, $payloadtotalnowITPTotal);
+        if ($params['isSubMitra'] == '2') {
+            $apiUrltotalnowITP  	= '/service/proxy/service/alias/total-trx-now-itp';
+            $payloadtotalnowITP  	= [$whereTanggal,$whereLayanan,$itProvider,$mitra,$keyword,'nama',$length,$start];
+            $responsetotalnowITP 	= $this->_api->request('POST', $apiUrltotalnowITP, $payloadtotalnowITP);
 
-        $response = $responsetotalnowITPTotal['msg'];
+            $response = $responsetotalnowITP['msg'];
+        } else {
+            $apiUrltotalnowITPTotal  	= '/service/proxy/service/alias/totalcount-trx-now-itp';
+            $payloadtotalnowITPTotal    = [$whereTanggal,$whereLayanan,$itProvider,$mitra,$keyword,'nama','',''];
+            $responsetotalnowITPTotal   = $this->_api->request('POST', $apiUrltotalnowITPTotal, $payloadtotalnowITPTotal);
+    
+            $response = $responsetotalnowITPTotal['msg'];
+        }
 
         return $response;
     }
@@ -275,7 +283,6 @@ class Reports_Model_Aps
         $worksheet->write(1, 0, "PERIODE TANGGAL : " . $params['tanggal'], $titleFormat);
         $worksheet->write(2, 0, "MITRA ACQUIRER : " . strtoupper($params['it_provider']), $titleFormat);
         $worksheet->write(3, 0, "LAYANAN : " . strtoupper($params['layanan']), $titleFormat);
-        $worksheet->write(4, 0, "IS SUB MITRA : " . strtoupper($params['isSubMitra']), $titleFormat);
 
         /*
         * Summary
