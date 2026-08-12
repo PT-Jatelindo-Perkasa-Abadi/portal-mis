@@ -1,13 +1,75 @@
 <?php
+
 class Default_IndexController extends App_Controller_Base
 {
     protected $_dashboardSession;
 
     public function init()
     {
-        Zend_Session::start();
+        parent::init();
+
+        // 1. Ambil session user via class App_Service_Session
+        $currentUser = App_Service_Session::get('user');
+
+        // 2. Pembacaan session_token yang fleksibel dan aman
+        $sessionToken = null;
+
+        if (is_array($currentUser) && !empty($currentUser['session_token'])) {
+            $sessionToken = $currentUser['session_token'];
+        } elseif (is_object($currentUser) && !empty($currentUser->session_token)) {
+            $sessionToken = $currentUser->session_token;
+        } else {
+            $userSession = new Zend_Session_Namespace('UserDetailCache');
+            if (isset($userSession->data['session_token'])) {
+                $sessionToken = $userSession->data['session_token'];
+            } elseif (isset($userSession->session_token)) {
+                $sessionToken = $userSession->session_token;
+            } elseif (isset($_SESSION['session_token'])) {
+                $sessionToken = $_SESSION['session_token'];
+            }
+        }
+
+        // 3. Validasi token session lokal
+        if (empty($sessionToken)) {
+            App_Service_Session::destroy();
+            $this->_helper->redirector->gotoSimple('index', 'login', 'auth');
+            return;
+        }
+
+        // 🛑 4. PING VALIDASI SESSION KE BACKEND (Proteksi Concurrent Login)
+        // Memaksa verifikasi ketersediaan session_token di database backend.
+        // Jika Device 2 sudah login, panggilan ini otomatis memicu auto-logout via App_Service_Api.
+        try {
+            $api = new App_Service_Api();
+            $api->authorization();
+            $response = $api->request('POST', '/service/proxy/service/alias/get-acl-config', [$sessionToken]);
+
+            $rawMsg = '';
+            if (isset($response['msg'])) {
+                if (is_string($response['msg'])) {
+                    $rawMsg = $response['msg'];
+                } elseif (is_array($response['msg'])) {
+                    $rawMsg = $response['msg'][0]['ERROR'] ?? ($response['msg']['ERROR'] ?? '');
+                }
+            }
+
+            if (
+                strpos(strtolower($rawMsg), 'invalid') !== false ||
+                strpos(strtolower($rawMsg), 'expired') !== false ||
+                strpos(strtolower($rawMsg), 'session') !== false
+            ) {
+                App_Service_Session::destroy();
+                $this->_helper->redirector->gotoSimple('index', 'login', 'auth');
+                return;
+            }
+        } catch (Exception $e) {
+            // Error session invalid ditangani oleh interseptor App_Service_Api
+        }
+
+        // 5. Inisialisasi namespace session dashboard
         $this->_dashboardSession = new Zend_Session_Namespace('dashboard_filter');
     }
+
     public function indexAction()
     {
         date_default_timezone_set('Asia/Jakarta');
@@ -26,7 +88,7 @@ class Default_IndexController extends App_Controller_Base
             : date('Y-m-d', strtotime('-1 day'));
         $this->view->filterDate = $filterDate;
         $this->view->currentDate = App_Helper_Date::indonesia($currentDate);
-        $this->view->currentHour = date('H').':00';
+        $this->view->currentHour = date('H') . ':00';
         $this->view->currentUser = $this->currentUser();
     }
 
@@ -39,7 +101,6 @@ class Default_IndexController extends App_Controller_Base
         $this->_dashboardSession->filterDate = $filterDate ?? '1';
 
         return $this->jsonSuccess([]);
-
     }
 
     public function totalSummaryAction()
@@ -53,7 +114,7 @@ class Default_IndexController extends App_Controller_Base
             'row1',
             $filterDate,
             'ch_12_dev',
-            [strtoupper($this->currentUser()['tp_code'])]
+            [strtoupper($this->currentUser()['tp_code'] ?? '')]
         );
 
         $response = $service->request(
@@ -62,7 +123,9 @@ class Default_IndexController extends App_Controller_Base
             $request['payload']
         );
 
-        return $this->jsonSuccess($response['msg'][0]);
+        $data = $response['msg'][0] ?? [];
+
+        return $this->jsonSuccess($data);
     }
 
     public function summaryTransactionAverageAction()
@@ -72,11 +135,13 @@ class Default_IndexController extends App_Controller_Base
             ? (int) $this->_dashboardSession->filterDate
             : 1;
 
+        $tpCode = $this->currentUser()['tp_code'] ?? '';
+
         $request = $this->buildDashboardRequest(
             'row2',
             $filterDate,
             'mis_ch_rekon',
-            array_fill(0, 4, $this->currentUser()['tp_code'])
+            array_fill(0, 4, $tpCode)
         );
 
         $response = $service->request(
@@ -85,7 +150,9 @@ class Default_IndexController extends App_Controller_Base
             $request['payload']
         );
 
-        return $this->jsonSuccess($response['msg'][0]);
+        $data = $response['msg'][0] ?? [];
+
+        return $this->jsonSuccess($data);
     }
 
     public function transactionChartAction()
@@ -95,11 +162,13 @@ class Default_IndexController extends App_Controller_Base
             ? (int) $this->_dashboardSession->filterDate
             : 1;
 
+        $tpCode = $this->currentUser()['tp_code'] ?? '';
+
         $request = $this->buildDashboardRequest(
             'row3',
             $filterDate,
             'ch_12_dev',
-            [$this->currentUser()['tp_code']]
+            [$tpCode]
         );
 
         $response = $service->request(
@@ -108,7 +177,8 @@ class Default_IndexController extends App_Controller_Base
             $request['payload']
         );
 
-        $result = Default_Model_TransactionTransformer::transform($response['msg']);
+        $msgData = isset($response['msg']) && is_array($response['msg']) ? $response['msg'] : [];
+        $result  = Default_Model_TransactionTransformer::transform($msgData);
 
         return $this->jsonSuccess($result);
     }
@@ -128,7 +198,8 @@ class Default_IndexController extends App_Controller_Base
             ["payload" => []]
         );
 
-        $result = Default_Model_LatencyTransformer::transform($response['msg']);
+        $msgData = isset($response['msg']) && is_array($response['msg']) ? $response['msg'] : [];
+        $result  = Default_Model_LatencyTransformer::transform($msgData);
 
         return $this->jsonSuccess($result);
     }
@@ -161,7 +232,7 @@ class Default_IndexController extends App_Controller_Base
     private function buildDashboardRequest($alias, $filterDate, $conf, array $params)
     {
         $period = ((int) $filterDate === 1) ? 'now' : 'yesterday';
-        $tpCode = strtoupper(trim((string) $this->currentUser()['tp_code']));
+        $tpCode = strtoupper(trim((string) ($this->currentUser()['tp_code'] ?? '')));
         $scope = 'all';
 
         if ($tpCode !== '') {
