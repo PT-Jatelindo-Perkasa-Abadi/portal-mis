@@ -1,4 +1,5 @@
 <?php
+
 class Auth_IndexController extends Zend_Controller_Action
 {
     public function indexAction()
@@ -52,29 +53,45 @@ class Auth_IndexController extends Zend_Controller_Action
         );
         $this->view->email = $data['email'] ?? '';
 
-        if ($response['code'] != '200') {
-            $this->view->error = $response['msg'];
+        if (!isset($response['code']) || $response['code'] != '200' || empty($response['msg'])) {
+            $this->view->error = $response['msg'] ?? 'Gagal terhubung ke server autentikasi.';
             return;
         }
 
-        if ($response['msg'][0]['ERROR'] == 'Kata Sandi Salah.') {
-            $this->view->errorPassword = "Kata Sandi Salah. Coba lagi atau klik 'Lupa kata sandi' untuk mengatur ulang.";
+        $user = $response['msg'][0] ?? [];
+
+        // 🛑 PERBAIKAN 1: Penangkap Pesan Error Spesifik dari Backend & Pemicu Modal UI
+        if (!empty($user['ERROR'])) {
+            $errMessage = $user['ERROR'];
+
+            if ($errMessage == 'Kata Sandi Salah.') {
+                $this->view->errorPassword = "Kata Sandi Salah. Coba lagi atau klik 'Lupa kata sandi' untuk mengatur ulang.";
+            } elseif ($errMessage == 'Akun Tidak Ditemukan') {
+                $this->view->errorAccount = true;
+            } elseif (strpos(strtolower($errMessage), 'diblokir') !== false || $errMessage == 'User sudah gagal login 3 kali, akun diblokir') {
+                // Memicu #modalErrorBlocked
+                $this->view->errorBlocked = true;
+            } else {
+                $this->view->error = $errMessage;
+            }
             return;
         }
 
-        if ($response['msg'][0]['ERROR'] == 'Akun Tidak Ditemukan') {
-            $this->view->errorAccount = $response['msg'][0]['ERROR'];
+        // 🛑 PERBAIKAN 2: Pemisahan Modal Terblokir (is_blocked) vs Dinonaktifkan (is_active = 0)
+        if (isset($user['is_blocked']) && $user['is_blocked'] == 1) {
+            // Memicu #modalErrorBlocked
+            $this->view->errorBlocked = true;
             return;
         }
 
-        if ($response['msg'][0]['ERROR'] == 'User sudah gagal login 3 kali, akun diblokir') {
-            $this->view->errorBlocked = $response['msg'][0]['ERROR'];
+        if (isset($user['is_active']) && $user['is_active'] == 0) {
+            // Memicu #modalErrorInactive
+            $this->view->errorInactive = true;
             return;
         }
 
-        $user = $response['msg'][0];
-
-        if ($user['has_changed_password'] == 0) {
+        // Penanganan User Baru yang Wajib Ganti Password
+        if (isset($user['has_changed_password']) && $user['has_changed_password'] == 0) {
             $session = new Zend_Session_Namespace('forgot_password');
             $session->otp = $user['session_id'];
             $session->verified = true;
@@ -87,35 +104,42 @@ class Auth_IndexController extends Zend_Controller_Action
         }
 
         $userProfile = [
-            'id' => $user['id'],
-            'username' => $user['username'],
-            'fullName' => $user['full_name'],
-            'email' => $user['email'],
-            'role' => strtolower($user['role_name']),
-            'session_token' => $user['session_token'],
-            'level' => $user['level_name'],
-            'tp_code' => $user['tp_code'] ?? ""
+            'id'            => $user['id'],
+            'username'      => $user['username'] ?? '',
+            'fullName'      => $user['full_name'] ?? '',
+            'email'         => $user['email'] ?? '',
+            'role'          => strtolower($user['role_name'] ?? 'guest'),
+            'session_token' => $user['session_token'] ?? '',
+            'level'         => $user['level_name'] ?? '',
+            'tp_code'       => $user['tp_code'] ?? ""
         ];
 
-        App_Service_Session::set('user', $userProfile);
-        App_Service_Session::refreshActivity();
-
-        /**
-         * ======================
-         * Fetch permission rows (sp_get_acl_config) & cache ACL config
-         * ======================
-         */
+        // 🛑 PERBAIKAN 3: Validasi get-acl-config Menampilkan Modal Dinonaktifkan Jika Session Ditolak
         try {
             $aclResponse = $api->request(
                 'POST',
                 '/service/proxy/service/alias/get-acl-config',
-                [$user['session_token']]
+                [$userProfile['session_token']]
             );
+
+            $aclError = '';
+            if (isset($aclResponse['msg'][0]['ERROR'])) {
+                $aclError = $aclResponse['msg'][0]['ERROR'];
+            } elseif (is_string($aclResponse['msg'] ?? null)) {
+                $aclError = $aclResponse['msg'];
+            }
+
+            // Jika get-acl-config menolak token (misal karena user terblokir/non-aktif di DB)
+            if (!empty($aclError)) {
+                App_Service_Session::destroy();
+                // Memicu #modalErrorInactive
+                $this->view->errorInactive = true;
+                return;
+            }
 
             if (
                 isset($aclResponse['code']) && $aclResponse['code'] == 200
                 && !empty($aclResponse['msg']) && is_array($aclResponse['msg'])
-                && empty($aclResponse['msg'][0]['ERROR'])
             ) {
                 $aclRows = $aclResponse['msg'];
 
@@ -129,10 +153,16 @@ class Auth_IndexController extends Zend_Controller_Action
                 );
             }
         } catch (Exception $e) {
-            // ACL fetch failed — App_Acl will use hardcoded fallback
+            App_Service_Session::destroy();
+            $this->view->errorInactive = true;
+            return;
         }
 
-        if (strtolower($user['role_name']) === 'rekon') {
+        // ✅ Simpan Session User HANYA jika seluruh validasi di atas lolos
+        App_Service_Session::set('user', $userProfile);
+        App_Service_Session::refreshActivity();
+
+        if (strtolower($user['role_name'] ?? '') === 'rekon') {
             $this->_helper->redirector->gotoUrl('/history');
         } else {
             $this->_helper->redirector->gotoUrl('/');
@@ -177,17 +207,10 @@ class Auth_IndexController extends Zend_Controller_Action
                 ]);
             }
 
-            if ($response['msg'][0]['ERROR']) {
+            if (!empty($response['msg'][0]['ERROR'])) {
                 return $this->_helper->json([
                     'success' => false,
                     'message' => $response['msg'][0]['ERROR']
-                ]);
-            }
-
-            if ($response['code'] != '200') {
-                return $this->_helper->json([
-                    'success' => false,
-                    'message' => $response['msg']
                 ]);
             }
 
@@ -196,16 +219,16 @@ class Auth_IndexController extends Zend_Controller_Action
                 [
                     'title' => 'Reset Password OTP',
                     'email' => $email,
-                    'name' => $response['msg'][0]['username'],
-                    'otp' => $response['msg'][0]['reset_token']
+                    'name'  => $response['msg'][0]['username'] ?? '',
+                    'otp'   => $response['msg'][0]['reset_token'] ?? ''
                 ],
                 'Kode OTP'
             );
             $emailPayload = [
-                'to' => [$email],
+                'to'      => [$email],
                 'subject' => 'Kode OTP',
-                'body' => $body,
-                'isHtml' => true
+                'body'    => $body,
+                'isHtml'  => true
             ];
 
             $emailResponse = $api->request(
@@ -240,14 +263,14 @@ class Auth_IndexController extends Zend_Controller_Action
 
         try {
             $email = trim($this->_getParam('email'));
-            $otp = trim($this->_getParam('otp'));
+            $otp   = trim($this->_getParam('otp'));
 
             if (empty($email) || empty($otp)) {
                 throw new Exception('OTP is required');
             }
 
             $api = new App_Service_Api();
-            $_ = $api->authorization();
+            $_   = $api->authorization();
 
             $payload = [
                 $otp,
@@ -274,7 +297,7 @@ class Auth_IndexController extends Zend_Controller_Action
                 ]);
             }
 
-            if ($response['msg'][0]['ERROR']) {
+            if (!empty($response['msg'][0]['ERROR'])) {
                 return $this->_helper->json([
                     'success' => false,
                     'message' => $response['msg'][0]['ERROR']
@@ -283,13 +306,13 @@ class Auth_IndexController extends Zend_Controller_Action
 
             $session = new Zend_Session_Namespace('forgot_password');
 
-            $session->verified = true;
-            $session->email = $email;
-            $session->otp = $otp;
+            $session->verified    = true;
+            $session->email       = $email;
+            $session->otp         = $otp;
             $session->verified_at = time();
 
             return $this->_helper->json([
-                'success' => true,
+                'success'  => true,
                 'redirect' => $this->view->baseUrl('auth/reset-password')
             ]);
         } catch (Exception $e) {
@@ -322,7 +345,7 @@ class Auth_IndexController extends Zend_Controller_Action
             $this->getResponse()->setHeader('Content-Type', 'application/json');
 
             try {
-                $password = trim($this->_getParam('newPassword'));
+                $password        = trim($this->_getParam('newPassword'));
                 $confirmPassword = trim($this->_getParam('confirmPassword'));
 
                 if (empty($password)) {
@@ -340,7 +363,7 @@ class Auth_IndexController extends Zend_Controller_Action
                 $hashedPassword = hash('sha256', $password);
 
                 $api = new App_Service_Api();
-                $_ = $api->authorization();
+                $_   = $api->authorization();
 
                 $payload = [
                     $session->otp,

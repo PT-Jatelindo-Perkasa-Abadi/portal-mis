@@ -1,7 +1,45 @@
 <?php
 
-class Distribution_IndexController extends Zend_Controller_Action
+class Distribution_IndexController extends App_Controller_Base
 {
+
+    public function init()
+    {
+        parent::init();
+
+        $currentUser = App_Service_Session::get('user');
+
+        $sessionToken = null;
+        if (is_array($currentUser) && !empty($currentUser['session_token'])) {
+            $sessionToken = $currentUser['session_token'];
+        } else {
+            $userSession = new Zend_Session_Namespace('UserDetailCache');
+            $sessionToken = $userSession->data['session_token'] ?? $_SESSION['session_token'] ?? null;
+        }
+
+        if (empty($sessionToken)) {
+            App_Service_Session::destroy();
+            $this->_helper->redirector->gotoSimple('index', 'login', 'auth');
+            return;
+        }
+
+        // 🛑 Memaksa verifikasi token ke backend sebelum halaman dimuat
+        $api = new App_Service_Api();
+        $api->authorization();
+        $response = $api->request('POST', '/service/proxy/service/alias/get-acl-config', [$sessionToken]);
+
+        // Pengecekan manual jika interseptor terlewat
+        if (
+            !isset($response['code']) || $response['code'] != 200 ||
+            (isset($response['msg'][0]['ERROR']) && strpos(strtolower($response['msg'][0]['ERROR']), 'session') !== false) ||
+            (is_string($response['msg'] ?? null) && strpos(strtolower($response['msg']), 'session') !== false)
+        ) {
+            App_Service_Session::destroy();
+            $this->_helper->redirector->gotoSimple('index', 'login', 'auth');
+            return;
+        }
+    }
+
     public function indexAction()
     {
         $this->view->isError = false;
@@ -81,37 +119,4 @@ class Distribution_IndexController extends Zend_Controller_Action
             'mitra_code' => $filterMitra
         ];
     }
-
-
-
-
-    // public function indexAction()
-    // {
-    //     // testing Error
-    //     $this->view->isError   = true;
-    //     $this->view->activeTab = $this->_getParam('type', 'it-provider');
-    //     $this->view->listData  = [];
-    //     $this->view->summary   = ['prepaid' => 0, 'postpaid' => 0, 'non_taglist' => 0];
-
-    //     $rawDateInput  = $this->_getParam('date', '');
-    //     $filterService = $this->_getParam('service', '');
-    //     $filterSort    = $this->_getParam('sort_by', 'total');
-    //     $filterSearch  = $this->_getParam('search', '');
-
-    //     $this->view->filters = [
-    //         'date'    => $rawDateInput,
-    //         'service' => $filterService,
-    //         'sort_by' => $filterSort,
-    //         'search'  => $filterSearch
-    //     ];
-
-    //     $this->view->chartJson = json_encode([
-    //         'labels'      => [],
-    //         'prepaid'     => [],
-    //         'postpaid'    => [],
-    //         'non_taglist' => []
-    //     ]);
-
-    //     return;
-    // }
 }
