@@ -275,6 +275,7 @@ class Reports_Model_Aps
         $worksheet->write(1, 0, "PERIODE TANGGAL : " . $params['tanggal'], $titleFormat);
         $worksheet->write(2, 0, "MITRA ACQUIRER : " . strtoupper($params['it_provider']), $titleFormat);
         $worksheet->write(3, 0, "LAYANAN : " . strtoupper($params['layanan']), $titleFormat);
+        $worksheet->write(4, 0, "IS SUB MITRA : " . strtoupper($params['isSubMitra']), $titleFormat);
 
         /*
         * Summary
@@ -298,7 +299,7 @@ class Reports_Model_Aps
         if ($params['isSubMitra'] == '1') {
             $headers = ['No', 'Sub Mitra', 'Mitra Acquirer', 'Layanan', 'Lembar', 'Tagihan (Rp)', 'Admin Mitra Acquirer (Rp)', 'Total (Rp)'];
             $columns = ['nama_mitra', 'nama_technical_provider', 'product', 'lembar', 'sum_total_tagihan', 'sum_total_fee', 'sum_total_nomial'];
-        } else if ($params['isSubMitra' == '2']) {
+        } else if ($params['isSubMitra'] == '2') {
             $headers = ['No', 'Sub Mitra', 'Layanan', 'Lembar', 'Tagihan (Rp)', 'Admin Mitra Acquirer (Rp)', 'Total (Rp)'];
             $columns = ['nama_mitra', 'product', 'lembar', 'sum_total_tagihan', 'sum_total_fee', 'sum_total_nomial'];
         } else {
