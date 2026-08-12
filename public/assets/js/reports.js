@@ -234,7 +234,7 @@ $(function () {
                 .reverse()
                 .join('-'),
             keyword: $('#keyword').val(),
-            it_provider: "",
+            it_provider: $('#itpcode').val(),
             layanan: $('#layanan').val(),
             mitra: $('#listmitra').val(),
             isSubMitra: 2,
