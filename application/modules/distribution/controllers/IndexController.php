@@ -3,43 +3,6 @@
 class Distribution_IndexController extends App_Controller_Base
 {
 
-    public function init()
-    {
-        parent::init();
-
-        $currentUser = App_Service_Session::get('user');
-
-        $sessionToken = null;
-        if (is_array($currentUser) && !empty($currentUser['session_token'])) {
-            $sessionToken = $currentUser['session_token'];
-        } else {
-            $userSession = new Zend_Session_Namespace('UserDetailCache');
-            $sessionToken = $userSession->data['session_token'] ?? $_SESSION['session_token'] ?? null;
-        }
-
-        if (empty($sessionToken)) {
-            App_Service_Session::destroy();
-            $this->_helper->redirector->gotoSimple('index', 'login', 'auth');
-            return;
-        }
-
-        // 🛑 Memaksa verifikasi token ke backend sebelum halaman dimuat
-        $api = new App_Service_Api();
-        $api->authorization();
-        $response = $api->request('POST', '/service/proxy/service/alias/get-acl-config', [$sessionToken]);
-
-        // Pengecekan manual jika interseptor terlewat
-        if (
-            !isset($response['code']) || $response['code'] != 200 ||
-            (isset($response['msg'][0]['ERROR']) && strpos(strtolower($response['msg'][0]['ERROR']), 'session') !== false) ||
-            (is_string($response['msg'] ?? null) && strpos(strtolower($response['msg']), 'session') !== false)
-        ) {
-            App_Service_Session::destroy();
-            $this->_helper->redirector->gotoSimple('index', 'login', 'auth');
-            return;
-        }
-    }
-
     public function indexAction()
     {
         $this->view->isError = false;
@@ -79,18 +42,14 @@ class Distribution_IndexController extends App_Controller_Base
 
         $modelAps = new Distribution_Model_Aps();
 
-        // 1. Ambil data dari API backend
         $result = $modelAps->getDistributionData($activeTab, $filterDate, $filterService, $filterSort);
         $this->view->isError = !$result['success'];
         $listData = $result['data'];
 
-        // 2. Master list mitra acquirer untuk dropdown
         $this->view->listMitraAcquirer = $modelAps->getMasterMitraList();
 
-        // 3. Filter data secara lokal di PHP
         $listData = $modelAps->filterSearchData($listData, $filterSearch, $filterMitra);
 
-        // 4. Fitur Export Excel
         $isDownload = $this->_getParam('download', 'false');
         if ($isDownload === 'true') {
             $this->_helper->layout->disableLayout();
@@ -100,7 +59,6 @@ class Distribution_IndexController extends App_Controller_Base
             exit;
         }
 
-        // 5. Olah Chart & Summary
         $chartSummary = $modelAps->processChartAndSummary($listData);
 
         $isUserFiltering = !empty($filterSearch) || !empty($filterService) || !empty($filterMitra);
