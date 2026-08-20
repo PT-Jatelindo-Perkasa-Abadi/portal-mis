@@ -7,9 +7,6 @@ class Auth_IndexController extends Zend_Controller_Action
         $this->_helper->redirector->gotoUrl('/auth/login');
     }
 
-    /**
-     * @var Zend_Controller_Action
-     */
     public function loginAction()
     {
         $this->view->headTitle('Login');
@@ -60,7 +57,6 @@ class Auth_IndexController extends Zend_Controller_Action
 
         $user = $response['msg'][0] ?? [];
 
-        // 🛑 PERBAIKAN 1: Penangkap Pesan Error Spesifik dari Backend & Pemicu Modal UI
         if (!empty($user['ERROR'])) {
             $errMessage = $user['ERROR'];
 
@@ -68,29 +64,34 @@ class Auth_IndexController extends Zend_Controller_Action
                 $this->view->errorPassword = "Kata Sandi Salah. Coba lagi atau klik 'Lupa kata sandi' untuk mengatur ulang.";
             } elseif ($errMessage == 'Akun Tidak Ditemukan') {
                 $this->view->errorAccount = true;
-            } elseif (strpos(strtolower($errMessage), 'diblokir') !== false || $errMessage == 'User sudah gagal login 3 kali, akun diblokir') {
-                // Memicu #modalErrorBlocked
+            } elseif (
+                strpos(strtolower($errMessage), 'blokir') !== false ||
+                $errMessage == 'User sudah gagal login 3 kali, akun diblokir'
+            ) {
                 $this->view->errorBlocked = true;
+            } elseif (
+                strpos(strtolower($errMessage), 'nonaktif') !== false ||
+                strpos(strtolower($errMessage), 'non-aktif') !== false ||
+                strpos(strtolower($errMessage), 'inactive') !== false ||
+                strpos(strtolower($errMessage), 'dinonaktifkan') !== false
+            ) {
+                $this->view->errorInactive = true;
             } else {
                 $this->view->error = $errMessage;
             }
             return;
         }
 
-        // 🛑 PERBAIKAN 2: Pemisahan Modal Terblokir (is_blocked) vs Dinonaktifkan (is_active = 0)
         if (isset($user['is_blocked']) && $user['is_blocked'] == 1) {
-            // Memicu #modalErrorBlocked
             $this->view->errorBlocked = true;
             return;
         }
 
         if (isset($user['is_active']) && $user['is_active'] == 0) {
-            // Memicu #modalErrorInactive
             $this->view->errorInactive = true;
             return;
         }
 
-        // Penanganan User Baru yang Wajib Ganti Password
         if (isset($user['has_changed_password']) && $user['has_changed_password'] == 0) {
             $session = new Zend_Session_Namespace('forgot_password');
             $session->otp = $user['session_id'];
@@ -114,7 +115,6 @@ class Auth_IndexController extends Zend_Controller_Action
             'tp_code'       => $user['tp_code'] ?? ""
         ];
 
-        // 🛑 PERBAIKAN 3: Validasi get-acl-config Menampilkan Modal Dinonaktifkan Jika Session Ditolak
         try {
             $aclResponse = $api->request(
                 'POST',
@@ -129,11 +129,13 @@ class Auth_IndexController extends Zend_Controller_Action
                 $aclError = $aclResponse['msg'];
             }
 
-            // Jika get-acl-config menolak token (misal karena user terblokir/non-aktif di DB)
             if (!empty($aclError)) {
                 App_Service_Session::destroy();
-                // Memicu #modalErrorInactive
-                $this->view->errorInactive = true;
+                if (strpos(strtolower($aclError), 'block') !== false) {
+                    $this->view->errorBlocked = true;
+                } else {
+                    $this->view->errorInactive = true;
+                }
                 return;
             }
 
@@ -158,7 +160,6 @@ class Auth_IndexController extends Zend_Controller_Action
             return;
         }
 
-        // ✅ Simpan Session User HANYA jika seluruh validasi di atas lolos
         App_Service_Session::set('user', $userProfile);
         App_Service_Session::refreshActivity();
 
@@ -365,7 +366,15 @@ class Auth_IndexController extends Zend_Controller_Action
                 $api = new App_Service_Api();
                 $_   = $api->authorization();
 
+                // $payload = [
+                //     $session->otp,
+                //     $hashedPassword,
+                //     App_Log_Context::getIp(),
+                //     App_Log_Context::getUserAgent()
+                // ];
+
                 $payload = [
+                    $session->email,
                     $session->otp,
                     $hashedPassword,
                     App_Log_Context::getIp(),

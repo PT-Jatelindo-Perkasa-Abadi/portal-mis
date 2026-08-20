@@ -6,62 +6,6 @@ class Activity_IndexController extends App_Controller_Base
     {
         parent::init();
 
-        // 1. Ambil session user via class App_Service_Session
-        $currentUser = App_Service_Session::get('user');
-
-        // 2. Pembacaan session_token yang fleksibel dan aman
-        $sessionToken = null;
-
-        if (is_array($currentUser) && !empty($currentUser['session_token'])) {
-            $sessionToken = $currentUser['session_token'];
-        } elseif (is_object($currentUser) && !empty($currentUser->session_token)) {
-            $sessionToken = $currentUser->session_token;
-        } else {
-            $userSession = new Zend_Session_Namespace('UserDetailCache');
-            if (isset($userSession->data['session_token'])) {
-                $sessionToken = $userSession->data['session_token'];
-            } elseif (isset($userSession->session_token)) {
-                $sessionToken = $userSession->session_token;
-            } elseif (isset($_SESSION['session_token'])) {
-                $sessionToken = $_SESSION['session_token'];
-            }
-        }
-
-        // 3. Validasi token session lokal
-        if (empty($sessionToken)) {
-            App_Service_Session::destroy();
-            $this->_helper->redirector->gotoSimple('index', 'login', 'auth');
-            return;
-        }
-
-        try {
-            $api = new App_Service_Api();
-            $api->authorization();
-            $response = $api->request('POST', '/service/proxy/service/alias/get-acl-config', [$sessionToken]);
-
-            // Pengecekan manual jika interseptor global belum mengeksekusi exit
-            $rawMsg = '';
-            if (isset($response['msg'])) {
-                if (is_string($response['msg'])) {
-                    $rawMsg = $response['msg'];
-                } elseif (is_array($response['msg'])) {
-                    $rawMsg = $response['msg'][0]['ERROR'] ?? ($response['msg']['ERROR'] ?? '');
-                }
-            }
-
-            if (
-                strpos(strtolower($rawMsg), 'invalid') !== false ||
-                strpos(strtolower($rawMsg), 'expired') !== false ||
-                strpos(strtolower($rawMsg), 'session') !== false
-            ) {
-                App_Service_Session::destroy();
-                $this->_helper->redirector->gotoSimple('index', 'login', 'auth');
-                return;
-            }
-        } catch (Exception $e) {
-            // Error ditangani langsung oleh App_Service_Api / redirector
-        }
-
         $this->view->headLink()->appendStylesheet(
             $this->view->baseUrl('/assets/css/activity.css')
         );
@@ -141,7 +85,6 @@ class Activity_IndexController extends App_Controller_Base
             $apiUrlN   = '/service/proxy/service/alias/get-view-auditlog';
             $responseN = $api->request('POST', $apiUrlN, $payloadT);
 
-            // 🛑 5. Validasi jika respon API backend mengembalikan error session expired
             $errT = $responseT['msg'][0]['ERROR'] ?? ($responseT['msg'] ?? '');
             $errN = $responseN['msg'][0]['ERROR'] ?? ($responseN['msg'] ?? '');
 

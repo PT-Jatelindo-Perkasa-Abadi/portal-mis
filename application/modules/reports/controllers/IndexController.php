@@ -6,65 +6,9 @@ class Reports_IndexController extends App_Controller_Base
 
     public function init()
     {
-        // 1. Wajib panggil parent::init() untuk menjalankan proteksi dasar
         parent::init();
 
         $this->_Model = new Reports_Model_Aps();
-
-        // 2. Ambil session user
-        $currentUser = App_Service_Session::get('user');
-
-        // 3. Ambil session_token
-        $sessionToken = null;
-        if (is_array($currentUser) && !empty($currentUser['session_token'])) {
-            $sessionToken = $currentUser['session_token'];
-        } elseif (is_object($currentUser) && !empty($currentUser->session_token)) {
-            $sessionToken = $currentUser->session_token;
-        } else {
-            $userSession = new Zend_Session_Namespace('UserDetailCache');
-            if (isset($userSession->data['session_token'])) {
-                $sessionToken = $userSession->data['session_token'];
-            } elseif (isset($userSession->session_token)) {
-                $sessionToken = $userSession->session_token;
-            } elseif (isset($_SESSION['session_token'])) {
-                $sessionToken = $_SESSION['session_token'];
-            }
-        }
-
-        // 4. Validasi token session lokal
-        if (empty($sessionToken)) {
-            App_Service_Session::destroy();
-            $this->_helper->redirector->gotoSimple('index', 'login', 'auth');
-            return;
-        }
-
-        // 🛑 5. PING VALIDASI SESSION KE BACKEND (Pencegah Concurrent Login)
-        try {
-            $api = new App_Service_Api();
-            $api->authorization();
-            $response = $api->request('POST', '/service/proxy/service/alias/get-acl-config', [$sessionToken]);
-
-            $rawMsg = '';
-            if (isset($response['msg'])) {
-                if (is_string($response['msg'])) {
-                    $rawMsg = $response['msg'];
-                } elseif (is_array($response['msg'])) {
-                    $rawMsg = $response['msg'][0]['ERROR'] ?? ($response['msg']['ERROR'] ?? '');
-                }
-            }
-
-            if (
-                strpos(strtolower($rawMsg), 'invalid') !== false ||
-                strpos(strtolower($rawMsg), 'expired') !== false ||
-                strpos(strtolower($rawMsg), 'session') !== false
-            ) {
-                App_Service_Session::destroy();
-                $this->_helper->redirector->gotoSimple('index', 'login', 'auth');
-                return;
-            }
-        } catch (Exception $e) {
-            // Ditangani interseptor global App_Service_Api
-        }
     }
 
     public function indexAction()
@@ -82,7 +26,6 @@ class Reports_IndexController extends App_Controller_Base
         $responseUser = $api->request('POST', '/service/proxy/service/alias/get-user-detail', $payloadUser);
         $listDataUser = isset($responseUser["msg"]) ? $responseUser["msg"] : [];
 
-        /*** Khusus Level ITP ****/
         if (isset($listDataUser[0]["level_id"]) && $listDataUser[0]["level_id"] == '2') {
             $this->_redirect('/reports/index/mitrareport');
             exit;

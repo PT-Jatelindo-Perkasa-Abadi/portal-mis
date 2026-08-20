@@ -91,7 +91,6 @@ class App_Service_Api
             $this->logger->info("IP: $ip | ACTIVITY_ID: $this->activityId | RESPONSE FROM $url METHOD=$method STATUS=$httpCode BODY=" . json_encode($maskedResponse));
 
             return json_decode($responseJson, true);
-
         } catch (Exception $e) {
             $httpCode = $e->getCode();
             $errorMessage = $e->getMessage();
@@ -119,6 +118,28 @@ class App_Service_Api
 
     public function authorization()
     {
+        // 🛑 1. CEK CACHE TOKEN DI SESSION
+        $authSession = new Zend_Session_Namespace('api_gateway_auth');
+
+        if (
+            isset($authSession->accessToken) &&
+            isset($authSession->expiresAt) &&
+            $authSession->expiresAt > time()
+        ) {
+            // Gunakan token dari cache jika belum expired
+            $this->setToken($authSession->accessToken);
+
+            return [
+                'code' => 200,
+                'status' => 'OK',
+                'msg' => [
+                    'access_token' => $authSession->accessToken,
+                    'cached' => true
+                ]
+            ];
+        }
+
+        // 🛑 2. JIKA BELUM ADA / EXPIRED, HIT KE SERVER GATEWAY
         $path = '/auth/login';
         $url = rtrim($this->baseUrl, '/') . '/' . ltrim($path, '/');
         $client = new Zend_Http_Client($url);
@@ -153,13 +174,17 @@ class App_Service_Api
             $this->logger->info("IP: $ip | ACTIVITY_ID: $this->activityId | RESPONSE FROM $url METHOD=GET STATUS=$httpCode BODY=" . json_encode($maskedResponse));
 
             if ($httpCode == '200') {
-                $this->setToken($responseArray['msg']['access_token']);
+                $accessToken = $responseArray['msg']['access_token'];
+                $this->setToken($accessToken);
+
+                // 🛑 3. SIMPAN TOKEN KE SESSION CACHE (Set TTL misal 15 menit / 900 detik)
+                $authSession->accessToken = $accessToken;
+                $authSession->expiresAt   = time() + 900;
             } else {
-                throw new Exception($responseArray['responseMessage']);
+                throw new Exception($responseArray['responseMessage'] ?? 'Authentication failed');
             }
 
-            return json_decode($responseJson, true);
-
+            return $responseArray;
         } catch (Exception $e) {
             $httpCode = $e->getCode();
             $errorMessage = $e->getMessage();

@@ -18,7 +18,66 @@ abstract class App_Controller_Base extends Zend_Controller_Action
 
     public function init()
     {
+        // 1. Inisialisasi Logger Bawaan Anda
         $this->logger = Zend_Registry::get('logger');
+
+        // 2. Cegah Infinite Redirect jika Controller yang Mengakses adalah 'auth'
+        $controllerName = strtolower($this->getRequest()->getControllerName());
+        if ($controllerName === 'auth') {
+            return;
+        }
+
+        // 3. Ambil Session User & Token
+        $user = $this->currentUser();
+        $sessionToken = $user['session_token'] ?? null;
+
+        if (empty($sessionToken)) {
+            App_Service_Session::destroy();
+            $this->_helper->redirector->gotoSimple('index', 'login', 'auth');
+            return;
+        }
+
+        // 🛑 TAMBAHAN PERUBAHAN: Bypass ping ACL untuk Request AJAX
+        // Request AJAX (seperti widget Dashboard & filter Laporan) tidak perlu hit /get-acl-config berulang kali
+        if ($this->getRequest()->isXmlHttpRequest()) {
+            return;
+        }
+
+        // 4. Validasi Session Token Real-Time ke Backend Database (Hanya untuk Navigasi Halaman Utama / Non-AJAX)
+        try {
+            $api = new App_Service_Api();
+            $api->authorization();
+            $response = $api->request('POST', '/service/proxy/service/alias/get-acl-config', [$sessionToken]);
+
+            $rawMsg = '';
+            if (isset($response['msg'])) {
+                if (is_string($response['msg'])) {
+                    $rawMsg = $response['msg'];
+                } elseif (is_array($response['msg'])) {
+                    $rawMsg = $response['msg'][0]['ERROR'] ?? ($response['msg']['ERROR'] ?? '');
+                }
+            }
+
+            // Jika token ditolak/dinonaktifkan/expired oleh backend
+            if (
+                strpos(strtolower($rawMsg), 'invalid') !== false ||
+                strpos(strtolower($rawMsg), 'expired') !== false ||
+                strpos(strtolower($rawMsg), 'session') !== false
+            ) {
+                App_Service_Session::destroy();
+
+                // Set flag notice agar halaman login menampilkan modal "Akun Dinonaktifkan"
+                $notice = new Zend_Session_Namespace('login_notice');
+                $notice->errorInactive = true;
+
+                $this->_helper->redirector->gotoSimple('index', 'login', 'auth');
+                return;
+            }
+        } catch (Exception $e) {
+            App_Service_Session::destroy();
+            $this->_helper->redirector->gotoSimple('index', 'login', 'auth');
+            return;
+        }
     }
 
     private $_api;
@@ -124,15 +183,6 @@ abstract class App_Controller_Base extends Zend_Controller_Action
             'created_by' => '',
             'group_id' => (string) ($user['groupId'] ?? 0)
         ];
-
-        // if ($role === 'checker') {
-        //     return ['created_by' => '', 'group_id' => (string) ($user['groupId'] ?? 0)];
-        // }
-
-        // return [
-        //     'created_by' => (string) ($this->currentUserId() ?? 0),
-        //     'group_id' => ''
-        // ];
     }
 
     /**
