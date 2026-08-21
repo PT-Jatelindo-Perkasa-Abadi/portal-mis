@@ -7,9 +7,20 @@ class Auth_IndexController extends Zend_Controller_Action
         $this->_helper->redirector->gotoUrl('/auth/login');
     }
 
+    /**
+     * @var Zend_Controller_Action
+     */
+
     public function loginAction()
     {
         $this->view->headTitle('Login');
+
+        // 🎯 1. Tangkap Notice dari Redirect (Skenario Akun Non-Aktif saat Beraktivitas)
+        $notice = new Zend_Session_Namespace('login_notice');
+        if (isset($notice->errorInactive) && $notice->errorInactive === true) {
+            $this->view->errorInactive = true;
+            unset($notice->errorInactive); // Hapus flag setelah dibaca
+        }
 
         if (App_Service_Session::getExpiredFlag()) {
             $this->view->errorMessage = 'Session expired, silakan login kembali';
@@ -19,7 +30,7 @@ class Auth_IndexController extends Zend_Controller_Action
             return;
         }
 
-        $data = $this->_request->getPost();
+        $data      = $this->_request->getPost();
         $validator = new Zend_Validate_EmailAddress();
 
         if (!$validator->isValid($data['email'])) {
@@ -27,9 +38,9 @@ class Auth_IndexController extends Zend_Controller_Action
             return;
         }
 
-        $api = new App_Service_Api();
-        $_ = $api->authorization();
-        $ip = App_Log_Context::getIp();
+        $api     = new App_Service_Api();
+        $_       = $api->authorization();
+        $ip      = App_Log_Context::getIp();
         $payload = [
             $data['email'],
             hash('sha256', $data['password']),
@@ -43,7 +54,7 @@ class Auth_IndexController extends Zend_Controller_Action
             "@p_refresh_token"
         ];
 
-        $response = $api->request(
+        $response          = $api->request(
             'POST',
             '/service/proxy/service/alias/login-session',
             $payload
@@ -57,23 +68,28 @@ class Auth_IndexController extends Zend_Controller_Action
 
         $user = $response['msg'][0] ?? [];
 
+        // 🎯 2. Penanganan Pesan Error dari Backend / Stored Procedure
         if (!empty($user['ERROR'])) {
-            $errMessage = $user['ERROR'];
+            $errMessage      = $user['ERROR'];
+            $errMessageLower = strtolower($errMessage);
 
-            if ($errMessage == 'Kata Sandi Salah.') {
+            if ($errMessage == 'Kata Sandi Salah.' || strpos($errMessageLower, 'sandi salah') !== false) {
                 $this->view->errorPassword = "Kata Sandi Salah. Coba lagi atau klik 'Lupa kata sandi' untuk mengatur ulang.";
-            } elseif ($errMessage == 'Akun Tidak Ditemukan') {
+            } elseif ($errMessage == 'Akun Tidak Ditemukan' || strpos($errMessageLower, 'tidak ditemukan') !== false) {
                 $this->view->errorAccount = true;
             } elseif (
-                strpos(strtolower($errMessage), 'blokir') !== false ||
+                strpos($errMessageLower, 'blokir') !== false ||
+                strpos($errMessageLower, 'block') !== false ||
                 $errMessage == 'User sudah gagal login 3 kali, akun diblokir'
             ) {
                 $this->view->errorBlocked = true;
             } elseif (
-                strpos(strtolower($errMessage), 'nonaktif') !== false ||
-                strpos(strtolower($errMessage), 'non-aktif') !== false ||
-                strpos(strtolower($errMessage), 'inactive') !== false ||
-                strpos(strtolower($errMessage), 'dinonaktifkan') !== false
+                strpos($errMessageLower, 'nonaktif') !== false ||
+                strpos($errMessageLower, 'non-aktif') !== false ||
+                strpos($errMessageLower, 'inactive') !== false ||
+                strpos($errMessageLower, 'dinonaktifkan') !== false ||
+                strpos($errMessageLower, 'deactive') !== false ||
+                strpos($errMessageLower, 'account') !== false
             ) {
                 $this->view->errorInactive = true;
             } else {
@@ -82,23 +98,25 @@ class Auth_IndexController extends Zend_Controller_Action
             return;
         }
 
-        if (isset($user['is_blocked']) && $user['is_blocked'] == 1) {
+        // 🎯 3. Penanganan Flag Status User
+        if (isset($user['is_blocked']) && (int)$user['is_blocked'] === 1) {
             $this->view->errorBlocked = true;
             return;
         }
 
-        if (isset($user['is_active']) && $user['is_active'] == 0) {
+        if (isset($user['is_active']) && (int)$user['is_active'] === 0) {
             $this->view->errorInactive = true;
             return;
         }
 
-        if (isset($user['has_changed_password']) && $user['has_changed_password'] == 0) {
-            $session = new Zend_Session_Namespace('forgot_password');
-            $session->otp = $user['session_id'];
-            $session->verified = true;
-            $session->email = $user['email'];
+        // 🎯 4. Penanganan Akun Baru / Perbarui Password
+        if (isset($user['has_changed_password']) && (int)$user['has_changed_password'] === 0) {
+            $session               = new Zend_Session_Namespace('forgot_password');
+            $session->otp          = $user['session_id'];
+            $session->verified     = true;
+            $session->email        = $user['email'];
             $session->verified_at = time();
-            $session->isNewUser = true;
+            $session->isNewUser    = true;
             $this->view->isNewUser = true;
 
             return;
@@ -115,6 +133,7 @@ class Auth_IndexController extends Zend_Controller_Action
             'tp_code'       => $user['tp_code'] ?? ""
         ];
 
+        // 🎯 5. Validasi ACL Config & Status Akses
         try {
             $aclResponse = $api->request(
                 'POST',
@@ -131,7 +150,9 @@ class Auth_IndexController extends Zend_Controller_Action
 
             if (!empty($aclError)) {
                 App_Service_Session::destroy();
-                if (strpos(strtolower($aclError), 'block') !== false) {
+                $aclErrorLower = strtolower($aclError);
+
+                if (strpos($aclErrorLower, 'block') !== false || strpos($aclErrorLower, 'blokir') !== false) {
                     $this->view->errorBlocked = true;
                 } else {
                     $this->view->errorInactive = true;
