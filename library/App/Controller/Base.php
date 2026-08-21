@@ -32,18 +32,11 @@ abstract class App_Controller_Base extends Zend_Controller_Action
         $sessionToken = $user['session_token'] ?? null;
 
         if (empty($sessionToken)) {
-            App_Service_Session::destroy();
-            $this->_helper->redirector->gotoSimple('index', 'login', 'auth');
+            $this->handleInvalidSession('Sesi tidak ditemukan.');
             return;
         }
 
-        // 🛑 TAMBAHAN PERUBAHAN: Bypass ping ACL untuk Request AJAX
-        // Request AJAX (seperti widget Dashboard & filter Laporan) tidak perlu hit /get-acl-config berulang kali
-        if ($this->getRequest()->isXmlHttpRequest()) {
-            return;
-        }
-
-        // 4. Validasi Session Token Real-Time ke Backend Database (Hanya untuk Navigasi Halaman Utama / Non-AJAX)
+        // 4. Validasi Session Token Real-Time ke Backend Database (Berlaku untuk Navigasi & AJAX)
         try {
             $api = new App_Service_Api();
             $api->authorization();
@@ -58,26 +51,59 @@ abstract class App_Controller_Base extends Zend_Controller_Action
                 }
             }
 
-            // Jika token ditolak/dinonaktifkan/expired oleh backend
+            $rawMsgLower = strtolower($rawMsg);
+
+            // 🎯 Deteksi jika token ditolak/dinonaktifkan/diblokir/expired oleh backend
             if (
-                strpos(strtolower($rawMsg), 'invalid') !== false ||
-                strpos(strtolower($rawMsg), 'expired') !== false ||
-                strpos(strtolower($rawMsg), 'session') !== false
+                strpos($rawMsgLower, 'invalid') !== false ||
+                strpos($rawMsgLower, 'expired') !== false ||
+                strpos($rawMsgLower, 'session') !== false ||
+                strpos($rawMsgLower, 'nonaktifkan') !== false ||
+                strpos($rawMsgLower, 'block') !== false
             ) {
-                App_Service_Session::destroy();
-
-                // Set flag notice agar halaman login menampilkan modal "Akun Dinonaktifkan"
-                $notice = new Zend_Session_Namespace('login_notice');
-                $notice->errorInactive = true;
-
-                $this->_helper->redirector->gotoSimple('index', 'login', 'auth');
+                $this->handleInvalidSession('Akun Anda telah dinonaktifkan atau sesi telah berakhir.');
                 return;
             }
         } catch (Exception $e) {
-            App_Service_Session::destroy();
-            $this->_helper->redirector->gotoSimple('index', 'login', 'auth');
+            $this->handleInvalidSession('Terjadi kesalahan otentikasi sesi.');
             return;
         }
+    }
+
+    /**
+     * 🎯 Helper untuk Menangani Logout Otomatis (Mendukung Navigasi Normal & Request AJAX)
+     */
+    protected function handleInvalidSession(string $message = '')
+    {
+        // 1. Simpan penanda ke Session Namespace 'login_notice'
+        $notice = new Zend_Session_Namespace('login_notice');
+        $notice->errorInactive = true;
+
+        // 2. Hapus data autentikasi user SAJA (JANGAN destroy seluruh sesi PHP)
+        App_Service_Session::set('user', null);
+        App_Service_Session::set('acl_config', null);
+        App_Service_Session::set('menus', null);
+
+        // 3. Jika Request berupa AJAX, kirim JSON HTTP 401 agar frontend bisa redirect
+        if ($this->getRequest()->isXmlHttpRequest()) {
+            $this->_helper->layout->disableLayout();
+            $this->_helper->viewRenderer->setNoRender(true);
+            $this->getResponse()
+                ->setHttpResponseCode(401)
+                ->setHeader('Content-Type', 'application/json');
+
+            echo json_encode([
+                'success'  => false,
+                'code'     => 401,
+                'msg'      => $message ?: 'Sesi Anda telah berakhir, silakan login kembali.',
+                'redirect' => $this->getBaseUrl() . '/auth/login'
+            ]);
+            exit;
+        }
+
+        // 4. Jika Request Normal (Navigasi Halaman), lakukan Redirect
+        $this->_helper->redirector->gotoSimple('login', 'index', 'auth');
+        exit;
     }
 
     private $_api;

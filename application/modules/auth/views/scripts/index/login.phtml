@@ -122,30 +122,62 @@
     </div>
 </div>
 
+<div id="modalErrorInactive" class="modal fade" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+    data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body pb-0">
+                <div class="d-flex flex-column align-items-center py-4 gap-4">
+                    <img src="<?= $this->baseUrl('assets/img/img-account-nonaktif.svg'); ?>"
+                        alt="image account inactive" style="max-width: 200px;" />
+                    <div class="d-flex flex-column align-items-center gap-2">
+                        <h3 class="text-neutral-100 fs-5 fw-bold mb-0 text-center">
+                            Akun Dinonaktifkan
+                        </h3>
+                        <p class="text-neutral-70 text-sm text-center px-2">
+                            Akses ke akun dinonaktifkan, silakan hubungi kami untuk informasi lebih lanjut
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer border-0 pt-0 pb-4 px-4">
+                <button type="button" class="btn btn-primary w-100 py-2 rounded-3" data-bs-dismiss="modal">
+                    Oke
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <p class="auth-tos"></p>
 
 <script type="text/javascript">
-$(document).ready(function() {
-    app.FormValidation.init("#login-form");
+    $(document).ready(function() {
+        app.FormValidation.init("#login-form");
 
-    <?php if ($this->isNewUser) : ?>
-    $('#modalRedirect').modal('show');
-    <?php endif; ?>
+        <?php if ($this->isNewUser) : ?>
+            $('#modalRedirect').modal('show');
+        <?php endif; ?>
 
-    <?php if ($this->error) : ?>
-    app.FormValidation.feedback('#password', "<?= $this->error; ?>");
-    <?php endif; ?>
+        <?php if ($this->error) : ?>
+            app.FormValidation.feedback('#password', "<?= $this->error; ?>");
+        <?php endif; ?>
 
-    <?php if ($this->errorPassword) : ?>
-    app.FormValidation.feedback('#password', "<?= $this->errorPassword; ?>");
-    <?php endif; ?>
+        <?php if ($this->errorPassword) : ?>
+            app.FormValidation.feedback('#password', "<?= $this->errorPassword; ?>");
+        <?php endif; ?>
 
-    <?php if($this->errorAccount) : ?>
-    $('#modalErrorAccount').modal('show');
-    <?php endif; ?>
+        <?php if ($this->errorAccount) : ?>
+            $('#modalErrorAccount').modal('show');
+        <?php endif; ?>
 
-    <?php if($this->errorBlocked) : ?>
-    $('#modalErrorBlocked').modal('show');
-    <?php endif; ?>
-});
+        <?php if ($this->errorBlocked) : ?>
+            $('#modalErrorBlocked').modal('show');
+        <?php endif; ?>
+
+        <?php if ($this->errorInactive) : ?>
+            $('#modalErrorInactive').modal('show');
+        <?php endif; ?>
+    });
 </script>
