@@ -15,7 +15,6 @@ class Auth_IndexController extends Zend_Controller_Action
     {
         $this->view->headTitle('Login');
 
-        // 🎯 1. Tangkap Notice dari Redirect (Skenario Akun Non-Aktif saat Beraktivitas)
         $notice = new Zend_Session_Namespace('login_notice');
         if (isset($notice->errorInactive) && $notice->errorInactive === true) {
             $this->view->errorInactive = true;
@@ -68,7 +67,6 @@ class Auth_IndexController extends Zend_Controller_Action
 
         $user = $response['msg'][0] ?? [];
 
-        // 🎯 2. Penanganan Pesan Error dari Backend / Stored Procedure
         if (!empty($user['ERROR'])) {
             $errMessage      = $user['ERROR'];
             $errMessageLower = strtolower($errMessage);
@@ -98,7 +96,6 @@ class Auth_IndexController extends Zend_Controller_Action
             return;
         }
 
-        // 🎯 3. Penanganan Flag Status User
         if (isset($user['is_blocked']) && (int)$user['is_blocked'] === 1) {
             $this->view->errorBlocked = true;
             return;
@@ -109,15 +106,26 @@ class Auth_IndexController extends Zend_Controller_Action
             return;
         }
 
-        // 🎯 4. Penanganan Akun Baru / Perbarui Password
+        $session = new Zend_Session_Namespace('forgot_password');
+        unset($session->isNewUser);
+        unset($session->isUser);
+
         if (isset($user['has_changed_password']) && (int)$user['has_changed_password'] === 0) {
-            $session               = new Zend_Session_Namespace('forgot_password');
-            $session->otp          = $user['session_id'];
+            $session->otp          = (string)$user['session_id'];
             $session->verified     = true;
             $session->email        = $user['email'];
             $session->verified_at = time();
             $session->isNewUser    = true;
             $this->view->isNewUser = true;
+
+            return;
+        } elseif (isset($user['has_changed_password']) && (int)$user['has_changed_password'] === 2) {
+            $session->otp          = (string)$user['session_id'];
+            $session->verified     = true;
+            $session->email        = $user['email'];
+            $session->verified_at = time();
+            $session->isUser       = true;
+            $this->view->isUser    = true;
 
             return;
         }
@@ -133,7 +141,6 @@ class Auth_IndexController extends Zend_Controller_Action
             'tp_code'       => $user['tp_code'] ?? ""
         ];
 
-        // 🎯 5. Validasi ACL Config & Status Akses
         try {
             $aclResponse = $api->request(
                 'POST',
@@ -387,25 +394,19 @@ class Auth_IndexController extends Zend_Controller_Action
                 $api = new App_Service_Api();
                 $_   = $api->authorization();
 
-                // $payload = [
-                //     $session->otp,
-                //     $hashedPassword,
-                //     App_Log_Context::getIp(),
-                //     App_Log_Context::getUserAgent()
-                // ];
-
                 $payload = [
-                    $session->email,
                     $session->otp,
                     $hashedPassword,
                     App_Log_Context::getIp(),
                     App_Log_Context::getUserAgent()
                 ];
+
                 $url = '/service/proxy/service/alias/forgotpassword';
 
-                if ($session->isNewUser) {
+                if (!empty($session->isNewUser) || !empty($session->isUser)) {
                     $url = '/service/proxy/service/alias/reset-password-newuser';
-                }
+
+                } 
 
                 $response = $api->request(
                     'POST',
