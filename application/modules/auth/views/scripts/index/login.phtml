@@ -178,6 +178,62 @@
     </div>
 </div>
 
+<div id="modalErrorOtherDevice" class="modal fade" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+    data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body pb-0">
+                <div class="d-flex flex-column align-items-center py-4 gap-4">
+                    <img src="<?= $this->baseUrl('assets/img/img-account-nonaktif.svg'); ?>"
+                        alt="image account inactive" style="max-width: 200px;" />
+                    <div class="d-flex flex-column align-items-center gap-2">
+                        <h3 class="text-neutral-100 fs-5 fw-bold mb-0 text-center">
+                            Akun Masuk di Perangkat Lain
+                        </h3>
+                        <p class="text-neutral-70 text-sm text-center px-2">
+                            Akun telah digunakan diperangkat yang berbeda, silakan masuk kembali
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer border-0 pt-0 pb-4 px-4">
+                <button type="button" class="btn btn-primary w-100 py-2 rounded-3" data-bs-dismiss="modal">
+                    Oke
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modalErrorExpired" class="modal fade" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+    data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body pb-0">
+                <div class="d-flex flex-column align-items-center py-4 gap-4">
+                    <img src="<?= $this->baseUrl('assets/img/img-expired-session.svg'); ?>"
+                        alt="image account inactive" style="max-width: 200px;" />
+                    <div class="d-flex flex-column align-items-center gap-2">
+                        <h3 class="text-neutral-100 fs-5 fw-bold mb-0 text-center">
+                            Sesi Masuk Berakhir
+                        </h3>
+                        <p class="text-neutral-70 text-sm text-center px-2">
+                            Akun otomatis keluar karena tidak ada aktivitas yang cukup lama, silakan masuk kembali
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer border-0 pt-0 pb-4 px-4">
+                <button type="button" class="btn btn-primary w-100 py-2 rounded-3" data-bs-dismiss="modal">
+                    Oke
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <p class="auth-tos"></p>
 
 <script type="text/javascript">
@@ -210,6 +266,14 @@
 
         <?php if ($this->errorInactive) : ?>
             $('#modalErrorInactive').modal('show');
+        <?php endif; ?>
+
+        <?php if ($this->errorOtherDevice) : ?>
+            $('#modalErrorOtherDevice').modal('show');
+        <?php endif; ?>
+
+        <?php if ($this->errorExpired) : ?>
+            $('#modalErrorExpired').modal('show');
         <?php endif; ?>
     });
 </script>

@@ -18,16 +18,13 @@ abstract class App_Controller_Base extends Zend_Controller_Action
 
     public function init()
     {
-        // 1. Inisialisasi Logger Bawaan Anda
         $this->logger = Zend_Registry::get('logger');
 
-        // 2. Cegah Infinite Redirect jika Controller yang Mengakses adalah 'auth'
         $controllerName = strtolower($this->getRequest()->getControllerName());
         if ($controllerName === 'auth') {
             return;
         }
 
-        // 3. Ambil Session User & Token
         $user = $this->currentUser();
         $sessionToken = $user['session_token'] ?? null;
 
@@ -36,7 +33,6 @@ abstract class App_Controller_Base extends Zend_Controller_Action
             return;
         }
 
-        // 4. Validasi Session Token Real-Time ke Backend Database (Berlaku untuk Navigasi & AJAX)
         try {
             $api = new App_Service_Api();
             $api->authorization();
@@ -53,38 +49,54 @@ abstract class App_Controller_Base extends Zend_Controller_Action
 
             $rawMsgLower = strtolower($rawMsg);
 
-            // 🎯 Deteksi jika token ditolak/dinonaktifkan/diblokir/expired oleh backend
             if (
+                strpos($rawMsgLower, 'login ditempat lain') !== false ||
+                strpos($rawMsgLower, 'ditempat lain') !== false ||
+                strpos($rawMsgLower, 'perangkat lain') !== false
+            ) {                
+                $this->handleInvalidSession('Akun telah digunakan diperangkat yang berbeda.', 'other_device');
+
+                return;
+            } elseif (
                 strpos($rawMsgLower, 'invalid') !== false ||
                 strpos($rawMsgLower, 'expired') !== false ||
-                strpos($rawMsgLower, 'session') !== false ||
+                strpos($rawMsgLower, 'session') !== false
+            ) {
+                
+                $this->handleInvalidSession('Sesi Anda telah berakhir, silakan login kembali.', 'expired');
+                
+                return;
+            } elseif (
                 strpos($rawMsgLower, 'nonaktifkan') !== false ||
                 strpos($rawMsgLower, 'block') !== false
             ) {
-                $this->handleInvalidSession('Akun Anda telah dinonaktifkan atau sesi telah berakhir.');
+
+                $this->handleInvalidSession('Akun Anda telah dinonaktifkan.', 'inactive');
+                
                 return;
             }
         } catch (Exception $e) {
-            $this->handleInvalidSession('Terjadi kesalahan otentikasi sesi.');
+            $this->handleInvalidSession('Terjadi kesalahan otentikasi sesi.', 'inactive');
             return;
         }
     }
 
-    /**
-     * 🎯 Helper untuk Menangani Logout Otomatis (Mendukung Navigasi Normal & Request AJAX)
-     */
-    protected function handleInvalidSession(string $message = '')
+    protected function handleInvalidSession(string $message = '', string $type = 'inactive')
     {
-        // 1. Simpan penanda ke Session Namespace 'login_notice'
         $notice = new Zend_Session_Namespace('login_notice');
-        $notice->errorInactive = true;
 
-        // 2. Hapus data autentikasi user SAJA (JANGAN destroy seluruh sesi PHP)
+        if ($type === 'other_device') {
+            $notice->errorOtherDevice = true;
+        } elseif ($type === 'expired') {
+            $notice->errorExpired = true;
+        } else {
+            $notice->errorInactive = true;
+        }
+
         App_Service_Session::set('user', null);
         App_Service_Session::set('acl_config', null);
         App_Service_Session::set('menus', null);
 
-        // 3. Jika Request berupa AJAX, kirim JSON HTTP 401 agar frontend bisa redirect
         if ($this->getRequest()->isXmlHttpRequest()) {
             $this->_helper->layout->disableLayout();
             $this->_helper->viewRenderer->setNoRender(true);
@@ -101,7 +113,6 @@ abstract class App_Controller_Base extends Zend_Controller_Action
             exit;
         }
 
-        // 4. Jika Request Normal (Navigasi Halaman), lakukan Redirect
         $this->_helper->redirector->gotoSimple('login', 'index', 'auth');
         exit;
     }

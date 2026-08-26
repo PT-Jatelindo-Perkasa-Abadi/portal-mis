@@ -16,13 +16,20 @@ class Auth_IndexController extends Zend_Controller_Action
         $this->view->headTitle('Login');
 
         $notice = new Zend_Session_Namespace('login_notice');
+
         if (isset($notice->errorInactive) && $notice->errorInactive === true) {
             $this->view->errorInactive = true;
-            unset($notice->errorInactive); // Hapus flag setelah dibaca
+            unset($notice->errorInactive);
+        }
+
+        if (isset($notice->errorOtherDevice) && $notice->errorOtherDevice === true) {
+            $this->view->errorOtherDevice = true;
+            unset($notice->errorOtherDevice);
         }
 
         if (App_Service_Session::getExpiredFlag()) {
-            $this->view->errorMessage = 'Session expired, silakan login kembali';
+            $this->view->errorMessage  = 'Session expired, silakan login kembali';
+            $this->view->errorExpired = true;
         }
 
         if (!$this->_request->isPost()) {
@@ -159,7 +166,9 @@ class Auth_IndexController extends Zend_Controller_Action
                 App_Service_Session::destroy();
                 $aclErrorLower = strtolower($aclError);
 
-                if (strpos($aclErrorLower, 'block') !== false || strpos($aclErrorLower, 'blokir') !== false) {
+                if (strpos($aclErrorLower, 'ditempat lain') !== false || strpos($aclErrorLower, 'perangkat lain') !== false) {
+                    $this->view->errorOtherDevice = true;
+                } elseif (strpos($aclErrorLower, 'block') !== false || strpos($aclErrorLower, 'blokir') !== false) {
                     $this->view->errorBlocked = true;
                 } else {
                     $this->view->errorInactive = true;
@@ -405,8 +414,7 @@ class Auth_IndexController extends Zend_Controller_Action
 
                 if (!empty($session->isNewUser) || !empty($session->isUser)) {
                     $url = '/service/proxy/service/alias/reset-password-newuser';
-
-                } 
+                }
 
                 $response = $api->request(
                     'POST',
