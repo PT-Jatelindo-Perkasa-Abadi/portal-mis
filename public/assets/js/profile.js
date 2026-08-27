@@ -23,7 +23,24 @@ $(document).ready(function() {
     }
 
     app.FormValidation.init("#change-password-form");
-    app.ValidatePassword.init('.password-validate');
+
+    $('#change-password-form').on('submit', function(e) {
+        e.preventDefault();
+    });
+
+    $('.password-validate').on('keyup', function(e) {
+        if (/\s/.test(e.key)) {
+            e.preventDefault();
+        }
+
+        if ($('.term-password-err').is(':visible')) {
+            $(".term-password-err").hide();
+        }
+    });
+
+    $('.empty-validate').on('input', function() {
+        this.value = this.value.replace(/\s/g, '');
+    });
 
     $("#ChngPass").on('click', function() {
         let form            = $(this).closest("form")[0];
@@ -65,20 +82,14 @@ $(document).ready(function() {
             url: '/profile/index/changepass',
             type: 'POST',
             data: {
-                sess: $('#sess').val(),
-                email: $('#email').val(),
                 currentPassword: $('#currentPassword').val(),
-                newPassword: $('#newPassword').val(),
-                ip: $('#ip').val(),
-                useragent: $('#useragent').val()
+                newPassword: $('#newPassword').val()
             },
-            beforeSend:function(){
+            beforeSend: function() {
                 showLoading();
             },
-            success:function(res){
-                let data = JSON.parse(
-                    $($.parseHTML(res)).find('.content').text().trim()
-                );
+            success: function(res) {
+                let data = res.data;
 
                 if (data.msg?.[0]?.ERROR) {
                     $('#modalChangePassword').hide();
@@ -95,19 +106,23 @@ $(document).ready(function() {
                     return;
                 }
             },
-            complete:function(){
+            complete: function() {
                 hideLoading();
             }
         });
     });
 
-    $('#btnModalErrorok').on('click', function () {
+    $('#btnModalErrorok').on('click', function() {
         location.reload();
     });
 
-    $('#btnModalSuccessok').on('click', function () {
+    $('#btnModalSuccessok').on('click', function() {
         window.location.href = '/auth/logout';
     });
 
-
+    $('#modalChangePassword').on('hidden.bs.modal', function() {
+        $('#change-password-form').trigger('reset');
+        $('.term-password').css('display', 'none');
+        $('.empty-validate').removeClass('error');
+    });
 });
