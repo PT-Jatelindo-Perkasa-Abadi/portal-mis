@@ -146,8 +146,8 @@
                             <label for="currentPassword" class="form-label">Kata Sandi Saat Ini <span
                                     class="merahSandi">*</span></label>
                             <div class="input-append append-right">
-                                <input id="currentPassword" name="currentPassword" class="form-control" type="password"
-                                    minlength="8" placeholder="Enter current password" required />
+                                <input id="currentPassword" name="currentPassword" class="form-control empty-validate"
+                                    type="password" minlength="8" placeholder="Enter current password" required />
                                 <div class="append-icon icon-password" data-toggle="password"></div>
                             </div>
                         </div>
@@ -155,8 +155,9 @@
                             <label for="newPassword" class="form-label">Kata Sandi Baru <span
                                     class="merahSandi">*</span></label>
                             <div class="input-append append-right">
-                                <input id="newPassword" name="newPassword" class="form-control password-validate"
-                                    type="password" minlength="8" placeholder="Enter new password" required />
+                                <input id="newPassword" name="newPassword"
+                                    class="form-control password-validate empty-validate" type="password" minlength="8"
+                                    placeholder="Enter new password" required />
                                 <div class="append-icon icon-password" data-toggle="password"></div>
                             </div>
                             <div class="term-password mt-2" style="display: none;">
@@ -186,7 +187,7 @@
                                     class="merahSandi">*</span></label>
                             <div class="input-append append-right">
                                 <input id="confirmPassword" name="confirmPassword"
-                                    class="form-control password-validate" type="password" minlength="8"
+                                    class="form-control password-validate empty-validate" type="password" minlength="8"
                                     placeholder="Enter new password" required />
                                 <div class="append-icon icon-password" data-toggle="password"></div>
                             </div>
@@ -197,7 +198,7 @@
                                 </div>
                                 <div class="d-flex align-items-center gap-2" data-rule="upper">
                                     <span class="ic icon-checklist"></span>
-                                    <span class="term-item">Must include uppercase letters (A-Z)</span>
+                                    <span class="term-item">Harus menyertakan huruf besar dan huruf kecil.</span>
                                 </div>
                                 <div class="d-flex align-items-center gap-2" data-rule="special">
                                     <span class="ic icon-checklist"></span>
@@ -214,15 +215,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <input id="sess" name="sess" class="form-control password-validate" type="hidden"
-                        value="<?= $this->user['session_token']; ?>" />
-                    <input id="email" name="email" class="form-control password-validate" type="hidden"
-                        value="<?= $this->user['email']; ?>" />
-                    <input id="ip" name="ip" class="form-control password-validate" type="hidden"
-                        value="<?= App_Log_Context::getIp(); ?>" />
-                    <input id="useragent" name="useragent" class="form-control password-validate" type="hidden"
-                        value="<?= App_Log_Context::getUserAgent(); ?>" />
-                    <button type="button" class="btn btn-primary w-100" id="ChngPass">
+                    <button type="submit" class="btn btn-primary w-100" id="ChngPass">
                         Perbarui Kata Sandi
                     </button>
                 </div>

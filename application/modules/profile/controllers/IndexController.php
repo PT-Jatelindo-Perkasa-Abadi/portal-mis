@@ -31,24 +31,25 @@ class Profile_IndexController extends App_Controller_Base
         $this->_helper->viewRenderer->setNoRender(true);
         $this->getResponse()->setHeader('Content-Type', 'application/json');
 
+        $userData = App_Service_Session::get('user');
         $data = $this->_request->getPost();
 
         if ($data) {
             try {
                 $payloadcp = [
-                    $data['sess'] ?? '',
-                    $data['email'] ?? '',
+                    $userData['session_token'] ?? '',
+                    $userData['email'] ?? '',
                     hash('sha256', $data['currentPassword'] ?? ''),
                     hash('sha256', $data['newPassword'] ?? ''),
-                    $data['ip'] ?? '',
-                    $data['useragent'] ?? ''
+                    App_Log_Context::getIp() ?? '',
+                    App_Log_Context::getUserAgent() ?? ''
                 ];
 
                 $api = new App_Service_Api();
                 $_ = $api->authorization();
                 $cp = $api->request('POST', '/service/proxy/service/alias/change-password', $payloadcp);
 
-                echo json_encode($cp);
+                return $this->jsonSuccess($cp);
             } catch (Exception $e) {
                 echo json_encode([
                     'code' => 500,
