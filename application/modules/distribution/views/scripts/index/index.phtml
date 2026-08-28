@@ -80,7 +80,6 @@ $isApiError = isset($this->isError) && $this->isError === true;
 ?>
 
 <link rel="stylesheet" href="<?= $this->baseUrl('assets/css/distribution.css'); ?>">
-
 <?php if ($isApiError): ?>
     <div class="toast-error-banner">
         <span>Gagal memuat data, silakan muat ulang halaman</span>
@@ -156,7 +155,7 @@ $isApiError = isset($this->isError) && $this->isError === true;
     </div>
 
     <!-- WRAPPER CARD UTAMA -->
-    <div class="card bg-white border-0 shadow-sm mb-4" style="border-radius: 12px; outline: 1px #E7E8E8 solid; outline-offset: -1px;">
+    <div class="card bg-white border-0 shadow-sm mb-4 overflow-hidden" style="border-radius: 12px; outline: 1px #E7E8E8 solid; outline-offset: -1px;">
         <div class="card-body p-4 d-flex flex-column gap-4">
 
             <!-- FORM FILTERS -->
@@ -407,128 +406,128 @@ $isApiError = isset($this->isError) && $this->isError === true;
                 </div>
             </div>
 
-            <!-- DATA TABLE -->
-            <div class="table-responsive w-100 rounded-3">
-                <table class="table align-middle mb-0 w-100" style="border-collapse: collapse;">
-                    <thead>
-                        <tr style="background: #FAFAFA; border-top: 1px #E7E8E8 solid; border-bottom: 1px #E7E8E8 solid; height: 56px;">
-                            <th class="ps-4 text-center fw-bold" style="color: #595C60; font-size: 14px; width: 60px;">No</th>
+        </div>
 
-                            <th class="fw-bold text-start" style="color: #595C60; font-size: 14px; min-width: 160px;">
-                                <?= ($this->activeTab === 'sub-mitra-acquirer') ? 'Nama Sub Mitra Acquirer' : 'Kode Mitra Acquirer'; ?>
-                            </th>
+        <div class="table-responsive w-100">
+            <table class="table align-middle mb-0 w-100 table-distribution">
+                <thead>
+                    <tr style="background: #FAFAFA; border-top: 1px #E7E8E8 solid; border-bottom: 1px #E7E8E8 solid; height: 56px;">
+                        <th class="ps-4 text-center fw-bold" style="color: #595C60; font-size: 14px; width: 60px;">No</th>
 
+                        <th class="fw-bold text-start" style="color: #595C60; font-size: 14px; min-width: 160px;">
+                            <?= ($this->activeTab === 'sub-mitra-acquirer') ? 'Nama Sub Mitra Acquirer' : 'Kode Mitra Acquirer'; ?>
+                        </th>
+
+                        <?php if ($this->currentUser['level'] != 'IT Provider' && $this->currentUser['level'] != 'Mitra Acquirer'): ?>
+                            <th class="fw-bold text-start" style="color: #595C60; font-size: 14px; min-width: 200px;">Nama Mitra Acquirer</th>
+                        <?php endif; ?>
+
+                        <th class="fw-bold text-start" style="color: #595C60; font-size: 14px; width: 130px;">Layanan</th>
+                        <th class="fw-bold text-end" style="color: #595C60; font-size: 14px; width: 100px;">Lembar</th>
+                        <th class="fw-bold text-center" style="color: #595C60; font-size: 14px; width: 160px;">Tagihan (Rp)</th>
+                        <th class="fw-bold text-start px-3" style="color: #595C60; font-size: 14px; width: 220px;">Admin Mitra Acquirer (Rp)</th>
+                        <th class="fw-bold text-start pe-4" style="color: #595C60; font-size: 14px; width: 160px; white-space: nowrap;">Total (Rp)</th>
+                    </tr>
+                </thead>
+
+                <!-- SHIMMER TABLE BODY -->
+                <tbody id="shimmer-table-body">
+                    <?php for ($i = 0; $i < 7; $i++): ?>
+                        <tr style="height: 64px; border-bottom: 1px #E7E8E8 solid;">
+                            <td class="ps-4 text-center">
+                                <div class="shimmer-placeholder mx-auto" style="width: 24px; height: 16px;"></div>
+                            </td>
+                            <td>
+                                <div class="shimmer-placeholder" style="width: 120px; height: 16px;"></div>
+                            </td>
                             <?php if ($this->currentUser['level'] != 'IT Provider' && $this->currentUser['level'] != 'Mitra Acquirer'): ?>
-                                <th class="fw-bold text-start" style="color: #595C60; font-size: 14px; min-width: 200px;">Nama Mitra Acquirer</th>
-                            <?php endif; ?>
-
-                            <th class="fw-bold text-start" style="color: #595C60; font-size: 14px; width: 130px;">Layanan</th>
-                            <th class="fw-bold text-end" style="color: #595C60; font-size: 14px; width: 100px;">Lembar</th>
-                            <th class="fw-bold text-center" style="color: #595C60; font-size: 14px; width: 160px;">Tagihan (Rp)</th>
-                            <th class="fw-bold text-start" style="color: #595C60; font-size: 14px; min-width: 220px; white-space: nowrap;">Admin Mitra Acquirer (Rp)</th>
-                            <th class="fw-bold text-start pe-4" style="color: #595C60; font-size: 14px; width: 160px;">Total (Rp)</th>
-                        </tr>
-                    </thead>
-
-                    <!-- SHIMMER TABLE BODY -->
-                    <tbody id="shimmer-table-body">
-                        <?php for ($i = 0; $i < 7; $i++): ?>
-                            <tr style="height: 64px; border-bottom: 1px #E7E8E8 solid;">
-                                <td class="ps-4 text-center">
-                                    <div class="shimmer-placeholder mx-auto" style="width: 24px; height: 16px;"></div>
-                                </td>
                                 <td>
-                                    <div class="shimmer-placeholder" style="width: 120px; height: 16px;"></div>
+                                    <div class="shimmer-placeholder" style="width: 160px; height: 16px;"></div>
                                 </td>
-                                <?php if ($this->currentUser['level'] != 'IT Provider' && $this->currentUser['level'] != 'Mitra Acquirer'): ?>
-                                    <td>
-                                        <div class="shimmer-placeholder" style="width: 160px; height: 16px;"></div>
-                                    </td>
+                            <?php endif; ?>
+                            <td class="text-center">
+                                <div class="shimmer-placeholder mx-auto" style="width: 80px; height: 28px; border-radius: 12px;"></div>
+                            </td>
+                            <td class="text-center">
+                                <div class="shimmer-placeholder mx-auto" style="width: 40px; height: 16px;"></div>
+                            </td>
+                            <td class="text-end">
+                                <div class="shimmer-placeholder ms-auto" style="width: 90px; height: 16px;"></div>
+                            </td>
+                            <td class="text-end">
+                                <div class="shimmer-placeholder ms-auto" style="width: 90px; height: 16px;"></div>
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="shimmer-placeholder ms-auto" style="width: 100px; height: 16px;"></div>
+                            </td>
+                        </tr>
+                    <?php endfor; ?>
+                </tbody>
+
+                <!-- REAL DATA TABLE BODY -->
+                <tbody id="real-table-body" class="d-none">
+                    <?php if (!empty($this->listData)): $no = 1;
+                        foreach ($this->listData as $row): ?>
+                            <tr style="height: 64px; background: white; border-bottom: 1px #E7E8E8 solid;">
+                                <td class="ps-4 text-center" style="color: #12161C; font-size: 14px; font-weight: 400;"><?= $no++; ?></td>
+
+                                <td class="text-start" style="color: #12161C; font-size: 14px; font-weight: 400;"><?= isset($row['kode']) ? $row['kode'] : ''; ?></td>
+
+                                <?php if ($this->currentUser['level'] != 'IT Provider' && $this->currentUser['level'] != 'Mitra Acquirer') : ?>
+                                    <td class="text-start" style="color: #12161C; font-size: 14px; font-weight: 400;"><?= isset($row['nama']) ? $row['nama'] : ''; ?></td>
                                 <?php endif; ?>
+
                                 <td class="text-center">
-                                    <div class="shimmer-placeholder mx-auto" style="width: 80px; height: 28px; border-radius: 12px;"></div>
-                                </td>
-                                <td class="text-center">
-                                    <div class="shimmer-placeholder mx-auto" style="width: 40px; height: 16px;"></div>
-                                </td>
-                                <td class="text-end">
-                                    <div class="shimmer-placeholder ms-auto" style="width: 90px; height: 16px;"></div>
-                                </td>
-                                <td class="text-end">
-                                    <div class="shimmer-placeholder ms-auto" style="width: 90px; height: 16px;"></div>
-                                </td>
-                                <td class="text-end pe-4">
-                                    <div class="shimmer-placeholder ms-auto" style="width: 100px; height: 16px;"></div>
-                                </td>
-                            </tr>
-                        <?php endfor; ?>
-                    </tbody>
-
-                    <!-- REAL DATA TABLE BODY -->
-                    <tbody id="real-table-body" class="d-none">
-                        <?php if (!empty($this->listData)): $no = 1;
-                            foreach ($this->listData as $row): ?>
-                                <tr style="height: 64px; background: white; border-bottom: 1px #E7E8E8 solid;">
-                                    <td class="ps-4 text-center" style="color: #12161C; font-size: 14px; font-weight: 400;"><?= $no++; ?></td>
-
-                                    <td class="text-start" style="color: #12161C; font-size: 14px; font-weight: 400;"><?= isset($row['kode']) ? $row['kode'] : ''; ?></td>
-
-                                    <?php if ($this->currentUser['level'] != 'IT Provider' && $this->currentUser['level'] != 'Mitra Acquirer') : ?>
-                                        <td class="text-start" style="color: #12161C; font-size: 14px; font-weight: 400;"><?= isset($row['nama']) ? $row['nama'] : ''; ?></td>
-                                    <?php endif; ?>
-
-                                    <td class="text-center">
-                                        <?php
-                                        $layananRaw = isset($row['layanan']) ? trim($row['layanan']) : '';
-                                        if (in_array(strtolower($layananRaw), ['nontaglist', 'non-taglist'])) {
-                                            $layananNama = 'Non-Taglist';
-                                        } else {
-                                            $layananNama = ucfirst(strtolower($layananRaw));
-                                        }
-                                        ?>
-                                        <div class="mx-auto d-flex align-items-center justify-content-center"
-                                            style="min-width: 88px; padding: 4px 12px; height: 32px; background: white; border: 1px #E7E8E8 solid; border-radius: 10px;">
-                                            <span class="fw-semibold" style="color: #595C60; font-size: 13px;"><?= $layananNama; ?></span>
-                                        </div>
-                                    </td>
-
-                                    <td class="text-center" style="color: #12161C; font-size: 14px; font-weight: 400;">
-                                        <?= isset($row['lembar']) ? $row['lembar'] : (isset($row['jumlah']) ? $row['jumlah'] : 0); ?>
-                                    </td>
-
-                                    <td class="text-center" style="color: #12161C; font-size: 14px; font-weight: 400;">
-                                        <?= isset($row['tagihan']) ? number_format((float)str_replace('.', '', $row['tagihan']), 0, ',', '.') : '0'; ?>
-                                    </td>
-
-                                    <td class="text-start" style="color: #12161C; font-size: 14px; font-weight: 400;">
-                                        <?= isset($row['admin']) ? number_format((float)str_replace('.', '', $row['admin']), 0, ',', '.') : '0'; ?>
-                                    </td>
-
-                                    <td class="text-start pe-4" style="color: #12161C; font-size: 14px; font-weight: 400;">
-                                        <?= isset($row['total']) ? number_format((float)str_replace('.', '', $row['total']), 0, ',', '.') : '0'; ?>
-                                    </td>
-                                </tr>
-                            <?php endforeach;
-                        else: ?>
-                            <tr>
-                                <td colspan="<?= ($this->currentUser['level'] != 'IT Provider' && $this->currentUser['level'] != 'Mitra Acquirer') ? 8 : 7; ?>" class="text-center py-5">
-                                    <div class="d-flex flex-column align-items-center justify-content-center py-4">
-                                        <img src="<?= $this->baseUrl('assets/img/img-data-empty.svg'); ?>" alt="Data Kosong" style="width: 280px; height: auto; object-fit: contain;" class="mb-3">
-                                        <h5 class="fw-bold mb-1" style="color: #12161C; font-size: 16px;">
-                                            Data Transaksi Masih Kosong
-                                        </h5>
-                                        <p class="m-0" style="color: #595C60; font-size: 14px; font-weight: 400;">
-                                            Saat ini data rangkuman distribusi belum tersedia
-                                        </p>
+                                    <?php
+                                    $layananRaw = isset($row['layanan']) ? trim($row['layanan']) : '';
+                                    if (in_array(strtolower($layananRaw), ['nontaglist', 'non-taglist'])) {
+                                        $layananNama = 'Non-Taglist';
+                                    } else {
+                                        $layananNama = ucfirst(strtolower($layananRaw));
+                                    }
+                                    ?>
+                                    <div class="mx-auto d-flex align-items-center justify-content-center"
+                                        style="min-width: 88px; padding: 4px 12px; height: 32px; background: white; border: 1px #E7E8E8 solid; border-radius: 10px;">
+                                        <span class="fw-semibold" style="color: #595C60; font-size: 13px;"><?= $layananNama; ?></span>
                                     </div>
                                 </td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
 
+                                <td class="text-center" style="color: #12161C; font-size: 14px; font-weight: 400;">
+                                    <?= isset($row['lembar']) ? $row['lembar'] : (isset($row['jumlah']) ? $row['jumlah'] : 0); ?>
+                                </td>
+
+                                <td class="text-center" style="color: #12161C; font-size: 14px; font-weight: 400;">
+                                    <?= isset($row['tagihan']) ? number_format((float)str_replace('.', '', $row['tagihan']), 0, ',', '.') : '0'; ?>
+                                </td>
+
+                                <td class="text-start" style="color: #12161C; font-size: 14px; font-weight: 400;">
+                                    <?= isset($row['admin']) ? number_format((float)str_replace('.', '', $row['admin']), 0, ',', '.') : '0'; ?>
+                                </td>
+
+                                <td class="text-start pe-4" style="color: #12161C; font-size: 14px; font-weight: 400;">
+                                    <?= isset($row['total']) ? number_format((float)str_replace('.', '', $row['total']), 0, ',', '.') : '0'; ?>
+                                </td>
+                            </tr>
+                        <?php endforeach;
+                    else: ?>
+                        <tr>
+                            <td colspan="<?= ($this->currentUser['level'] != 'IT Provider' && $this->currentUser['level'] != 'Mitra Acquirer') ? 8 : 7; ?>" class="text-center py-5">
+                                <div class="d-flex flex-column align-items-center justify-content-center py-4">
+                                    <img src="<?= $this->baseUrl('assets/img/img-data-empty.svg'); ?>" alt="Data Kosong" style="width: 280px; height: auto; object-fit: contain;" class="mb-3">
+                                    <h5 class="fw-bold mb-1" style="color: #12161C; font-size: 16px;">
+                                        Data Transaksi Masih Kosong
+                                    </h5>
+                                    <p class="m-0" style="color: #595C60; font-size: 14px; font-weight: 400;">
+                                        Saat ini data rangkuman distribusi belum tersedia
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
         </div>
+
     </div>
 </div>
 
