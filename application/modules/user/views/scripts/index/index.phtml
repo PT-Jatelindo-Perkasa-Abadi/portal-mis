@@ -48,7 +48,6 @@ $baseUrl = $this->baseUrl('/');
         </div>
     </div>
 
-    <!-- <div class="card card-dashboard rounded-4 overflow-hidden"> -->
     <div class="card card-dashboard border-0 mb-5 bg-white shadow-sm" style="border-radius: 12px; outline: 1px #E7E8E8 solid; outline-offset: -1px; overflow: hidden;">
 
         <div class="d-flex justify-content-between align-items-center px-4 py-3 bg-white"
@@ -373,14 +372,14 @@ $baseUrl = $this->baseUrl('/');
                                 </div>
                             </th>
 
-                            <th class="py-3 px-3 sortable-header" data-sort="fullName" style="width: 17%; cursor: pointer;">
+                            <th class="py-3 px-3 sortable-header" data-sort="fullName" style="width: 15.5%; cursor: pointer;">
                                 <div class="d-flex align-items-center justify-content-between pe-2">
                                     <span>Nama</span>
                                     <?= renderSortIcon('fullName', $currentSort, $currentDir, $baseUrl); ?>
                                 </div>
                             </th>
 
-                            <th class="py-3 px-3 sortable-header" data-sort="email" style="width: 24%; cursor: pointer;">
+                            <th class="py-3 px-3 sortable-header" data-sort="email" style="width: 21%; cursor: pointer;">
                                 <div class="d-flex align-items-center justify-content-between pe-2">
                                     <span>Email</span>
                                     <?= renderSortIcon('email', $currentSort, $currentDir, $baseUrl); ?>
@@ -408,7 +407,7 @@ $baseUrl = $this->baseUrl('/');
                                 </div>
                             </th>
 
-                            <th class="py-3 pe-4 sortable-header" data-sort="action" style="width: 17%; cursor: pointer;">
+                            <th class="py-3 px-3 pe-4 sortable-header" data-sort="action" style="width: 12%; cursor: pointer;">
                                 <div class="d-flex align-items-center justify-content-between pe-2">
                                     <span>Action</span>
                                     <?= renderSortIcon('action', $currentSort, $currentDir, $baseUrl); ?>
@@ -442,11 +441,8 @@ $baseUrl = $this->baseUrl('/');
                                 <td class="py-3 px-3">
                                     <div class="shimmer-placeholder" style="width: 70px; height: 26px; border-radius: 8px;"></div>
                                 </td>
-                                <td class="py-3 pe-4">
-                                    <div class="d-flex gap-2">
-                                        <div class="shimmer-placeholder" style="width: 68px; height: 36px; border-radius: 8px;"></div>
-                                        <div class="shimmer-placeholder" style="width: 68px; height: 36px; border-radius: 8px;"></div>
-                                    </div>
+                                <td class="py-3 px-3 pe-4">
+                                    <div class="shimmer-placeholder" style="width: 68px; height: 36px; border-radius: 8px;"></div>
                                 </td>
                             </tr>
                         <?php endfor; ?>
@@ -471,7 +467,7 @@ $baseUrl = $this->baseUrl('/');
                                 }
                                 ?>
                                 <tr class="text-dark border-bottom" style="border-color: #E7E8E8 !important; font-size: 14px; background: #fff;">
-                                    <td class="py-3 text-center" style="color: #12161C; font-weight: 400;"><?= $no++; ?></td>
+                                    <td class="py-3 ps-4 text-center" style="color: #12161C; font-weight: 400;"><?= $no++; ?></td>
                                     <td class="py-3 px-3" style="color: #12161C; font-weight: 400;"><?= isset($user['id_user']) ? $user['id_user'] : '-'; ?></td>
                                     <td class="py-3 px-3 text-truncate" style="max-width: 160px; color: #12161C; font-weight: 400;"><?= $user['fullName'] ?? '-'; ?></td>
                                     <td class="py-3 px-3 text-truncate" style="max-width: 220px; color: #12161C; font-weight: 400;"><?= $user['email'] ?? '-'; ?></td>
@@ -494,16 +490,14 @@ $baseUrl = $this->baseUrl('/');
                                             <?= $statusText; ?>
                                         </div>
                                     </td>
-                                    <td class="py-3 pe-4">
-                                        <div class="d-flex gap-2">
-                                            <!-- Tombol Detail -->
-                                            <a href="<?= $this->baseUrl('user/index/detail/id/' . ($user['id_user'] ?? '')); ?>"
-                                                class="btn btn-sm btn-action-detail d-flex align-items-center justify-content-center gap-1 px-0"
-                                                style="height: 36px; width: 68px; font-size: 12px;">
-                                                <img src="<?= $this->baseUrl('assets/img/ic-detail.index.svg'); ?>" alt="Detail" style="width: 14px; height: 14px; object-fit: contain;">
-                                                Detail
-                                            </a>
-                                        </div>
+                                    <td class="py-3 px-3 pe-4">
+                                        <!-- Tombol Detail -->
+                                        <a href="<?= $this->baseUrl('user/index/detail/id/' . ($user['id_user'] ?? '')); ?>"
+                                            class="btn btn-sm btn-action-detail d-inline-flex align-items-center justify-content-center gap-1 px-0"
+                                            style="height: 36px; width: 68px; font-size: 12px;">
+                                            <img src="<?= $this->baseUrl('assets/img/ic-detail.index.svg'); ?>" alt="Detail" style="width: 14px; height: 14px; object-fit: contain;">
+                                            Detail
+                                        </a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
