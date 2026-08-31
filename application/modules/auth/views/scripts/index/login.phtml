@@ -79,7 +79,8 @@
                             Perbarui Kata Sandi
                         </h3>
                         <p class="text-neutral-70 text-sm text-center px-2">
-                            Password anda telah berhasil di reset, Silakan melakukan perubahan kata sandi dengan yang baru
+                            Password anda telah berhasil di reset, Silakan melakukan perubahan kata sandi dengan yang
+                            baru
                         </p>
                     </div>
                 </div>
@@ -143,7 +144,7 @@
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary flex-fill" data-bs-dismiss="modal">
-                    Oke
+                    Tutup
                 </button>
             </div>
         </div>
@@ -212,8 +213,8 @@
         <div class="modal-content">
             <div class="modal-body pb-0">
                 <div class="d-flex flex-column align-items-center py-4 gap-4">
-                    <img src="<?= $this->baseUrl('assets/img/img-expired-session.svg'); ?>"
-                        alt="image account inactive" style="max-width: 280px; width: 100%;" />
+                    <img src="<?= $this->baseUrl('assets/img/img-expired-session.svg'); ?>" alt="image account inactive"
+                        style="max-width: 280px; width: 100%;" />
                     <div class="d-flex flex-column align-items-center gap-2">
                         <h3 class="text-neutral-100 fs-5 fw-bold mb-0 text-center">
                             Sesi Masuk Berakhir
@@ -237,43 +238,43 @@
 <p class="auth-tos"></p>
 
 <script type="text/javascript">
-    $(document).ready(function() {
-        app.FormValidation.init("#login-form");
+$(document).ready(function() {
+    app.FormValidation.init("#login-form");
 
-        <?php if ($this->isNewUser) : ?>
-            $('#modalRedirect').modal('show');
-        <?php endif; ?>
+    <?php if ($this->isNewUser) : ?>
+    $('#modalRedirect').modal('show');
+    <?php endif; ?>
 
-        <?php if ($this->isUser) : ?>
-            $('#modalRedirectpassword').modal('show');
-        <?php endif; ?>
+    <?php if ($this->isUser) : ?>
+    $('#modalRedirectpassword').modal('show');
+    <?php endif; ?>
 
-        <?php if ($this->error) : ?>
-            app.FormValidation.feedback('#password', "<?= $this->error; ?>");
-        <?php endif; ?>
+    <?php if ($this->error) : ?>
+    app.FormValidation.feedback('#password', "<?= $this->error; ?>");
+    <?php endif; ?>
 
-        <?php if ($this->errorPassword) : ?>
-            app.FormValidation.feedback('#password', "<?= $this->errorPassword; ?>");
-        <?php endif; ?>
+    <?php if ($this->errorPassword) : ?>
+    app.FormValidation.feedback('#password', "<?= $this->errorPassword; ?>");
+    <?php endif; ?>
 
-        <?php if ($this->errorAccount) : ?>
-            $('#modalErrorAccount').modal('show');
-        <?php endif; ?>
+    <?php if ($this->errorAccount) : ?>
+    $('#modalErrorAccount').modal('show');
+    <?php endif; ?>
 
-        <?php if ($this->errorBlocked) : ?>
-            $('#modalErrorBlocked').modal('show');
-        <?php endif; ?>
+    <?php if ($this->errorBlocked) : ?>
+    $('#modalErrorBlocked').modal('show');
+    <?php endif; ?>
 
-        <?php if ($this->errorInactive) : ?>
-            $('#modalErrorInactive').modal('show');
-        <?php endif; ?>
+    <?php if ($this->errorInactive) : ?>
+    $('#modalErrorInactive').modal('show');
+    <?php endif; ?>
 
-        <?php if ($this->errorOtherDevice) : ?>
-            $('#modalErrorOtherDevice').modal('show');
-        <?php endif; ?>
+    <?php if ($this->errorOtherDevice) : ?>
+    $('#modalErrorOtherDevice').modal('show');
+    <?php endif; ?>
 
-        <?php if ($this->errorExpired) : ?>
-            $('#modalErrorExpired').modal('show');
-        <?php endif; ?>
-    });
+    <?php if ($this->errorExpired) : ?>
+    $('#modalErrorExpired').modal('show');
+    <?php endif; ?>
+});
 </script>
