@@ -241,43 +241,43 @@
 <p class="auth-tos"></p>
 
 <script type="text/javascript">
-$(document).ready(function() {
-    app.FormValidation.init("#login-form");
+    $(document).ready(function() {
+        app.FormValidation.init("#login-form");
 
-    <?php if ($this->isNewUser) : ?>
-    $('#modalRedirect').modal('show');
-    <?php endif; ?>
+        <?php if ($this->isNewUser) : ?>
+            $('#modalRedirect').modal('show');
+        <?php endif; ?>
 
-    <?php if ($this->isUser) : ?>
-    $('#modalRedirectpassword').modal('show');
-    <?php endif; ?>
+        <?php if ($this->isUser) : ?>
+            $('#modalRedirectpassword').modal('show');
+        <?php endif; ?>
 
-    <?php if ($this->error) : ?>
-    app.FormValidation.feedback('#password', "<?= $this->error; ?>");
-    <?php endif; ?>
+        <?php if ($this->error) : ?>
+            app.FormValidation.feedback('#password', "<?= $this->error; ?>");
+        <?php endif; ?>
 
-    <?php if ($this->errorPassword) : ?>
-    app.FormValidation.feedback('#password', "<?= $this->errorPassword; ?>");
-    <?php endif; ?>
+        <?php if ($this->errorPassword) : ?>
+            app.FormValidation.feedback('#password', "<?= $this->errorPassword; ?>");
+        <?php endif; ?>
 
-    <?php if ($this->errorAccount) : ?>
-    $('#modalErrorAccount').modal('show');
-    <?php endif; ?>
+        <?php if ($this->errorAccount) : ?>
+            $('#modalErrorAccount').modal('show');
+        <?php endif; ?>
 
-    <?php if ($this->errorBlocked) : ?>
-    $('#modalErrorBlocked').modal('show');
-    <?php endif; ?>
+        <?php if ($this->errorBlocked) : ?>
+            $('#modalErrorBlocked').modal('show');
+        <?php endif; ?>
 
-    <?php if ($this->errorInactive) : ?>
-    $('#modalErrorInactive').modal('show');
-    <?php endif; ?>
+        <?php if ($this->errorInactive) : ?>
+            $('#modalErrorInactive').modal('show');
+        <?php endif; ?>
 
-    <?php if ($this->errorOtherDevice) : ?>
-    $('#modalErrorOtherDevice').modal('show');
-    <?php endif; ?>
+        <?php if ($this->errorOtherDevice) : ?>
+            $('#modalErrorOtherDevice').modal('show');
+        <?php endif; ?>
 
-    <?php if ($this->errorExpired) : ?>
-    $('#modalErrorExpired').modal('show');
-    <?php endif; ?>
-});
+        <?php if ($this->errorExpired) : ?>
+            $('#modalErrorExpired').modal('show');
+        <?php endif; ?>
+    });
 </script>
