@@ -1,13 +1,11 @@
 <?php
 $user = (isset($this->userDetail) && is_array($this->userDetail)) ? $this->userDetail : [];
 
-// 🎯 PENGECEKAN STATUS USER (True jika user berstatus BLOKIR)
 $isBlockedUser = (isset($user['is_blocked']) && $user['is_blocked'] == 1) ||
     (isset($user['status']) && strtolower(trim($user['status'])) === 'blokir');
 
 $rawLevelName = isset($user['level_name']) ? trim($user['level_name']) : '';
 
-// 🎯 1. FORMAT ALIAS LEVEL USER (BE: "Admin MIS" -> FE: "ASP", BE: "IT Provider" -> FE: "Mitra Acquirer")
 $displayLevelName = '-';
 if (!empty($rawLevelName)) {
     $lvlClean = strtolower($rawLevelName);
@@ -177,7 +175,7 @@ if (!empty($tpCode) && !empty($listItp)) {
         <div class="modal-content border-0 rounded-4 shadow p-4 bg-white text-dark">
             <div class="modal-body text-center p-0">
                 <div class="mb-4">
-                    <img src="<?= $this->baseUrl('assets/img/img-create.svg'); ?>" alt="Konfirmasi Reset" style="width: 220px; height: auto;">
+                    <img src="<?= $this->baseUrl('assets/img/img-create.svg'); ?>" alt="Konfirmasi Reset" style="max-width: 280px; width: 100%;">
                 </div>
                 <h4 class="fw-bold text-dark mb-2" style="font-size: 20px;">Reset Kata Sandi?</h4>
                 <p class="text-secondary mb-4 px-2" style="font-size: 14px;">Kata sandi akun user akan direset</p>
@@ -204,7 +202,7 @@ if (!empty($tpCode) && !empty($listItp)) {
                 </div>
                 <div id="contentResponse" class="d-none w-100 text-center" style="transition: opacity 0.3s ease-in-out; opacity: 0;">
                     <div class="mb-4">
-                        <img id="statusImage" src="" alt="Status" style="width: 200px; height: auto;">
+                        <img id="statusImage" src="" alt="Status" style="max-width: 280px; width: 100%;">
                     </div>
                     <h4 id="statusTitle" class="fw-bold text-dark mb-2" style="font-size: 20px;"></h4>
                     <p id="statusMessage" class="text-secondary mb-4 px-3" style="font-size: 14px; line-height: 1.5;"></p>
