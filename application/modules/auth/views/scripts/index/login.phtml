@@ -12,10 +12,13 @@
     <div class="form-content">
         <div class="form-group">
             <label for="email" class="form-label">Email</label>
-            <input id="email" type="email" name="email" class="form-control" placeholder="Masukkan email"
-                value="<?= $this->escape($this->email); ?>" required />
+            <input id="email" type="text" name="email" class="form-control" placeholder="Masukkan email"
+                value="<?= $this->escape($this->email); ?>"
+                pattern="^[a-zA-Z0-9._%+-]+(?:\+[a-zA-Z0-9._%+-]+)+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                required />
             <div class="form-feedback"></div>
         </div>
+
         <div class="form-group">
             <div class="d-flex align-items-center justify-content-between">
                 <label for="password" class="form-label">Kata Sandi</label>
@@ -172,7 +175,7 @@
 
             <div class="modal-footer border-0 pt-0 pb-4 px-4">
                 <button type="button" class="btn btn-primary w-100 py-2 rounded-3" data-bs-dismiss="modal">
-                    Oke
+                    Tutup
                 </button>
             </div>
         </div>
@@ -200,7 +203,7 @@
 
             <div class="modal-footer border-0 pt-0 pb-4 px-4">
                 <button type="button" class="btn btn-primary w-100 py-2 rounded-3" data-bs-dismiss="modal">
-                    Oke
+                    Tutup
                 </button>
             </div>
         </div>
@@ -238,43 +241,43 @@
 <p class="auth-tos"></p>
 
 <script type="text/javascript">
-$(document).ready(function() {
-    app.FormValidation.init("#login-form");
+    $(document).ready(function() {
+        app.FormValidation.init("#login-form");
 
-    <?php if ($this->isNewUser) : ?>
-    $('#modalRedirect').modal('show');
-    <?php endif; ?>
+        <?php if ($this->isNewUser) : ?>
+            $('#modalRedirect').modal('show');
+        <?php endif; ?>
 
-    <?php if ($this->isUser) : ?>
-    $('#modalRedirectpassword').modal('show');
-    <?php endif; ?>
+        <?php if ($this->isUser) : ?>
+            $('#modalRedirectpassword').modal('show');
+        <?php endif; ?>
 
-    <?php if ($this->error) : ?>
-    app.FormValidation.feedback('#password', "<?= $this->error; ?>");
-    <?php endif; ?>
+        <?php if ($this->error) : ?>
+            app.FormValidation.feedback('#password', "<?= $this->error; ?>");
+        <?php endif; ?>
 
-    <?php if ($this->errorPassword) : ?>
-    app.FormValidation.feedback('#password', "<?= $this->errorPassword; ?>");
-    <?php endif; ?>
+        <?php if ($this->errorPassword) : ?>
+            app.FormValidation.feedback('#password', "<?= $this->errorPassword; ?>");
+        <?php endif; ?>
 
-    <?php if ($this->errorAccount) : ?>
-    $('#modalErrorAccount').modal('show');
-    <?php endif; ?>
+        <?php if ($this->errorAccount) : ?>
+            $('#modalErrorAccount').modal('show');
+        <?php endif; ?>
 
-    <?php if ($this->errorBlocked) : ?>
-    $('#modalErrorBlocked').modal('show');
-    <?php endif; ?>
+        <?php if ($this->errorBlocked) : ?>
+            $('#modalErrorBlocked').modal('show');
+        <?php endif; ?>
 
-    <?php if ($this->errorInactive) : ?>
-    $('#modalErrorInactive').modal('show');
-    <?php endif; ?>
+        <?php if ($this->errorInactive) : ?>
+            $('#modalErrorInactive').modal('show');
+        <?php endif; ?>
 
-    <?php if ($this->errorOtherDevice) : ?>
-    $('#modalErrorOtherDevice').modal('show');
-    <?php endif; ?>
+        <?php if ($this->errorOtherDevice) : ?>
+            $('#modalErrorOtherDevice').modal('show');
+        <?php endif; ?>
 
-    <?php if ($this->errorExpired) : ?>
-    $('#modalErrorExpired').modal('show');
-    <?php endif; ?>
-});
+        <?php if ($this->errorExpired) : ?>
+            $('#modalErrorExpired').modal('show');
+        <?php endif; ?>
+    });
 </script>
